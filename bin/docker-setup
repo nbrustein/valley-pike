@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker compose build
+
+bundler_version="$(awk '/^BUNDLED WITH$/{getline; gsub(/^[[:space:]]+/, "", $0); print; exit}' Gemfile.lock)"
+if [ -n "$bundler_version" ]; then
+  docker compose run --rm web bundle "_${bundler_version}_" install
+else
+  docker compose run --rm web bundle install
+fi
+docker compose run --rm web bin/rails db:prepare
