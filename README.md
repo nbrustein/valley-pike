@@ -1,24 +1,38 @@
-# README
+# Valley Pike
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Docker dev setup
 
-Things you may want to cover:
+This repo is set up to run Rails in a container with Postgres. Each checkout
+gets its own database container + volume (based on the directory name), so
+separate copies of the repo do not interfere with each other.
 
-* Ruby version
+### One-time setup
 
-* System dependencies
+```bash
+bin/docker-setup
+```
 
-* Configuration
+### Run the app
 
-* Database creation
+```bash
+docker compose up
+```
 
-* Database initialization
+Visit http://localhost:3000
 
-* How to run the test suite
+### Run tests
 
-* Services (job queues, cache servers, search engines, etc.)
+```bash
+docker compose run --rm web bin/rails test
+```
 
-* Deployment instructions
+## Creating an isolated copy for another branch
 
-* ...
+Use a git worktree (fast and keeps one git history) and bootstrap a fresh DB:
+
+```bash
+bin/new-workdir <branch-name>
+```
+
+That creates a new directory and runs `bin/docker-setup` inside it. Each
+worktree has its own Postgres volume, so dev/test DBs are isolated by folder.
