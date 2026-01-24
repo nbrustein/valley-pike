@@ -1,0 +1,12 @@
+model = "gpt-5.2-codex"
+model_reasoning_effort = "medium"
+[features]
+rmcp_client = true
+
+[mcp_servers.trello]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-trello"]
+env = { TRELLO_API_KEY = "YOUR_TRELLO_API_KEY", TRELLO_TOKEN = "YOUR_TRELLO_TOKEN" }
+
+[notice]
+hide_rate_limit_model_nudge = true
