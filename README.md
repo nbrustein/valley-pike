@@ -23,7 +23,14 @@ Visit http://localhost:3000
 ### Run tests
 
 ```bash
-docker compose run --rm web bin/rails test
+bin/test
+bin/test path/to/file_spec.rb
+bin/test path/to/file_spec.rb:123
+bin/test --name "example name"
+bin/test "example name"
+
+# direct docker invocation
+docker compose run --rm web bundle exec rspec
 ```
 
 ## Creating an isolated copy for another branch

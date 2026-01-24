@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  bin/test
+  bin/test path/to/file_spec.rb
+  bin/test path/to/file_spec.rb:123
+  bin/test --name "example name"
+  bin/test "example name"
+USAGE
+}
+
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+if [ $# -eq 0 ]; then
+  exec docker compose run --rm web bundle exec rspec
+fi
+
+if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
+  shift
+  if [ $# -eq 0 ]; then
+    usage
+    exit 1
+  fi
+  exec docker compose run --rm web bundle exec rspec --example "$*"
+fi
+
+first="$1"
+file_part="${first%%:*}"
+
+if [ -f "$first" ] || { [ -f "$file_part" ] && [[ "$first" == *:* ]]; }; then
+  exec docker compose run --rm web bundle exec rspec "$@"
+fi
+
+exec docker compose run --rm web bundle exec rspec --example "$*"
