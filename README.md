@@ -36,3 +36,17 @@ bin/new-workdir <branch-name>
 
 That creates a new directory and runs `bin/docker-setup` inside it. Each
 worktree has its own Postgres volume, so dev/test DBs are isolated by folder.
+
+To clean up a worktree and delete its data:
+
+1) Stop containers and remove the DB volume from inside the worktree:
+
+```bash
+docker compose down -v
+```
+
+2) Remove the worktree directory (run from the main repo):
+
+```bash
+git worktree remove <path-to-worktree>
+```
