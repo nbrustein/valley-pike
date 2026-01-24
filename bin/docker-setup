@@ -3,4 +3,5 @@ set -euo pipefail
 
 docker compose build
 
+docker compose run --rm web bundle install
 docker compose run --rm web bin/rails db:prepare

@@ -11,9 +11,17 @@ shift
 
 dir="${1:-../valley-pike-$branch}"
 
-git worktree add "$dir" "$branch"
+if git show-ref --verify --quiet "refs/heads/$branch"; then
+  git worktree add "$dir" "$branch"
+elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+  git worktree add -b "$branch" "$dir" "origin/$branch"
+else
+  git worktree add -b "$branch" "$dir"
+fi
 
 (
   cd "$dir"
   bin/docker-setup
 )
+
+code "$dir"
