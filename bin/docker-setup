@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Install host gems for IDE tooling (e.g., RuboCop).
+bundle install
+
 docker compose build
 
 bundler_version="$(awk '/^BUNDLED WITH$/{getline; gsub(/^[[:space:]]+/, "", $0); print; exit}' Gemfile.lock)"
