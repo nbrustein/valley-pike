@@ -12,6 +12,12 @@ separate copies of the repo do not interfere with each other.
 bin/docker-setup
 ```
 
+You will need to run this script again if:
+
+ * gems are added or updated (you can run `bundle install` on the host and re-run)
+ * Docker build inputs change (`Dockerfile`, `Dockerfile.dev`, or `docker-compose.yml`)
+ * database setup changes (new migrations or reset/removed volumes)
+
 ### Run the app
 
 ```bash
@@ -57,3 +63,9 @@ docker compose down -v
 ```bash
 git worktree remove <path-to-worktree>
 ```
+
+## Editor setup (VS Code)
+
+The repo includes recommended VS Code extensions in `.vscode/extensions.json`.
+Rubocop is included to provide linting and formatting support for Ruby.
+Autocorrect on save is enabled via `.vscode/settings.json`.

@@ -1,0 +1,8 @@
+{
+  "editor.formatOnSave": true,
+  "[ruby]": {
+    "editor.defaultFormatter": "rubocop.vscode-rubocop"
+  },
+  "rubocop.autocorrect": true,
+  "rubocop.autocorrectOnSave": true
+}
