@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bundler_version="$(awk '/^BUNDLED WITH$/{getline; gsub(/^[[:space:]]+/, "", $0); print; exit}' Gemfile.lock)"
+if [ -n "$bundler_version" ]; then
+  if ! asdf exec gem list -i bundler -v "$bundler_version" >/dev/null 2>&1; then
+    asdf exec gem install bundler -v "$bundler_version"
+  fi
+fi
+
+# Install host gems for IDE tooling (e.g., RuboCop).
+if [ -n "$bundler_version" ]; then
+  asdf exec bundle "_${bundler_version}_" install
+else
+  asdf exec bundle install
+fi
+
+docker compose build
+
+if [ -n "$bundler_version" ]; then
+  docker compose run --rm web bundle "_${bundler_version}_" install
+else
+  docker compose run --rm web bundle install
+fi
+docker compose run --rm web bin/rails db:prepare
