@@ -4,11 +4,11 @@ set -euo pipefail
 usage() {
   cat <<'USAGE'
 Usage:
-  bin/test
-  bin/test path/to/file_spec.rb
-  bin/test path/to/file_spec.rb:123
-  bin/test --name "example name"
-  bin/test "example name"
+  host-bin/test
+  host-bin/test path/to/file_spec.rb
+  host-bin/test path/to/file_spec.rb:123
+  host-bin/test --name "example name"
+  host-bin/test "example name"
 USAGE
 }
 

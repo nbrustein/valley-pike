@@ -6,10 +6,17 @@ This repo is set up to run Rails in a container with Postgres. Each checkout
 gets its own database container + volume (based on the directory name), so
 separate copies of the repo do not interfere with each other.
 
+### Scripts
+
+`host-bin/` contains scripts intended to run on the host
+(wrapping `docker compose`, git worktrees, etc.). `bin/` contains scripts that
+are meant to run inside the container.
+
+
 ### One-time setup
 
 ```bash
-bin/docker-setup
+host-bin/setup
 ```
 
 You will need to run this script again if:
@@ -29,11 +36,11 @@ Visit http://localhost:3000
 ### Run tests
 
 ```bash
-bin/test
-bin/test path/to/file_spec.rb
-bin/test path/to/file_spec.rb:123
-bin/test --name "example name"
-bin/test "example name"
+host-bin/test
+host-bin/test path/to/file_spec.rb
+host-bin/test path/to/file_spec.rb:123
+host-bin/test --name "example name"
+host-bin/test "example name"
 
 # direct docker invocation
 docker compose run --rm web bundle exec rspec
@@ -44,10 +51,10 @@ docker compose run --rm web bundle exec rspec
 Use a git worktree (fast and keeps one git history) and bootstrap a fresh DB:
 
 ```bash
-bin/new-workdir <branch-name>
+host-bin/new-workdir <branch-name>
 ```
 
-That creates a new directory and runs `bin/docker-setup` inside it. Each
+That creates a new directory and runs `host-bin/setup` inside it. Each
 worktree has its own Postgres volume, so dev/test DBs are isolated by folder.
 
 To clean up a worktree and delete its data:
