@@ -19,6 +19,8 @@ are meant to run inside the container.
 host-bin/setup
 ```
 
+That script will prompt you to manage ruby via asdf. If you choose to manage ruby a different way and you are using vscode, then you will need to override vscode settings so the rubocop extension can use the correct ruby.
+
 You will need to run this script again if:
 
  * gems are added or updated (you can run `bundle install` on the host and re-run)

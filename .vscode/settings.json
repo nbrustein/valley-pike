@@ -4,5 +4,13 @@
     "editor.defaultFormatter": "rubocop.vscode-rubocop"
   },
   "rubocop.autocorrect": true,
-  "rubocop.autocorrectOnSave": true
+  "rubocop.autocorrectOnSave": true,
+  "rubocop.commandPath": "${userHome}/.asdf/shims/rubocop",
+  "rubocop.bundleCommandPath": "${userHome}/.asdf/shims/bundle",
+  "ruby.rubyPath": "${userHome}/.asdf/shims/ruby",
+  "ruby.rubocop.executePath": "${userHome}/.asdf/shims",
+  "ruby.rubocop.useBundler": true,
+  "terminal.integrated.env.osx": {
+    "PATH": "${env:HOME}/.asdf/shims:${env:HOME}/.asdf/bin:${env:PATH}"
+  }
 }
