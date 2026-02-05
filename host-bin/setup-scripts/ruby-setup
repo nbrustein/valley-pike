@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ruby_version_file="$root_dir/.ruby-version"
+tool_versions_file="$root_dir/.tool-versions"
+
+cd "$root_dir"
+
+echo "== Host Ruby setup =="
+
+if [ ! -f "$ruby_version_file" ]; then
+  echo "Missing .ruby-version at $ruby_version_file"
+  exit 1
+fi
+
+required_version="$(tr -d ' \t\r\n' < "$ruby_version_file")"
+if [ -z "$required_version" ]; then
+  echo ".ruby-version is empty"
+  exit 1
+fi
+
+asdf_version="${required_version#ruby-}"
+
+if [ ! -f "$tool_versions_file" ]; then
+  printf "ruby %s\n" "$asdf_version" > "$tool_versions_file"
+fi
+
+echo "Ruby $required_version is required on the host for tooling (e.g., RuboCop)."
+printf "Install/activate Ruby %s via asdf? [y/N] " "$required_version" >&2
+read -r reply
+case "$reply" in
+  [yY]) ;;
+  *)
+    echo "Canceled."
+    exit 1
+    ;;
+esac
+
+ensure_brew() {
+  if command -v brew >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "Homebrew is required to install asdf."
+  printf "Install Homebrew now? [y/N] " >&2
+  read -r brew_reply
+  case "$brew_reply" in
+    [yY]) ;;
+    *)
+      echo "Canceled."
+      exit 1
+      ;;
+  esac
+
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew installation did not complete successfully."
+    exit 1
+  fi
+}
+
+load_asdf() {
+  if command -v asdf >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if command -v brew >/dev/null 2>&1; then
+    asdf_sh="$(brew --prefix asdf 2>/dev/null)/libexec/asdf.sh"
+    if [ -f "$asdf_sh" ]; then
+      # shellcheck source=/dev/null
+      . "$asdf_sh"
+    fi
+  fi
+
+  if command -v asdf >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if [ -f "$HOME/.asdf/asdf.sh" ]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.asdf/asdf.sh"
+  fi
+
+  command -v asdf >/dev/null 2>&1
+}
+
+if ! load_asdf; then
+  ensure_brew
+  brew install asdf
+  if ! load_asdf; then
+    echo "asdf is installed but not available in this shell."
+    echo "Add this to your shell profile and re-run this script:"
+    echo "  . \"$(brew --prefix asdf)/libexec/asdf.sh\""
+    exit 1
+  fi
+fi
+
+if ! asdf plugin list | tr -d ' \t' | grep -qx ruby; then
+  asdf plugin add ruby
+fi
+
+current_asdf_version="$(asdf current ruby 2>/dev/null | awk '{print $2}' | head -n 1 || true)"
+if [ "$current_asdf_version" = "$asdf_version" ]; then
+  echo "Ruby $required_version already active in asdf."
+fi
+
+install_failed=0
+if ! asdf install ruby "$asdf_version"; then
+  install_failed=1
+fi
+
+if [ "$install_failed" -eq 1 ]; then
+  echo "Ruby $required_version was not found by asdf. Updating the ruby plugin and retrying..."
+  asdf plugin update ruby || true
+  if ! asdf install ruby "$asdf_version"; then
+    echo "Unable to install Ruby $required_version via asdf."
+    echo "Check that .ruby-version is valid and that the ruby plugin knows about this version."
+    echo "You can list available versions with:"
+    echo "  asdf list all ruby | rg \"^$asdf_version$\""
+    exit 1
+  fi
+fi
+asdf reshim ruby "$asdf_version"
+
+if [ -d "$HOME/.asdf/shims" ] && [[ ":$PATH:" != *":$HOME/.asdf/shims:"* ]]; then
+  needs_path_update=1
+else
+  needs_path_update=0
+fi
+
+if [ "$needs_path_update" -eq 1 ]; then
+  echo
+  echo "PATH update needed for asdf shims. Do this once, then re-open your shell and re-run host-bin/setup."
+  echo "Add the following to your shell profile (e.g., ~/.bashrc, ~/.bash_profile, ~/.zshrc):"
+  if command -v brew >/dev/null 2>&1; then
+    brew_asdf_sh="$(brew --prefix asdf 2>/dev/null)/libexec/asdf.sh"
+    if [ -f "$brew_asdf_sh" ]; then
+      echo "  . \"$brew_asdf_sh\""
+    fi
+  fi
+  if [ -f "$HOME/.asdf/asdf.sh" ]; then
+    echo "  . \"$HOME/.asdf/asdf.sh\""
+  fi
+  echo "  export PATH=\"\$HOME/.asdf/shims:\$PATH\""
+  echo
+  echo "After updating your profile, run:"
+  echo "  source <your-profile>  # or open a new terminal"
+  echo "  host-bin/setup"
+  exit 1
+fi
+
+current_version="$(asdf exec ruby -e 'print RUBY_VERSION' 2>/dev/null || true)"
+if [ "$current_version" != "$asdf_version" ] && [ "$current_version" != "$required_version" ]; then
+  echo "Ruby $required_version is installed, but the current shell is still using: ${current_version:-none}."
+  echo "Try opening a new shell and ensure asdf is initialized."
+  exit 1
+fi
+
+echo "Ruby active version: $(asdf exec ruby --version)"
