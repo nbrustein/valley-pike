@@ -12,6 +12,11 @@ separate copies of the repo do not interfere with each other.
 (wrapping `docker compose`, git worktrees, etc.). `bin/` contains scripts that
 are meant to run inside the container.
 
+To run generic commands inside the container, do something like:
+
+```
+docker compose run --rm -e RAILS_ENV=test web bin/rails db:reset
+```
 
 ### One-time setup
 
