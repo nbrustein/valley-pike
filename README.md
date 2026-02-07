@@ -32,8 +32,9 @@ You will need to run this script again if:
 ```bash
 docker compose up
 ```
+Visit http://localhost:#{WEB_PORT}
 
-Visit http://localhost:3000
+The default WEB_PORT is 3000
 
 ### Run tests
 
@@ -58,6 +59,8 @@ host-bin/new-workdir <branch-name>
 
 That creates a new directory and runs `host-bin/setup` inside it. Each
 worktree has its own Postgres volume, so dev/test DBs are isolated by folder.
+It also writes a `.env` file with a unique `WEB_PORT` so multiple worktrees can
+run at the same time without clashing on port 3000.
 
 To clean up a worktree and delete its data:
 
