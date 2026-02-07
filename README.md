@@ -78,3 +78,7 @@ git worktree remove <path-to-worktree>
 The repo includes recommended VS Code extensions in `.vscode/extensions.json`.
 Rubocop is included to provide linting and formatting support for Ruby.
 Autocorrect on save is enabled via `.vscode/settings.json`.
+
+## Coding guidelines
+
+Read docs/coding_guidelines.md
