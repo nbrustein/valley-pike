@@ -12,6 +12,11 @@ separate copies of the repo do not interfere with each other.
 (wrapping `docker compose`, git worktrees, etc.). `bin/` contains scripts that
 are meant to run inside the container.
 
+To run generic commands inside the container, do something like:
+
+```
+docker compose run --rm -e RAILS_ENV=test web bin/rails db:reset
+```
 
 ### One-time setup
 
@@ -81,3 +86,7 @@ git worktree remove <path-to-worktree>
 The repo includes recommended VS Code extensions in `.vscode/extensions.json`.
 Rubocop is included to provide linting and formatting support for Ruby.
 Autocorrect on save is enabled via `.vscode/settings.json`.
+
+## Coding guidelines
+
+Read docs/coding_guidelines.md

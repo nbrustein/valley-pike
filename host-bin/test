@@ -18,7 +18,9 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
 fi
 
 if [ $# -eq 0 ]; then
-  exec docker compose run --rm web bundle exec rspec
+  exec docker compose run --rm \
+    -e RAILS_ENV=test \
+    web bundle exec rspec
 fi
 
 if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
@@ -27,14 +29,21 @@ if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
     usage
     exit 1
   fi
-  exec docker compose run --rm web bundle exec rspec --example "$*"
+  exec docker compose run --rm \
+    -e RAILS_ENV=test \
+    web bundle exec rspec --example "$*"
 fi
 
 first="$1"
 file_part="${first%%:*}"
 
 if [ -f "$first" ] || { [ -f "$file_part" ] && [[ "$first" == *:* ]]; }; then
-  exec docker compose run --rm web bundle exec rspec "$@"
+  exec docker compose run --rm \
+    -e RAILS_ENV=test \
+    web bundle exec rspec "$@"
 fi
 
-exec docker compose run --rm web bundle exec rspec --example "$*"
+exec docker compose run --rm \
+  -e RAILS_ENV=test \
+
+  web bundle exec rspec --example "$*"
