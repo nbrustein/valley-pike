@@ -14,15 +14,17 @@ RSpec.describe "Magic link sign in", type: :request do
     host! "example.com"
   end
 
+  def post_login(params:, headers:)
+    post identity_session_path, params: params, headers: headers
+  end
+
   describe "POST /identity/sign_in" do
     let(:email) { "User@Example.com" }
     let(:params) { { identity: { email: email } } }
 
     context "when the email is present" do
       before do
-        post identity_session_path,
-             params: params,
-             headers: headers
+        post_login(params: params, headers: headers)
       end
 
       it "redirects" do
@@ -44,9 +46,7 @@ RSpec.describe "Magic link sign in", type: :request do
       let(:email) { "" }
 
       before do
-        post identity_session_path,
-             params: params,
-             headers: headers
+        post_login(params: params, headers: headers)
       end
 
       it "returns an unprocessable entity response" do
@@ -67,9 +67,7 @@ RSpec.describe "Magic link sign in", type: :request do
         allow(identity).to receive(:magic_link_inactive_message).and_return(:inactive)
         expect(identity).not_to receive(:send_magic_link)
 
-        post identity_session_path,
-             params: params,
-             headers: headers
+        post_login(params: params, headers: headers)
       end
 
       it "returns a forbidden response" do
@@ -78,6 +76,48 @@ RSpec.describe "Magic link sign in", type: :request do
 
       it "does not send an email" do
         expect(ActionMailer::Base.deliveries).to be_empty
+      end
+    end
+  end
+
+  describe "rate limiting" do
+    let(:email) { "user@example.com" }
+    let(:params) { { identity: { email: email } } }
+    let(:attack_cache_store) { ActiveSupport::Cache::MemoryStore.new }
+    let(:original_cache_store) { Rack::Attack.cache.store }
+
+    before do
+      Rack::Attack.cache.store = attack_cache_store
+    end
+
+    after do
+      Rack::Attack.cache.store = original_cache_store
+    end
+
+    context "when a single email exceeds the limit" do
+      let(:limit) { Rack::Attack::LOGIN_LIMIT_PER_EMAIL }
+
+      before do
+        limit.times { post_login(params: params, headers: headers) }
+        post_login(params: params, headers: headers)
+      end
+
+      it "returns too many requests" do
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
+    context "when a single IP exceeds the limit" do
+      let(:limit) { Rack::Attack::LOGIN_LIMIT_PER_IP }
+      let(:ip_headers) { headers.merge("REMOTE_ADDR" => "203.0.113.10") }
+
+      before do
+        limit.times { post_login(params: params, headers: ip_headers) }
+        post_login(params: params, headers: ip_headers)
+      end
+
+      it "returns too many requests" do
+        expect(response).to have_http_status(:too_many_requests)
       end
     end
   end

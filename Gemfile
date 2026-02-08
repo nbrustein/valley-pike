@@ -5,6 +5,7 @@ gem "rails", "~> 8.1.2"
 # Authentication
 gem "devise"
 gem "devise-passwordless"
+gem "rack-attack"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use PostgreSQL as the database for Active Record
