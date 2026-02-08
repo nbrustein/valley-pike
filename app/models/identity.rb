@@ -5,5 +5,4 @@ class Identity < ApplicationRecord
   include IdentityConcerns::SupportsMagicLinks
   include IdentityConcerns::CanBeDisabled
   include IdentityConcerns::IsDeviseResource
-
 end

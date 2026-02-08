@@ -15,8 +15,8 @@ class CreateIdentities < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :identities, [:kind, :email_normalized], unique: true, where: "email_normalized IS NOT NULL"
-    add_index :identities, [:provider, :uid], unique: true, where: "provider IS NOT NULL AND uid IS NOT NULL"
+    add_index :identities, [ :kind, :email_normalized ], unique: true, where: "email_normalized IS NOT NULL"
+    add_index :identities, [ :provider, :uid ], unique: true, where: "provider IS NOT NULL AND uid IS NOT NULL"
     add_check_constraint :identities, "kind IN ('magic_link', 'password', 'oauth')", name: "identities_kind_check"
   end
 end

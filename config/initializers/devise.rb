@@ -8,9 +8,9 @@ Devise.setup do |config|
   config.passwordless_tokenizer = "SignedGlobalIDTokenizer"
 
   # Keep normalization logic in the Identity model.
-  config.authentication_keys = [:email]
-  config.case_insensitive_keys = [:email]
-  config.strip_whitespace_keys = [:email]
+  config.authentication_keys = [ :email ]
+  config.case_insensitive_keys = [ :email ]
+  config.strip_whitespace_keys = [ :email ]
 end
 
 Warden::Manager.after_set_user except: :fetch do |record, warden, _options|
