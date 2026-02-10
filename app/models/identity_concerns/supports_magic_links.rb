@@ -5,7 +5,7 @@ module IdentityConcerns
     extend ActiveSupport::Concern
 
     included do
-      devise :magic_link_authenticatable
+      devise :magic_link_authenticatable, :rememberable
     end
 
     class_methods do
