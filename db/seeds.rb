@@ -9,6 +9,7 @@
 #   end
 
 user = User.first_or_create!
+user.update!(email: "email@example.com") unless user.email == "email@example.com"
 
 identity = Identity.find_or_initialize_by(kind: "password", email: "email@example.com")
 identity.user = user

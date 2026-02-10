@@ -33,7 +33,7 @@ module IdentityHelpers
   def render_sessions_new_with_errors(errors)
     self.resource = resource_class.new
     errors.each { |attribute, message| resource.errors.add(attribute, message) }
-    render "devise/sessions/new", status: :unprocessable_entity
+    render "devise/sessions/new", status: :unprocessable_content
   end
 
   def ensure_devise_mapping

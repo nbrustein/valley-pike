@@ -1,0 +1,32 @@
+<h1>Profile</h1>
+
+<% if @profile_errors&.any? %>
+  <ul>
+    <% @profile_errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with scope: :profile, url: profile_path, method: :patch, local: true do |f| %>
+  <div>
+    <%= f.label :email %>
+    <%= f.email_field :email, value: current_user.email, autocomplete: "email" %>
+  </div>
+
+  <h2><%= @password_heading %></h2>
+
+  <div>
+    <%= f.label :password %>
+    <%= f.password_field :password, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= f.label :password_confirmation, "Password confirmation" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= f.submit "Save" %>
+  </div>
+<% end %>

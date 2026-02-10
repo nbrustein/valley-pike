@@ -7,8 +7,7 @@ module IdentityConcerns
     EMAIL_BASED_KINDS = %w[magic_link password].freeze
 
     included do
-      validates :email, presence: true, if: :email_based?
-      validates :email, uniqueness: { scope: :kind }, if: :email_based?
+      validates :email, uniqueness: { scope: :kind }, if: :password_identity?
     end
 
     class_methods do
@@ -23,6 +22,10 @@ module IdentityConcerns
 
     def email_based?
       kind.in?(EMAIL_BASED_KINDS)
+    end
+
+    def password_identity?
+      kind == "password"
     end
   end
 end
