@@ -41,7 +41,7 @@ RSpec.describe IdentityConcerns::SupportsMagicLinks, type: :model do
   end
 
   describe "#magic_link_url" do
-    let(:identity) { Identity.new(kind: "magic_link", email_normalized: "user@example.com") }
+    let(:identity) { build_stubbed(:identity, kind: "magic_link", email: "user@example.com") }
     let(:url) { identity.magic_link_url(host: "example.com", protocol: "https") }
     let(:uri) { URI.parse(url) }
     let(:params) { Rack::Utils.parse_nested_query(uri.query) }

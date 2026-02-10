@@ -7,3 +7,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+user = User.first_or_create!
+
+identity = Identity.find_or_initialize_by(kind: "password", email: "email@example.com")
+identity.user = user
+identity.email = "email@example.com"
+identity.password = "password"
+identity.password_confirmation = "password"
+identity.skip_password_validation = true
+identity.skip_password_strength_validation = true
+identity.save!
