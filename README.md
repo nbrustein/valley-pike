@@ -8,15 +8,9 @@ separate copies of the repo do not interfere with each other.
 
 ### Scripts
 
-`host-bin/` contains scripts intended to run on the host
-(wrapping `docker compose`, git worktrees, etc.). `bin/` contains scripts that
-are meant to run inside the container.
-
-To run generic commands inside the container, do something like:
-
-```
-docker compose run --rm -e RAILS_ENV=test web bin/rails db:reset
-```
+`host-bin/` contains scripts intended to be run from the host. Many of them just run the
+script of the same name inside the container. For example `host-bin/rake` runs `bin/rake`
+inside the container.
 
 ### One-time setup
 
