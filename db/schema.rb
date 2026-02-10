@@ -25,10 +25,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_090000) do
     t.datetime "last_used_at"
     t.string "last_used_ip"
     t.string "provider"
+    t.datetime "remember_created_at"
     t.string "uid"
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
-    t.datetime "remember_created_at"
     t.index ["kind", "email"], name: "index_identities_on_kind_and_email", unique: true, where: "(email IS NOT NULL)"
     t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["user_id"], name: "index_identities_on_user_id"
