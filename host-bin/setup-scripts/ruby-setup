@@ -26,6 +26,12 @@ if [ ! -f "$tool_versions_file" ]; then
   printf "ruby %s\n" "$asdf_version" > "$tool_versions_file"
 fi
 
+current_ruby_version="$(ruby -e 'print RUBY_VERSION' 2>/dev/null || true)"
+if [ "$current_ruby_version" = "$asdf_version" ] || [ "$current_ruby_version" = "$required_version" ]; then
+  echo "Ruby $required_version already active in current shell."
+  exit 0
+fi
+
 echo "Ruby $required_version is required on the host for tooling (e.g., RuboCop)."
 printf "Install/activate Ruby %s via asdf? [y/N] " "$required_version" >&2
 read -r reply
