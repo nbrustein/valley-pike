@@ -61,7 +61,7 @@ RSpec.describe "Profile", type: :request do
         result = instance_double("UnitOfWork::Result", success?: true, errors: ActiveModel::Errors.new(User.new))
         allow(UnitsOfWork::UpdateProfile).to receive(:execute).and_return(result)
 
-        act_patch_profile(profile_params: { email: "new@example.com" })
+        act_patch_profile(profile_params: {email: "new@example.com"})
 
         expect(response).to redirect_to(profile_path)
       end
@@ -74,7 +74,7 @@ RSpec.describe "Profile", type: :request do
         result = instance_double("UnitOfWork::Result", success?: false, errors:)
         allow(UnitsOfWork::UpdateProfile).to receive(:execute).and_return(result)
 
-        act_patch_profile(profile_params: { password: "short" })
+        act_patch_profile(profile_params: {password: "short"})
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Password is too short (minimum is 12 characters)")
@@ -91,6 +91,6 @@ RSpec.describe "Profile", type: :request do
 
   def act_patch_profile(profile_params:)
     sign_in identity
-    patch profile_path, params: { profile: profile_params }, headers:
+    patch profile_path, params: {profile: profile_params}, headers:
   end
 end

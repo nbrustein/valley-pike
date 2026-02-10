@@ -7,7 +7,7 @@ module IdentityConcerns
     EMAIL_BASED_KINDS = %w[magic_link password].freeze
 
     included do
-      validates :email, uniqueness: { scope: :kind }, if: :password_identity?
+      validates :email, uniqueness: {scope: :kind}, if: :password_identity?
     end
 
     class_methods do

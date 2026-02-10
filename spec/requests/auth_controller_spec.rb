@@ -7,7 +7,7 @@ RSpec.describe "Password sign in", type: :request do
   before { configure_request_host! }
 
   describe "POST /auth/password_session" do
-    let(:params) { { identity: { email:, password:, kind: "password" } } }
+    let(:params) { {identity: {email:, password:, kind: "password"}} }
     let(:password) { "Str0ngPassw0rd!" }
 
     context "with missing email" do

@@ -5,13 +5,12 @@ RSpec.describe IdentityConcerns::SupportsMagicLinks, type: :model do
     let(:email) { "User@Example.com" }
 
     context "when the email is new" do
-      it "creates a user and identity", :aggregate_failures do
+      it "creates an identity", :aggregate_failures do
         expect {
           @identity = Identity.find_or_create_magic_link_identity!(email)
-        }.to change(User, :count).by(1)
-        .and change(Identity, :count).by(1)
+        }.to change(Identity, :count).by(1)
 
-        expect(@identity.user).to be_present
+        expect(@identity.user).to be_nil
       end
 
       it "normalizes the email" do

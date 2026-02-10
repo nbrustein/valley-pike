@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_10_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -28,7 +28,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_120000) do
     t.datetime "remember_created_at"
     t.string "uid"
     t.datetime "updated_at", null: false
-    t.uuid "user_id", null: false
+    t.uuid "user_id"
     t.index ["kind", "email"], name: "index_identities_on_kind_and_email", unique: true, where: "(email IS NOT NULL)"
     t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["user_id"], name: "index_identities_on_user_id"

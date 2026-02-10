@@ -16,7 +16,11 @@ end
 Warden::Manager.after_set_user except: :fetch do |record, warden, _options|
   next unless record.is_a?(Identity)
 
-  updates = { last_used_at: Time.current, last_used_ip: warden.request&.remote_ip }
+  if record.kind == "magic_link" && record.user_id.nil?
+    UnitsOfWork::CreateUserFromMagicLink.new(identity: record).execute
+  end
+
+  updates = {last_used_at: Time.current, last_used_ip: warden.request&.remote_ip}
   updates[:confirmed_at] = Time.current if record.confirmed_at.nil?
 
   record.update_columns(updates)

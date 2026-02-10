@@ -3,17 +3,20 @@
 class CreateMagicLinkIdentityController < ApplicationController
   include IdentityHelpers
 
+  # POST /identity/magic_link_identity
+  # This is what an unauthenticated user hits to create a magic link identity.
   def create_magic_link_identity
     email = email_param
     return if maybe_render_blank_email_error?(email)
 
-    self.resource = resource_class.find_or_create_magic_link_identity!(email)
+    user = User.find_by_email(email)
+    return if maybe_render_missing_user_error?(email, user)
+
+    self.resource = resource_class.find_or_create_magic_link_identity_for_user!(user)
     return if maybe_render_inactive_link_error?(resource)
 
     send_magic_link_and_redirect(resource)
   end
-
-  private
 
   private def send_magic_link_and_redirect(resource)
     resource.send_magic_link
@@ -38,6 +41,13 @@ class CreateMagicLinkIdentityController < ApplicationController
     end
 
     false
+  end
+
+  def maybe_render_missing_user_error?(_email, user)
+    return false if user
+
+    render_sessions_new_with_errors(email: "not found")
+    true
   end
 
   def translation_scope
