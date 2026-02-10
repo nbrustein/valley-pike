@@ -7,5 +7,9 @@ module UserConcerns
     included do
       has_many :identities, dependent: :destroy
     end
+
+    def password_identity
+      identities.find_by(kind: "password")
+    end
   end
 end

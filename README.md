@@ -1,18 +1,18 @@
 # Valley Pike
 
-## Docker dev setup
+## Development structure
 
 This repo is set up to run Rails in a container with Postgres. Each checkout
 gets its own database container + volume (based on the directory name), so
 separate copies of the repo do not interfere with each other.
 
-### Scripts
+## Scripts
 
 `host-bin/` contains scripts intended to be run from the host. Many of them just run the
 script of the same name inside the container. For example `host-bin/rake` runs `bin/rake`
 inside the container.
 
-### One-time setup
+## One-time setup
 
 ```bash
 host-bin/setup
@@ -26,7 +26,7 @@ You will need to run this script again if:
  * Docker build inputs change (`Dockerfile`, `Dockerfile.dev`, or `docker-compose.yml`)
  * database setup changes (new migrations or reset/removed volumes)
 
-### Run the app
+## Run the app
 
 ```bash
 docker compose up
@@ -35,7 +35,7 @@ Visit http://localhost:#{WEB_PORT}
 
 The default WEB_PORT is 3000
 
-### Run tests
+## Run tests
 
 ```bash
 host-bin/test
@@ -48,7 +48,7 @@ host-bin/test "example name"
 docker compose run --rm web bundle exec rspec
 ```
 
-## Creating an isolated copy for another branch
+## Create an isolated copy for another branch
 
 Use a git worktree (fast and keeps one git history) and bootstrap a fresh DB:
 
@@ -84,3 +84,7 @@ Autocorrect on save is enabled via `.vscode/settings.json`.
 ## Coding guidelines
 
 Read docs/coding_guidelines.md
+
+## Staging
+
+Deployed via render to https://valley-pike-staging.onrender.com/
