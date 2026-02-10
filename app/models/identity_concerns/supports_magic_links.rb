@@ -5,7 +5,7 @@ module IdentityConcerns
     extend ActiveSupport::Concern
 
     included do
-      devise :magic_link_authenticatable
+      devise :magic_link_authenticatable, :rememberable
     end
 
     class_methods do
@@ -28,11 +28,11 @@ module IdentityConcerns
       options = {
         identity: {
           email: email,
-          token: token,
-          remember_me: remember_me
+          token: token
         },
         host: host
       }
+      options[:identity][:remember_me] = remember_me
       options[:protocol] = protocol if protocol
 
       Rails.application.routes.url_helpers.identity_magic_link_url(**options)

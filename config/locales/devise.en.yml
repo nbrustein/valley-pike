@@ -1,0 +1,4 @@
+en:
+  devise:
+    failure:
+      magic_link_invalid: "Invalid or expired login link."
