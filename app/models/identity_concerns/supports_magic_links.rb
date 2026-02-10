@@ -14,10 +14,7 @@ module IdentityConcerns
         identity = find_by(kind: "magic_link", email: normalized_email)
         return identity if identity
 
-        transaction do
-          user = User.create!
-          create!(user:, kind: "magic_link", email: normalized_email)
-        end
+        create!(kind: "magic_link", email: normalized_email)
       rescue ActiveRecord::RecordNotUnique
         find_by!(kind: "magic_link", email: normalized_email)
       end
