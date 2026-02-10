@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe IdentityConcerns::IsDeviseResource, type: :model do
   describe ".find_for_database_authentication" do
     let!(:identity) do
-      Identity.create!(user: User.create!, kind: "magic_link", email_normalized: "user@example.com")
+      create(:identity, kind: "magic_link", email: "user@example.com")
     end
 
     context "when email is provided" do

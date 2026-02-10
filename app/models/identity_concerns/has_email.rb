@@ -7,8 +7,8 @@ module IdentityConcerns
     EMAIL_BASED_KINDS = %w[magic_link password].freeze
 
     included do
-      validates :email_normalized, presence: true, if: :email_based?
-      validates :email_normalized, uniqueness: { scope: :kind }, if: :email_based?
+      validates :email, presence: true, if: :email_based?
+      validates :email, uniqueness: { scope: :kind }, if: :email_based?
     end
 
     class_methods do
@@ -17,12 +17,8 @@ module IdentityConcerns
       end
     end
 
-    def email
-      email_normalized
-    end
-
     def email=(value)
-      self.email_normalized = self.class.normalize_email(value)
+      super(self.class.normalize_email(value))
     end
 
     def email_based?
