@@ -7,7 +7,7 @@ module IdentityConcerns
     KINDS = %w[magic_link password oauth].freeze
 
     included do
-      validates :kind, presence: true, inclusion: { in: KINDS }
+      validates :kind, presence: true, inclusion: {in: KINDS}
     end
   end
 end

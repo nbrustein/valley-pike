@@ -5,7 +5,7 @@ module ShowsFlashMessages
 
   private
 
-  def set_flash_message(key, kind, options = {})
+  def set_flash_message(key, kind, options={})
     message = find_message(kind, options)
     if options[:now]
       flash.now[key] = message if message.present?
@@ -14,7 +14,7 @@ module ShowsFlashMessages
     end
   end
 
-  def set_flash_message!(key, kind, options = {})
+  def set_flash_message!(key, kind, options={})
     set_flash_message(key, kind, options) if is_flashing_format?
   end
 
@@ -26,7 +26,7 @@ module ShowsFlashMessages
     options
   end
 
-  def find_message(kind, options = {})
+  def find_message(kind, options={})
     options[:scope] ||= translation_scope
     options[:default] = Array(options[:default]).unshift(kind.to_sym)
     options[:resource_name] = resource_name
