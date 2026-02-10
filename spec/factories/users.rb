@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :user do
-    sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:email) {|n| "user#{n}@example.com" }
 
     trait :with_identity do
       transient do
@@ -11,7 +11,7 @@ FactoryBot.define do
       end
 
       after(:create) do |user, evaluator|
-        attrs = { user: }
+        attrs = {user:}
         attrs[:email] = evaluator.identity_email if evaluator.identity_email
 
         if evaluator.identity_kind == "magic_link"

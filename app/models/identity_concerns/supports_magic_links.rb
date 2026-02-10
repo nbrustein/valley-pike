@@ -9,6 +9,8 @@ module IdentityConcerns
     end
 
     class_methods do
+      # This isn't used right now, but we will want it when admins create magic links
+      # for new users.
       def find_or_create_magic_link_identity!(email)
         normalized_email = normalize_email(email)
         identity = find_by(kind: "magic_link", email: normalized_email)
@@ -17,6 +19,15 @@ module IdentityConcerns
         create!(kind: "magic_link", email: normalized_email)
       rescue ActiveRecord::RecordNotUnique
         find_by!(kind: "magic_link", email: normalized_email)
+      end
+
+      def find_or_create_magic_link_identity_for_user!(user)
+        normalized_email = normalize_email(user.email)
+        identity = find_or_initialize_by(kind: "magic_link", email: normalized_email)
+
+        identity.user ||= user
+        identity.save!
+        identity
       end
     end
 
