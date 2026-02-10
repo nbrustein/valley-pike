@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class UnitOfWork
   class Result
     attr_reader :errors

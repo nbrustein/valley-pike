@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module UserConcerns
   module HasIdentities
     extend ActiveSupport::Concern
