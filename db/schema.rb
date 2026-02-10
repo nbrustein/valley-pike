@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_035210) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -19,7 +19,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_035210) do
     t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.datetime "disabled_at"
-    t.string "email_normalized"
+    t.string "email"
     t.string "encrypted_password"
     t.string "kind", null: false
     t.datetime "last_used_at"
@@ -29,10 +29,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_035210) do
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.datetime "remember_created_at"
-    t.index ["kind", "email_normalized"], name: "index_identities_on_kind_and_email_normalized", unique: true, where: "(email_normalized IS NOT NULL)"
+    t.index ["kind", "email"], name: "index_identities_on_kind_and_email", unique: true, where: "(email IS NOT NULL)"
     t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["user_id"], name: "index_identities_on_user_id"
-    t.check_constraint "kind::text = ANY (ARRAY['magic_link'::character varying, 'password'::character varying, 'oauth'::character varying]::text[])", name: "identities_kind_check"
+    t.check_constraint "kind::text = ANY (ARRAY['magic_link'::character varying::text, 'password'::character varying::text, 'oauth'::character varying::text])", name: "identities_kind_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

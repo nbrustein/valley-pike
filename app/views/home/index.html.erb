@@ -4,5 +4,8 @@
   <p>Signed in as <%= current_identity.email %></p>
   <%= button_to "Sign out", destroy_identity_session_path, method: :delete %>
 <% else %>
-  <%= link_to "Sign in with magic link", new_identity_session_path %>
+  <%= render "shared/auth/sign_in_form",
+             resource: Identity.new,
+             resource_name: :identity %>
+
 <% end %>
