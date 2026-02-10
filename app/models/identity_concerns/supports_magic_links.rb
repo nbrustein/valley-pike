@@ -9,7 +9,7 @@ module IdentityConcerns
     end
 
     class_methods do
-      # This isn't used right now, but we will want it when admins create magic links 
+      # This isn't used right now, but we will want it when admins create magic links
       # for new users.
       def find_or_create_magic_link_identity!(email)
         normalized_email = normalize_email(email)
