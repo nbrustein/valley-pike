@@ -18,7 +18,11 @@ Models that are likely to have much complexity (i.e. more than 60 lines) should 
 
 ## Migrations
 
-You should never need `if exists` in a migration. You always know the state of the schema at each migratino.
+ * You should never need `if exists` in a migration. You always know the state of the schema at each migratino.
+ * all tables should have uuid primary key fields (even join tables)
+ * all tables should have created_at/updated_at (even join tables)
+ * enums should be implemented as text fields with a constraint. See example in db/migrate/20260207120001_create_identities.rb
+ * add foreign keys with indexes to join columns
 
 # Tests
 
