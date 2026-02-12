@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-jade-500: #7B9669;
+  --color-sage-500: #6C8480;
+  --color-fog-100: #E6E6E6;
+  --color-moss-200: #BAC8B1;
+  --color-forest-900: #404E3B;
+}
+
+@layer base {
+  body {
+    @apply min-h-screen bg-fog-100 text-forest-900 antialiased;
+  }
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-forest-900/10 bg-white/80 p-6 shadow-sm backdrop-blur;
+  }
+
+  .menu-link {
+    @apply rounded-md px-3 py-2 text-sm font-medium text-forest-900 transition hover:bg-moss-200/45 hover:text-forest-900;
+  }
+
+  .field-label {
+    @apply mb-1 block text-sm font-medium text-forest-900;
+  }
+
+  .text-input {
+    @apply w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-forest-900 shadow-sm outline-none ring-0 transition focus:border-jade-500 focus:ring-2 focus:ring-jade-500/25;
+  }
+
+  .primary-btn {
+    @apply inline-flex items-center justify-center rounded-lg bg-forest-900 px-4 py-2 text-sm font-semibold text-fog-100 transition hover:bg-sage-500;
+  }
+
+  .error-box {
+    @apply mb-6 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700;
+  }
+}

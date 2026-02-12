@@ -1,39 +1,44 @@
-<h1>Sign in with a magic link</h1>
+<h2 class="text-xl font-semibold text-forest-900">Sign in with a magic link</h2>
 
 <% if resource.errors.any? %>
-  <ul>
-    <% resource.errors.full_messages.each do |message| %>
-      <li><%= message %></li>
-    <% end %>
-  </ul>
+  <div class="error-box mt-4">
+    <ul class="list-disc space-y-1 pl-5">
+      <% resource.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
 <% end %>
 
 <%= form_for(resource, as: resource_name, url: identity_magic_link_identity_path) do |f| %>
-  <div>
-    <%= f.label :email %>
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  <div class="mt-4">
+    <%= f.label :email, class: "field-label" %>
+    <%= f.email_field :email,
+                      autofocus: true,
+                      autocomplete: "email",
+                      class: "text-input" %>
   </div>
 
-  <div>
-    <%= f.submit "Send magic link" %>
+  <div class="mt-4">
+    <%= f.submit "Send magic link", class: "primary-btn" %>
   </div>
 <% end %>
 
-<h2>Sign in with password</h2>
+<h2 class="mt-8 text-xl font-semibold text-forest-900">Sign in with password</h2>
 <%= form_with scope: :identity, url: password_session_path, local: true do |f| %>
   <%= f.hidden_field :kind, value: "password" %>
 
-  <div>
-    <%= f.label :email %>
-    <%= f.email_field :email, autocomplete: "email" %>
+  <div class="mt-4">
+    <%= f.label :email, class: "field-label" %>
+    <%= f.email_field :email, autocomplete: "email", class: "text-input" %>
   </div>
 
-  <div>
-    <%= f.label :password %>
-    <%= f.password_field :password, autocomplete: "current-password" %>
+  <div class="mt-4">
+    <%= f.label :password, class: "field-label" %>
+    <%= f.password_field :password, autocomplete: "current-password", class: "text-input" %>
   </div>
 
-  <div>
-    <%= f.submit "Sign in" %>
+  <div class="mt-5">
+    <%= f.submit "Sign in", class: "primary-btn" %>
   </div>
 <% end %>

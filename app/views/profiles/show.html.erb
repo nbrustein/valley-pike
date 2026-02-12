@@ -1,32 +1,36 @@
-<h1>Profile</h1>
+<section class="surface-card">
+  <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Profile</h1>
 
-<% if @profile_errors&.any? %>
-  <ul>
-    <% @profile_errors.full_messages.each do |message| %>
-      <li><%= message %></li>
-    <% end %>
-  </ul>
-<% end %>
+  <% if @profile_errors&.any? %>
+    <div class="error-box mt-5">
+      <ul class="list-disc space-y-1 pl-5">
+        <% @profile_errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-<%= form_with scope: :profile, url: profile_path, method: :patch, local: true do |f| %>
-  <div>
-    <%= f.label :email %>
-    <%= f.email_field :email, value: current_user.email, autocomplete: "email" %>
-  </div>
+  <%= form_with scope: :profile, url: profile_path, method: :patch, local: true do |f| %>
+    <div class="mt-5">
+      <%= f.label :email, class: "field-label" %>
+      <%= f.email_field :email, value: current_user.email, autocomplete: "email", class: "text-input" %>
+    </div>
 
-  <h2><%= @password_heading %></h2>
+    <h2 class="mt-6 text-xl font-semibold text-forest-900"><%= @password_heading %></h2>
 
-  <div>
-    <%= f.label :password %>
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
+    <div class="mt-4">
+      <%= f.label :password, class: "field-label" %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "text-input" %>
+    </div>
 
-  <div>
-    <%= f.label :password_confirmation, "Password confirmation" %>
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+    <div class="mt-4">
+      <%= f.label :password_confirmation, "Password confirmation", class: "field-label" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "text-input" %>
+    </div>
 
-  <div>
-    <%= f.submit "Save" %>
-  </div>
-<% end %>
+    <div class="mt-6">
+      <%= f.submit "Save", class: "primary-btn" %>
+    </div>
+  <% end %>
+</section>
