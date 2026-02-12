@@ -18,18 +18,32 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <% flash.each do |type, message| %>
-      <div class="flash <%= type %>"><%= message %></div>
-    <% end %>
+    <div class="min-h-screen bg-gradient-to-b from-fog-100 via-moss-200/35 to-jade-500/20">
+      <header class="border-b border-forest-900/10 bg-white/70 backdrop-blur">
+        <div class="flex w-full items-center justify-between py-4 pl-8 pr-4 sm:pl-10 sm:pr-6">
+          <p class="text-lg font-semibold tracking-tight text-forest-900">Valley Pike</p>
+          <nav aria-label="Main">
+            <% if user_signed_in? %>
+              <%= link_to "Edit profile", profile_path, class: "menu-link" %>
+            <% end %>
+          </nav>
+        </div>
+      </header>
 
-    <main>
-      <%= yield %>
-    </main>
+      <main class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+        <% flash.each do |type, message| %>
+          <% flash_style = type.to_s == "notice" ? "border-jade-500/35 bg-jade-500/12 text-forest-900" : "border-red-300 bg-red-50 text-red-700" %>
+          <div class="mb-4 rounded-lg border px-4 py-3 text-sm <%= flash_style %>"><%= message %></div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>
