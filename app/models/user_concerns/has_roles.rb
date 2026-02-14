@@ -12,5 +12,13 @@ module UserConcerns
     memoize def has_role?(organization_id)
       user_roles.where(organization_id: [ organization_id, nil ]).exists?
     end
+
+    memoize def has_role_permissions?(role)
+      user_roles.any? {|user_role| user_role.has_role_permissions?(role) }
+    end
+
+    def roles_with_permissions(role)
+      user_roles.select {|user_role| user_role.has_role_permissions?(role) }
+    end
   end
 end

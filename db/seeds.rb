@@ -19,26 +19,6 @@ def upsert_organization!(name:, abbreviation:, require_vetted_drivers:)
   organization
 end
 
-def upsert_user!(email:)
-  user = User.find_or_initialize_by(email:)
-  user.email = email
-  user.save!
-
-  identity = Identity.find_or_initialize_by(kind: "password", email:)
-  identity.user = user
-  identity.password = DEFAULT_PASSWORD
-  identity.password_confirmation = DEFAULT_PASSWORD
-  identity.skip_password_validation = true
-  identity.skip_password_strength_validation = true
-  identity.save!
-
-  user
-end
-
-def upsert_user_role!(user:, role:, organization:)
-  UserRole.find_or_create_by!(user:, role:, organization:)
-end
-
 organizations = {
   "udo" => upsert_organization!(
     name: "Unvetted Driver Org",
@@ -54,47 +34,86 @@ organizations = {
 
 user_definitions = [
   {
-    email: "dev.deverson@#{EMAIL_DOMAIN}",
-    roles: [ [ UserRole::DEVELOPER, nil ], [ UserRole::VANITA_ADMIN, nil ], [ UserRole::ORG_ADMIN, nil ] ]
+    email: "dev@#{EMAIL_DOMAIN}",
+    full_name: "dev deverson",
+    phone: "555-0101",
+    sortable_name: "deverson",
+    roles: [ [ UserRole::DEVELOPER, nil ] ]
   },
   {
     email: "vanita.leader@#{EMAIL_DOMAIN}",
-    roles: [ [ UserRole::VANITA_ADMIN, nil ], [ UserRole::DRIVER, nil ], [ UserRole::ORG_ADMIN, nil ] ]
+    full_name: "vanita leader",
+    phone: "555-0102",
+    sortable_name: "leader",
+    roles: [ [ UserRole::VANITA_ADMIN, nil ], [ UserRole::DRIVER, nil ] ]
   },
   {
     email: "vanita.driverless@#{EMAIL_DOMAIN}",
-    roles: [ [ UserRole::VANITA_ADMIN, nil ], [ UserRole::ORG_ADMIN, nil ] ]
+    full_name: "vanita driverless",
+    phone: "555-0103",
+    sortable_name: "driverless",
+    roles: [ [ UserRole::VANITA_ADMIN, nil ] ]
   },
   {
     email: "udo.admin@#{EMAIL_DOMAIN}",
+    full_name: "udo admin",
+    phone: "555-0104",
+    sortable_name: "admin",
     roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("udo") ] ]
   },
   {
     email: "vdo.admin@#{EMAIL_DOMAIN}",
+    full_name: "vdo admin",
+    phone: "555-0105",
+    sortable_name: "admin",
     roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("vdo") ] ]
   },
   {
     email: "unvetted.driver.1@#{EMAIL_DOMAIN}",
+    full_name: "unvetted driver 1",
+    phone: "555-0106",
+    sortable_name: "driver 1",
     roles: [ [ UserRole::DRIVER, nil ] ]
   },
   {
     email: "vdo.vetted.driver.1@#{EMAIL_DOMAIN}",
+    full_name: "vdo vetted driver 1",
+    phone: "555-0107",
+    sortable_name: "driver 1",
     roles: [ [ UserRole::DRIVER, organizations.fetch("vdo") ] ]
   },
   {
     email: "unvetted.driver.2@#{EMAIL_DOMAIN}",
+    full_name: "unvetted driver 2",
+    phone: "555-0108",
+    sortable_name: "driver 2",
     roles: [ [ UserRole::DRIVER, nil ] ]
   },
   {
     email: "vdo.vetted.driver.2@#{EMAIL_DOMAIN}",
+    full_name: "vdo vetted driver 2",
+    phone: "555-0109",
+    sortable_name: "driver 2",
     roles: [ [ UserRole::DRIVER, organizations.fetch("vdo") ] ]
   }
 ]
 
-user_definitions.each do |user_definition|
-  user = upsert_user!(email: user_definition.fetch(:email))
+begin
+  user_definitions.each do |user_definition|
+    result = UnitsOfWork::UpsertUser.execute(
+      email: user_definition.fetch(:email),
+      full_name: user_definition.fetch(:full_name),
+      phone: user_definition.fetch(:phone),
+      sortable_name: user_definition.fetch(:sortable_name),
+      roles: user_definition.fetch(:roles),
+      password: DEFAULT_PASSWORD
+    )
+    next if result.success?
 
-  user_definition.fetch(:roles).each do |role, organization|
-    upsert_user_role!(user:, role:, organization:)
+    raise "Failed to seed user #{user_definition.fetch(:email)}: #{result.errors.full_messages.join(', ')}"
   end
+rescue StandardError => error
+  warn "SEED FAILURE: #{error.message}"
+  warn(error.backtrace.first(10).join("\n")) if error.backtrace.present?
+  abort("db:seed failed")
 end
