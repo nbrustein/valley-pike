@@ -2,6 +2,10 @@ FactoryBot.define do
   factory :user do
     sequence(:email) {|n| "user#{n}@example.com" }
 
+    after(:build) do |user|
+      user.human ||= build(:human, user:)
+    end
+
     trait :with_identity do
       transient do
         identity_kind { "password" }
