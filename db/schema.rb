@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_123000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -35,6 +35,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123000) do
     t.check_constraint "kind::text = ANY (ARRAY['magic_link'::character varying::text, 'password'::character varying::text, 'oauth'::character varying::text])", name: "identities_kind_check"
   end
 
+  create_table "organizations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "abbreviation", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.boolean "require_vetted_drivers", default: false, null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "organization_id"
+    t.string "role", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["organization_id"], name: "index_user_roles_on_organization_id"
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'org_admin'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "disabled_at"
@@ -44,4 +63,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123000) do
   end
 
   add_foreign_key "identities", "users"
+  add_foreign_key "user_roles", "organizations"
+  add_foreign_key "user_roles", "users"
 end

@@ -20,4 +20,4 @@ ENV BUNDLE_PATH="/usr/local/bundle"
 
 RUN gem install --no-document bundler:${BUNDLER_VERSION}
 
-CMD ["bash", "-lc", "bundle install && bin/rails server -b 0.0.0.0"]
+CMD ["bash", "-lc", "bin/rails server -b 0.0.0.0"]
