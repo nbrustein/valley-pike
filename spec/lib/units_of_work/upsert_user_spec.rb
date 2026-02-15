@@ -2,13 +2,19 @@ require "rails_helper"
 
 RSpec.describe UnitsOfWork::UpsertUser do
   describe ".execute" do
+    let(:executor) { create(:user) }
     let(:organization) { create(:organization, abbreviation: "UDO") }
     let(:other_organization) { create(:organization, abbreviation: "VDO") }
     let(:email) { "existing.user@example.com" }
     let(:full_name) { "Existing User" }
     let(:phone) { "555-9898" }
     let(:sortable_name) { "User" }
-    let(:roles) { [ [ UserRole::ORG_ADMIN, organization ], [ UserRole::DRIVER, nil ] ] }
+    let(:roles) do
+      [
+        {role: UserRole::ORG_ADMIN, organization_id: organization.id},
+        {role: UserRole::DRIVER, organization_id: nil}
+      ]
+    end
     let(:password) { nil }
 
     context "when the user does not exist" do
@@ -72,12 +78,15 @@ RSpec.describe UnitsOfWork::UpsertUser do
 
   def act
     described_class.execute(
-      email:,
-      full_name:,
-      phone:,
-      sortable_name:,
-      roles:,
-      password:
+      executor_id: executor.id,
+      params: {
+        email:,
+        full_name:,
+        phone:,
+        sortable_name:,
+        roles:,
+        password:
+      }
     )
   end
 
