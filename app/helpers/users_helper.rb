@@ -19,10 +19,6 @@ module UsersHelper
     UserPolicy.new(current_user, nil)
   end
 
-  memoize def can_view_all_users?
-    view_users_policy.can_view_all_users?
-  end
-
   memoize def permitted_org_abbreviations
     permitted_organizations.map(&:abbreviation)
   end
