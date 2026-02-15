@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  echo "Usage: host-bin/new-workdir <branch> [directory]"
+  echo "Usage: host-bin/worktree-new <branch> [directory]"
   exit 1
 fi
 
@@ -11,7 +11,7 @@ shift
 
 dir="${1:-../valley-pike-$branch}"
 
-# Find a value for WEB_PORT that is not already being used 
+# Find a value for WEB_PORT that is not already being used
 # by an existing worktree
 used_ports=" 3000 "
 while IFS= read -r path; do

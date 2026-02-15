@@ -53,7 +53,7 @@ docker compose run --rm web bundle exec rspec
 Use a git worktree (fast and keeps one git history) and bootstrap a fresh DB:
 
 ```bash
-host-bin/new-workdir <branch-name>
+host-bin/worktree-new <branch-name>
 ```
 
 That creates a new directory and runs `host-bin/setup` inside it. Each
@@ -61,18 +61,10 @@ worktree has its own Postgres volume, so dev/test DBs are isolated by folder.
 It also writes a `.env` file with a unique `WEB_PORT` so multiple worktrees can
 run at the same time without clashing on port 3000.
 
-To clean up a worktree and delete its data:
-
-1) Stop containers and remove the DB volume from inside the worktree:
+To clean up a worktree and delete its containers/volumes:
 
 ```bash
-docker compose down -v
-```
-
-2) Remove the worktree directory (run from the main repo):
-
-```bash
-git worktree remove <path-to-worktree>
+host-bin/worktree-rm <branch-name>
 ```
 
 ## Editor setup (VS Code)
