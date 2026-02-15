@@ -6,21 +6,26 @@ class UserRole < ApplicationRecord
   # vanita admins can do anything that org admins can do
   VANITA_ADMIN = "vanita_admin"
 
-  # org admins can view all the drivers and org_admins in their organization but cannot modify users
-  # org admins can manage ride requests
+  # org admins manage ride requesters in their organization and also act as
+  # ride requesters themselves
   ORG_ADMIN = "org_admin"
+
+  # ride requesters can manage ride requests
+  RIDE_REQUESTER = "ride_requester"
 
   # drivers can edit some things in their own profiles
   # drivers can view ride requests they have permissions for
   # drivers can accept ride requests
   DRIVER = "driver"
 
-  ROLES = [ DEVELOPER, VANITA_ADMIN, ORG_ADMIN, DRIVER ].freeze
+  ROLES = [ DEVELOPER, VANITA_ADMIN, ORG_ADMIN, RIDE_REQUESTER, DRIVER ].freeze
 
   belongs_to :user
   belongs_to :organization, optional: true
 
   validates :role, inclusion: {in: ROLES}
+  validates :organization, presence: true, if: -> { role.in?([ ORG_ADMIN, RIDE_REQUESTER ]) }
+  validates :organization, absence: true, if: -> { role.in?([ DEVELOPER, VANITA_ADMIN ]) }
 
   def has_role_permissions?(target_role)
     # developers can do anything
@@ -42,6 +47,10 @@ class UserRole < ApplicationRecord
       return "#{organization.abbreviation.downcase} admin" if organization.present?
 
       "admin"
+    when RIDE_REQUESTER
+      return "#{organization.abbreviation.downcase} ride requester" if organization.present?
+
+      "ride requester"
     when DRIVER
       return "#{organization.abbreviation.downcase} driver" if organization.present?
 

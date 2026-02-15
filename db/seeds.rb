@@ -73,11 +73,25 @@ user_definitions = [
     roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("udo") ] ]
   },
   {
+    email: "udo.ride.requester@#{EMAIL_DOMAIN}",
+    full_name: "udo ride requester",
+    phone: "555-0110",
+    sortable_name: "requester",
+    roles: [ [ UserRole::RIDE_REQUESTER, organizations.fetch("udo") ] ]
+  },
+  {
     email: "vdo.admin@#{EMAIL_DOMAIN}",
     full_name: "vdo admin",
     phone: "555-0105",
     sortable_name: "admin",
     roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("vdo") ] ]
+  },
+  {
+    email: "vdo.ride.requester@#{EMAIL_DOMAIN}",
+    full_name: "vdo ride requester",
+    phone: "555-0111",
+    sortable_name: "requester",
+    roles: [ [ UserRole::RIDE_REQUESTER, organizations.fetch("vdo") ] ]
   },
   {
     email: "unvetted.driver.1@#{EMAIL_DOMAIN}",

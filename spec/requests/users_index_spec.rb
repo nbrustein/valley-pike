@@ -48,9 +48,9 @@ RSpec.describe "Users index", type: :request do
         nameless_user.human.destroy!
         create(:user_role, user:, role: UserRole::VANITA_ADMIN)
         create(:user_role, user: alpha_user, role: UserRole::DEVELOPER)
-        create(:user_role, user: alpha_user, role: UserRole::ORG_ADMIN)
-        create(:user_role, user: alpha_user, role: UserRole::DRIVER)
         create(:user_role, user: alpha_user, role: UserRole::ORG_ADMIN, organization:)
+        create(:user_role, user: alpha_user, role: UserRole::DRIVER)
+        create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:)
         create(:user_role, user: zeta_user, role: UserRole::DRIVER, organization:)
         create(:identity, :magic_link, user:, email: user.email)
       end
@@ -69,10 +69,10 @@ RSpec.describe "Users index", type: :request do
 
         expect(response.body).to include("dev")
         expect(response.body).to include("vanita")
-        expect(response.body).to include("admin")
         expect(response.body).to include("driver")
         expect(response.body).to include("udo admin")
         expect(response.body).to include("udo driver")
+        expect(response.body).to include("udo ride requester")
       end
     end
 
