@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec docker compose exec db psql -U postgres -d valley_pike_development "$@"
