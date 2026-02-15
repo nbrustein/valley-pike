@@ -1,6 +1,12 @@
 # AGENTS
 
-When you are asked a question about the codebase, do not guess or give theoretical answers. Read the codebase and give a specific answer to the question based on the code in this project.
+## Answer questions about this codebase
+
+When I ask you questions about the codebase, I expect specific answers taken from THIS codebase.
+
+I will generally be unhappy with answers like: "Common reasons include...", "Often, in a apps like this..."
+
+Do research in the codebase and give specific answers to questions.
 
 ## Coding guidelines
 

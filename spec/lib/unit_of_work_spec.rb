@@ -58,11 +58,14 @@ RSpec.describe UnitOfWork do
 
     context "when execute_unit_of_work calls another unit of work" do
       it "only stores an audit record for the outer unit of work" do
-        result = nested_unit_of_work_class.execute(executor_id:, params:)
+        result = nil
+
+        expect {
+          result = nested_unit_of_work_class.execute(executor_id:, params:)
+        }.to change(UnitOfWorkExecution, :count).by(1)
 
         aggregate_failures do
           expect(result.success?).to be(true), result.errors.full_messages.join(", ")
-          expect(UnitOfWorkExecution.count).to eq(1)
           assert_execution_record(result: "success", expected_unit_of_work: "UnitOfWork::OuterImplementation")
         end
       end

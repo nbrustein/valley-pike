@@ -8,6 +8,8 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+return unless Rails.env.development?
+
 DEFAULT_PASSWORD = "password".freeze
 EMAIL_DOMAIN = "example.com".freeze
 
