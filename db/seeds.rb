@@ -8,8 +8,19 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+return unless Rails.env.development?
+
 DEFAULT_PASSWORD = "password".freeze
 EMAIL_DOMAIN = "example.com".freeze
+
+def upsert_seed_executor!(email:)
+  user = User.find_or_initialize_by(email:)
+  if user.human.nil?
+    user.build_human(full_name: "seed executor", phone: "555-0000", sortable_name: "executor")
+  end
+  user.save! if user.new_record? || user.changed? || user.human&.changed?
+  user
+end
 
 def upsert_organization!(name:, abbreviation:, require_vetted_drivers:)
   organization = Organization.find_or_initialize_by(abbreviation:)
@@ -99,14 +110,19 @@ user_definitions = [
 ]
 
 begin
+  seed_executor = upsert_seed_executor!(email: "seed.executor@#{EMAIL_DOMAIN}")
+
   user_definitions.each do |user_definition|
     result = UnitsOfWork::UpsertUser.execute(
-      email: user_definition.fetch(:email),
-      full_name: user_definition.fetch(:full_name),
-      phone: user_definition.fetch(:phone),
-      sortable_name: user_definition.fetch(:sortable_name),
-      roles: user_definition.fetch(:roles),
-      password: DEFAULT_PASSWORD
+      executor_id: seed_executor.id,
+      params: {
+        email: user_definition.fetch(:email),
+        full_name: user_definition.fetch(:full_name),
+        phone: user_definition.fetch(:phone),
+        sortable_name: user_definition.fetch(:sortable_name),
+        roles: user_definition.fetch(:roles),
+        password: DEFAULT_PASSWORD
+      }
     )
     next if result.success?
 

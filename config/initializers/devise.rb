@@ -17,7 +17,7 @@ Warden::Manager.after_set_user except: :fetch do |record, warden, _options|
   next unless record.is_a?(Identity)
 
   if record.kind == "magic_link" && record.user_id.nil?
-    UnitsOfWork::CreateUserFromMagicLink.new(identity: record).execute
+    raise "Expected to have a user"
   end
 
   updates = {last_used_at: Time.current, last_used_ip: warden.request&.remote_ip}
