@@ -19,6 +19,24 @@ services:
     depends_on:
       - db
 
+  css:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bash -lc "bundle install && bin/rails 'tailwindcss:watch[always]'"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: valley_pike_development
+      RAILS_ENV: development
+      RUBYOPT: "--enable-frozen-string-literal"
+    depends_on:
+      - db
+
   db:
     image: postgres:16-alpine
     environment:
