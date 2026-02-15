@@ -32,6 +32,7 @@ RSpec.describe "Users index", type: :request do
       end
     end
 
+
     context "when the signed-in user has global org_admin permissions" do
       let(:user) do
         create(
@@ -78,22 +79,22 @@ RSpec.describe "Users index", type: :request do
 
     context "when the signed-in user only has organization-scoped org_admin permissions" do
       let(:user) { create(:user, email: "udo-admin@example.com") }
-      let!(:udo_admin_user) { create(:user, human: build(:human, full_name: "UDO Admin", sortable_name: "Admin")) }
-      let!(:vdo_admin_user) { create(:user, human: build(:human, full_name: "VDO Admin", sortable_name: "Admin")) }
+      let!(:udo_requester_user) { create(:user, human: build(:human, full_name: "UDO Requester", sortable_name: "Requester")) }
+      let!(:vdo_requester_user) { create(:user, human: build(:human, full_name: "VDO Requester", sortable_name: "Requester")) }
 
       before do
         create(:user_role, user:, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: udo_admin_user, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: vdo_admin_user, role: UserRole::ORG_ADMIN, organization: other_organization)
+        create(:user_role, user: udo_requester_user, role: UserRole::RIDE_REQUESTER, organization:)
+        create(:user_role, user: vdo_requester_user, role: UserRole::RIDE_REQUESTER, organization: other_organization)
         create(:identity, :magic_link, user:, email: user.email)
       end
 
-      it "shows only users with org_admin roles in the same organization" do
+      it "shows only users with ride requester roles in the same organization" do
         act_get_users(user:)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("UDO Admin")
-        expect(response.body).not_to include("VDO Admin")
+        expect(response.body).to include("UDO Requester")
+        expect(response.body).not_to include("VDO Requester")
       end
     end
   end
