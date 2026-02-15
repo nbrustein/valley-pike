@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    command: bash -lc "bundle install && bin/rails tailwindcss:build && bin/rails server -b 0.0.0.0"
+    command: bash -lc "bundle install && script/ensure_assets && bin/rails server -b 0.0.0.0"
     volumes:
       - .:/rails
       - bundle:/usr/local/bundle

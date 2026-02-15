@@ -20,7 +20,7 @@ fi
 if [ $# -eq 0 ]; then
   exec docker compose run --rm \
     -e RAILS_ENV=test \
-    web bundle exec rspec
+    web script/rspec_with_assets
 fi
 
 if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
@@ -31,7 +31,7 @@ if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
   fi
   exec docker compose run --rm \
     -e RAILS_ENV=test \
-    web bundle exec rspec --example "$*"
+    web script/rspec_with_assets --example "$*"
 fi
 
 first="$1"
@@ -40,10 +40,9 @@ file_part="${first%%:*}"
 if [ -f "$first" ] || { [ -f "$file_part" ] && [[ "$first" == *:* ]]; }; then
   exec docker compose run --rm \
     -e RAILS_ENV=test \
-    web bundle exec rspec "$@"
+    web script/rspec_with_assets "$@"
 fi
 
 exec docker compose run --rm \
   -e RAILS_ENV=test \
-
-  web bundle exec rspec --example "$*"
+  web script/rspec_with_assets --example "$*"

@@ -8,10 +8,8 @@ class ProfilesController < ApplicationController
   def update
     assign_profile_state
     result = UnitsOfWork::UpdateProfile.execute(
-      user: current_user,
-      email: profile_params[:email],
-      password: profile_params[:password],
-      password_confirmation: profile_params[:password_confirmation]
+      executor_id: current_user.id,
+      params: profile_params.to_h.symbolize_keys.merge(user_id: current_user.id)
     )
     @profile_errors = result.errors
 

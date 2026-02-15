@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -43,6 +43,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_100000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "completed_at", precision: nil
+    t.datetime "created_at", null: false
+    t.uuid "executor_id", null: false
+    t.json "params", default: {}, null: false
+    t.text "result"
+    t.datetime "started_at", precision: nil, null: false
+    t.text "unit_of_work", null: false
+    t.datetime "updated_at", null: false
+    t.index ["executor_id"], name: "index_unit_of_work_executions_on_executor_id"
+    t.check_constraint "result = ANY (ARRAY['failure'::text, 'success'::text])", name: "unit_of_work_executions_result_check"
+  end
+
   create_table "user_roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "organization_id"
@@ -63,6 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_100000) do
   end
 
   add_foreign_key "identities", "users"
+  add_foreign_key "unit_of_work_executions", "users", column: "executor_id"
   add_foreign_key "user_roles", "organizations"
   add_foreign_key "user_roles", "users"
 end

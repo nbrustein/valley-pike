@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script/ensure_assets
+bundle exec rspec "$@"

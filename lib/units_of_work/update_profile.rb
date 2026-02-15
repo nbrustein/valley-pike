@@ -1,36 +1,41 @@
 module UnitsOfWork
   class UpdateProfile < UnitOfWork
-  include Memery
+    include Memery
 
-    def initialize(user:, email:, password:, password_confirmation:)
-      @user = user
-      @email = email
-      @password = password
-      @password_confirmation = password_confirmation
+    def initialize(executor_id:, params:)
+      super
+      @email = params[:email]
+      @password = params[:password]
+      @password_confirmation = params[:password_confirmation]
+      @user_id = params.fetch(:user_id)
       @has_email_update = email.present? && email != user.email
-    end
-
-    def execute
-      password_identity = user.password_identity
-      errors = ActiveModel::Errors.new(user)
-
-      ActiveRecord::Base.transaction do
-        try_to_update_user_email(errors) if has_email_update?
-        if errors.empty? && (has_password_update? || has_email_update?)
-          password_identity ||= user.identities.build(kind: "password")
-
-          try_to_update_password_identity(password_identity, normalized_email || user.email, errors)
-        end
-
-        raise ActiveRecord::Rollback unless errors.empty?
-      end
-
-      Result.new(errors:)
     end
 
     private
 
-    attr_reader :user, :email, :password, :password_confirmation
+    attr_reader :email, :password, :password_confirmation
+
+    memoize def user
+      User.find(@user_id)
+    end
+
+    def execute_unit_of_work(errors:)
+      password_identity = user.password_identity
+
+      try_to_update_user_email(errors) if has_email_update?
+      if errors.empty? && (has_password_update? || has_email_update?)
+        password_identity ||= user.identities.build(kind: "password")
+
+        try_to_update_password_identity(password_identity, normalized_email || user.email, errors)
+      end
+    end
+
+    def audit_params
+      _ = params.clone
+      _[:password] = "[FILTERED]" if _[:password].present?
+      _[:password_confirmation] = "[FILTERED]" if _[:password_confirmation].present?
+      _
+    end
 
     def has_password_update?
       password.present? || password_confirmation.present?

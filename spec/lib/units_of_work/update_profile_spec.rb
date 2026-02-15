@@ -6,6 +6,14 @@ RSpec.describe UnitsOfWork::UpdateProfile do
     let(:new_email) { nil }
     let(:new_password) { nil }
     let(:new_password_confirmation) { new_password }
+    let(:instance) do
+      described_class.new(executor_id: user.id, params: {
+        user_id: user.id,
+        email: new_email,
+        password: new_password,
+        password_confirmation: new_password_confirmation
+      })
+    end
 
     context "when updating the user email" do
       let(:new_email) { "new-email@example.com" }
@@ -54,6 +62,16 @@ RSpec.describe UnitsOfWork::UpdateProfile do
         assert_success(result)
         expect(password_identity.reload.valid_password?(new_password)).to be(true)
       end
+
+      it "stores filtered password fields in audit params" do
+        audit_params = instance.send(:audit_params)
+        expect(audit_params).to eq({
+          user_id: user.id,
+          email: new_email,
+          password: "[FILTERED]",
+          password_confirmation: "[FILTERED]"
+        })
+      end
     end
 
     context "when the password is invalid" do
@@ -71,19 +89,14 @@ RSpec.describe UnitsOfWork::UpdateProfile do
         )
       end
     end
-  end
 
-  private
-  def act
-    result = described_class.execute(
-      user:,
-      email: new_email,
-      password: new_password,
-      password_confirmation: new_password_confirmation
-    )
-  end
+    private
+    def act
+      instance.execute
+    end
 
-  def assert_success(result)
-    expect(result.success?).to be(true), result.errors.full_messages.join(", ")
+    def assert_success(result)
+      expect(result.success?).to be(true), result.errors.full_messages.join(", ")
+    end
   end
 end

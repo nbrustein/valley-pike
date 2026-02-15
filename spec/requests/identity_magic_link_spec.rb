@@ -110,12 +110,10 @@ RSpec.describe "Magic link sign in", type: :request do
     let(:uri) { URI.parse(identity.magic_link_url(host: "example.com", remember_me: false)) }
     let(:params) { Rack::Utils.parse_nested_query(uri.query.to_s) }
 
-    it "creates a user for an identity without one" do
-      get uri.path, params:, headers: request_headers
-
-      identity.reload
-      expect(identity.user).to be_present
-      expect(identity.user.email).to eq("user@example.com")
+    it "raises when an identity has no user" do
+      expect {
+        get uri.path, params:, headers: request_headers
+      }.to raise_error(RuntimeError, "Expected to have a user")
     end
   end
 
