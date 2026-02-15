@@ -4,7 +4,9 @@ class UserPolicy < ApplicationPolicy
   end
 
   def restricted_to_viewing_ride_requesters_for_own_organization?
-    user&.has_role_permissions?(UserRole::ORG_ADMIN) && !can_view_all_users?
+    return false unless user&.has_role_permissions?(UserRole::ORG_ADMIN)
+
+    !can_view_all_users?
   end
 
   def can_view_all_users?

@@ -2,16 +2,14 @@ require "rails_helper"
 
 RSpec.describe UsersHelper do
   let(:current_user) { build(:user) }
-  let(:policy_class) { Class.new }
-  let(:policy) { policy_class.new }
-  let(:scope_instance) { instance_double("Scope") }
+  let(:policy) { instance_double(UserPolicy) }
+  let(:scope_instance) { instance_double(UserPolicy::Scope) }
 
   before do
-    stub_const("UsersHelperSpecPolicy", policy_class)
-    stub_const("UsersHelperSpecPolicy::Scope", Class.new)
-    allow(UsersHelperSpecPolicy::Scope).to receive(:new).and_return(scope_instance)
+    allow(UserPolicy::Scope).to receive(:new).with(current_user, User).and_return(scope_instance)
     allow(helper).to receive(:view_users_policy).and_return(policy)
-    allow(helper).to receive(:current_user).and_return(current_user)
+    user = current_user
+    helper.define_singleton_method(:current_user) { user }
     helper.clear_memery_cache!
   end
 
