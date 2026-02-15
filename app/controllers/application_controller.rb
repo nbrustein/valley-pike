@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Pundit::Authorization
   include ShowsFlashMessages
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -9,11 +10,19 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :user_signed_in?
 
+  rescue_from Pundit::NotAuthorizedError, with: :render_not_found
+
   def current_user
     current_identity&.user
   end
 
   def user_signed_in?
     identity_signed_in?
+  end
+
+  private
+
+  def render_not_found
+    head :not_found
   end
 end

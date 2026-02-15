@@ -74,7 +74,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_130000) do
     t.uuid "user_id", null: false
     t.index ["organization_id"], name: "index_user_roles_on_organization_id"
     t.index ["user_id"], name: "index_user_roles_on_user_id"
-    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'org_admin'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'org_admin'::character varying::text, 'driver'::character varying::text])", name: "user_roles_role_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
