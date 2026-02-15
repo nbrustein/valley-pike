@@ -3,16 +3,8 @@ class UserPolicy < ApplicationPolicy
     user&.has_role_permissions?(UserRole::ORG_ADMIN) || false
   end
 
-  def restricted_to_viewing_ride_requesters_for_own_organization?
-    return false unless user&.has_role_permissions?(UserRole::ORG_ADMIN)
-
-    !can_view_all_users?
-  end
-
-  def can_view_all_users?
-    return false if user.nil?
-
-    roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
+  def can_manage_all_users?
+    user.has_role_permissions?(UserRole::VANITA_ADMIN)
   end
 
   class Scope < Scope
@@ -20,20 +12,23 @@ class UserPolicy < ApplicationPolicy
       return scope.none unless user&.has_role_permissions?(UserRole::ORG_ADMIN)
 
       users = base_scope
-      return users if UserPolicy.new(user, nil).send(:can_view_all_users?)
-      if restricted_to_viewing_ride_requesters_for_own_organization?
-        return users.joins(:user_roles).where(
-          user_roles: {
-            role: UserRole::RIDE_REQUESTER,
-            organization_id: permitted_org_ids
-          }
-        )
-      end
+
+      return users if policy.send(:can_manage_all_users?)
+      return users.joins(:user_roles).where(
+        user_roles: {
+          role: UserRole::RIDE_REQUESTER,
+          organization_id: organization_ids_with_org_admin_permissions
+        }
+      )
 
       raise NotImplementedError, "Hit an unexpected situation in UserPolicy::Scope#resolve"
     end
 
     private
+
+    def policy
+      UserPolicy.new(user, nil)
+    end
 
     def base_scope
       scope.joins(:human)
@@ -42,12 +37,7 @@ class UserPolicy < ApplicationPolicy
         .distinct
     end
 
-    def restricted_to_viewing_ride_requesters_for_own_organization?
-      UserPolicy.new(user, nil)
-        .restricted_to_viewing_ride_requesters_for_own_organization?
-    end
-
-    def permitted_org_ids
+    def organization_ids_with_org_admin_permissions
       user.roles_with_permissions(UserRole::ORG_ADMIN)
         .filter_map(&:organization_id)
         .uniq
