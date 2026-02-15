@@ -1,4 +1,6 @@
 class UnitOfWork
+  include UnitOfWork::HasExecutionContext
+
   attr_reader :executor_id, :params
 
   def self.execute(**)
@@ -11,26 +13,28 @@ class UnitOfWork
   end
 
   def execute
-    execution = create_execution_record
-    errors = ActiveModel::Errors.new(executor_for_errors)
+    with_execution_context do
+      execution = create_execution_record if should_audit_execution?
+      errors = ActiveModel::Errors.new(executor_for_errors)
 
-    ActiveRecord::Base.transaction do
-      begin
-        ActiveRecord::Base.transaction(requires_new: true) do
-          execute_unit_of_work(errors:)
-          raise ActiveRecord::Rollback if errors.any?
+      ActiveRecord::Base.transaction do
+        begin
+          ActiveRecord::Base.transaction(requires_new: true) do
+            execute_unit_of_work(errors:)
+            raise ActiveRecord::Rollback if errors.any?
+          end
+        rescue StandardError => error
+          errors.add(:base, error.message)
         end
-      rescue StandardError => error
-        errors.add(:base, error.message)
+
+        execution&.update!(
+          completed_at: Time.current,
+          result: errors.any? ? "failure" : "success"
+        )
       end
 
-      execution.update!(
-        completed_at: Time.current,
-        result: errors.any? ? "failure" : "success"
-      )
+      UnitOfWork::Result.new(errors:)
     end
-
-    UnitOfWork::Result.new(errors:)
   end
 
   private
@@ -60,5 +64,11 @@ class UnitOfWork
 
   def executor_for_errors
     @executor_for_errors ||= User.find(executor_id)
+  end
+
+  # We do not store execution records for units of work that are executed from within
+  # another unit of work. Only the unit triggered at the top level is recorded.
+  def should_audit_execution?
+    execution_depth == 1
   end
 end

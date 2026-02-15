@@ -56,6 +56,18 @@ RSpec.describe UnitOfWork do
       end
     end
 
+    context "when execute_unit_of_work calls another unit of work" do
+      it "only stores an audit record for the outer unit of work" do
+        result = nested_unit_of_work_class.execute(executor_id:, params:)
+
+        aggregate_failures do
+          expect(result.success?).to be(true), result.errors.full_messages.join(", ")
+          expect(UnitOfWorkExecution.count).to eq(1)
+          assert_execution_record(result: "success", expected_unit_of_work: "UnitOfWork::OuterImplementation")
+        end
+      end
+    end
+
     private
 
     def act
@@ -84,12 +96,31 @@ RSpec.describe UnitOfWork do
       end)
     end
 
-    def assert_execution_record(result:, params: nil)
+    def nested_unit_of_work_class
+      stub_const("UnitOfWork::InnerImplementation", Class.new(UnitOfWork) do
+        private
+
+        def execute_unit_of_work(errors:)
+          errors
+        end
+      end)
+
+      stub_const("UnitOfWork::OuterImplementation", Class.new(UnitOfWork) do
+        private
+
+        def execute_unit_of_work(errors:)
+          errors
+          UnitOfWork::InnerImplementation.execute(executor_id:, params:)
+        end
+      end)
+    end
+
+    def assert_execution_record(result:, params: nil, expected_unit_of_work: "UnitOfWork::TestImplementation")
       params ||= self.params
       execution = UnitOfWorkExecution.order(:created_at).last
       expect(execution).not_to be_nil
       expect(execution.executor_id).to eq(executor_id)
-      expect(execution.unit_of_work).to eq("UnitOfWork::TestImplementation")
+      expect(execution.unit_of_work).to eq(expected_unit_of_work)
       expect(execution.started_at).to be_present
       expect(execution.completed_at).to be_present
       expect(execution.params).to eq(params.as_json)
