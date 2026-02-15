@@ -3,21 +3,32 @@ class UserPolicy < ApplicationPolicy
     user&.has_role_permissions?(UserRole::ORG_ADMIN) || false
   end
 
+  def restricted_to_viewing_ride_requesters_for_own_organization?
+    user&.has_role_permissions?(UserRole::ORG_ADMIN) && !can_view_all_users?
+  end
+
+  def can_view_all_users?
+    return false if user.nil?
+
+    roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
+  end
+
   class Scope < Scope
     def resolve
       return scope.none unless user&.has_role_permissions?(UserRole::ORG_ADMIN)
 
       users = base_scope
-      return users if can_view_all_users?
+      return users if UserPolicy.new(user, nil).send(:can_view_all_users?)
+      if restricted_to_viewing_ride_requesters_for_own_organization?
+        return users.joins(:user_roles).where(
+          user_roles: {
+            role: UserRole::RIDE_REQUESTER,
+            organization_id: permitted_org_ids
+          }
+        )
+      end
 
-      # People who cannot view all users (i.e. org admins) can only view
-      # the other org admins in their organization.
-      users.joins(:user_roles).where(
-        user_roles: {
-          role: UserRole::ORG_ADMIN,
-          organization_id: permitted_org_ids
-        }
-      )
+      raise NotImplementedError, "Hit an unexpected situation in UserPolicy::Scope#resolve"
     end
 
     private
@@ -29,16 +40,21 @@ class UserPolicy < ApplicationPolicy
         .distinct
     end
 
-    def can_view_all_users?
-      roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
+    def restricted_to_viewing_ride_requesters_for_own_organization?
+      UserPolicy.new(user, nil)
+        .restricted_to_viewing_ride_requesters_for_own_organization?
     end
 
     def permitted_org_ids
-      roles_granting_org_admin_permissions.filter_map(&:organization_id).uniq
-    end
-
-    def roles_granting_org_admin_permissions
       user.roles_with_permissions(UserRole::ORG_ADMIN)
+        .filter_map(&:organization_id)
+        .uniq
     end
+  end
+
+  private
+
+  def roles_granting_org_admin_permissions
+    user.roles_with_permissions(UserRole::ORG_ADMIN)
   end
 end

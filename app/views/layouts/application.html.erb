@@ -29,12 +29,7 @@
         <div class="flex w-full items-center justify-between py-4 pl-8 pr-4 sm:pl-10 sm:pr-6">
           <p class="text-lg font-semibold tracking-tight text-fog-100">Valley Pike</p>
           <nav aria-label="Main" class="flex items-center gap-2">
-            <% if user_signed_in? %>
-              <% if policy(User).index? %>
-                <%= link_to "Users", users_path, class: "menu-link" %>
-              <% end %>
-              <%= link_to "Edit profile", profile_path, class: "menu-link" %>
-            <% end %>
+            <%= render "layouts/app_menu" %>
           </nav>
         </div>
       </header>
