@@ -23,7 +23,7 @@
 
     <%= form.hidden_field :role, value: UserRole::RIDE_REQUESTER %>
 
-    <% if policy(User).can_create_ride_requesters_for_any_organization? %>
+    <% if @organizations.size > 1 %>
       <div>
         <%= form.label :organization_id, "Organization", class: "block text-sm font-semibold text-forest-900" %>
         <%= form.select :organization_id,

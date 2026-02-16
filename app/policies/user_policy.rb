@@ -3,6 +3,10 @@ class UserPolicy < ApplicationPolicy
     user&.has_role_permissions?(UserRole::ORG_ADMIN) || false
   end
 
+  def create?
+    has_org_admin_permissions?
+  end
+
   def can_manage_all_users?
     user.has_role_permissions?(UserRole::VANITA_ADMIN)
   end
@@ -11,6 +15,12 @@ class UserPolicy < ApplicationPolicy
     return false if user.nil?
 
     roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
+  end
+
+  def permitted_org_ids_for_role_management
+    return Organization.ids if can_manage_all_users?
+
+    organization_ids_with_org_admin_permissions
   end
 
   class Scope < Scope
@@ -53,12 +63,18 @@ class UserPolicy < ApplicationPolicy
   private
 
   def roles_granting_org_admin_permissions
+    return [] if user.nil?
+
     user.roles_with_permissions(UserRole::ORG_ADMIN)
   end
 
-  def has_org_admin_permissions_only_for_own_organization?
-    return false if user.nil?
+  def organization_ids_with_org_admin_permissions
+    roles_granting_org_admin_permissions
+      .filter_map(&:organization_id)
+      .uniq
+  end
 
-    roles_granting_org_admin_permissions.any? {|role| role.organization_id.present? }
+  def has_org_admin_permissions?
+    roles_granting_org_admin_permissions.any?
   end
 end

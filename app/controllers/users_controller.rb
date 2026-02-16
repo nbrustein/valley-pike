@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  include Memery
+
   def index
     authorize User, :index?
     @users = policy_scope(User)
@@ -54,7 +56,7 @@ class UsersController < ApplicationController
   end
 
   def resolve_organization_id
-    return permitted_org_ids_for_creation.first unless can_select_organization?
+    return permitted_org_ids_for_creation.first if permitted_org_ids_for_creation.size == 1
 
     organization_id = create_user_params[:organization_id]
     return if organization_id.blank?
@@ -64,12 +66,8 @@ class UsersController < ApplicationController
     nil
   end
 
-  def can_select_organization?
-    policy(User).can_create_ride_requesters_for_any_organization?
-  end
-
-  def permitted_org_ids_for_creation
-    @permitted_org_ids_for_creation ||= policy(User).permitted_org_ids_for_ride_requester_creation
+  memoize def permitted_org_ids_for_creation
+    policy(User).permitted_org_ids_for_role_management
   end
 
   def set_errors(attribute, message)
