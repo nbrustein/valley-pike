@@ -12,6 +12,10 @@ post password_session_path,
         headers:
 ```
 
+## Memoization
+
+use Memery, not @___ ||=
+
 ## Models
 
 Models that are likely to have much complexity (i.e. more than 60 lines) should be split up into concerns. See identity.rb for an example
