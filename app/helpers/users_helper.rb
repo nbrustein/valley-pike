@@ -23,10 +23,6 @@ module UsersHelper
     permitted_organizations.map(&:abbreviation)
   end
 
-  memoize def permitted_org_ids
-    permitted_organizations.map(&:id)
-  end
-
   memoize def permitted_organizations
     view_users_policy.send(:roles_granting_org_admin_permissions)
       .filter_map(&:organization)
