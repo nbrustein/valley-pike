@@ -3,50 +3,152 @@ require "rails_helper"
 RSpec.describe UserPolicy do
   describe "#create?" do
     let(:organization) { create(:organization) }
+    let(:record) { build(:user) }
 
-    context "when the current user is an org admin for a specific organization" do
-      let(:current_user) { create(:user) }
+    def act
+      described_class.new(current_user, record).create?
+    end
 
-      before do
-        create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
-      end
-
-      it "allows creation" do
-        policy = described_class.new(current_user, nil)
-        expect(policy.create?).to be(true)
+    def build_roles(*entries)
+      entries.each do |entry|
+        record.user_roles.build(**entry)
       end
     end
 
-    context "when the current user is a vanita admin" do
-      let(:current_user) { create(:user) }
+    context "when the record is the User class" do
+      let(:record) { User }
 
-      before do
-        create(:user_role, user: current_user, role: UserRole::VANITA_ADMIN)
+      context "when the current user is an org admin" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+        end
+
+        it "allows creation" do
+          expect(act).to be(true)
+        end
       end
 
-      it "allows creation" do
-        policy = described_class.new(current_user, nil)
-        expect(policy.create?).to be(true)
+      context "when the current user is not an org admin" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::RIDE_REQUESTER, organization:)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
       end
     end
 
-    context "when the current user does not have org admin permissions" do
-      let(:current_user) { create(:user) }
+    context "when the record is a user instance" do
+      context "when the current user is an org admin for a specific organization" do
+        let(:current_user) { create(:user) }
 
-      before do
-        create(:user_role, user: current_user, role: UserRole::RIDE_REQUESTER, organization:)
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+          build_roles(role: UserRole::RIDE_REQUESTER, organization_id: organization.id)
+        end
+
+        it "allows creation" do
+          expect(act).to be(true)
+        end
       end
 
-      it "denies creation" do
-        policy = described_class.new(current_user, nil)
-        expect(policy.create?).to be(false)
-      end
-    end
+      context "when the current user is a vanita admin" do
+        let(:current_user) { create(:user) }
+        let(:other_organization) { create(:organization) }
 
-    context "when there is no current user" do
-      it "denies creation" do
-        policy = described_class.new(nil, nil)
-        expect(policy.create?).to be(false)
+        before do
+          create(:user_role, user: current_user, role: UserRole::VANITA_ADMIN)
+          build_roles(role: UserRole::RIDE_REQUESTER, organization_id: other_organization.id)
+        end
+
+        it "allows creation" do
+          expect(act).to be(true)
+        end
+      end
+
+      context "when the record has no roles" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
+      end
+
+      context "when the record has multiple roles" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+          build_roles(
+            {role: UserRole::RIDE_REQUESTER, organization_id: organization.id},
+            {role: UserRole::DRIVER, organization_id: organization.id}
+          )
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
+      end
+
+      context "when the record role is not ride requester" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+          build_roles(role: UserRole::DRIVER, organization_id: organization.id)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
+      end
+
+      context "when the record organization is missing" do
+        let(:current_user) { create(:user) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+          build_roles(role: UserRole::RIDE_REQUESTER, organization_id: nil)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
+      end
+
+      context "when the record organization is not permitted" do
+        let(:current_user) { create(:user) }
+        let(:other_organization) { create(:organization) }
+
+        before do
+          create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
+          build_roles(role: UserRole::RIDE_REQUESTER, organization_id: other_organization.id)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
+      end
+
+      context "when there is no current user" do
+        let(:current_user) { nil }
+
+        before do
+          build_roles(role: UserRole::RIDE_REQUESTER, organization_id: organization.id)
+        end
+
+        it "denies creation" do
+          expect(act).to be(false)
+        end
       end
     end
   end
