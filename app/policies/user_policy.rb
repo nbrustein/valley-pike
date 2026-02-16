@@ -49,4 +49,16 @@ class UserPolicy < ApplicationPolicy
   def roles_granting_org_admin_permissions
     user.roles_with_permissions(UserRole::ORG_ADMIN)
   end
+
+  def has_org_admin_permissions_for_all_organizations?
+    return false if user.nil?
+
+    roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
+  end
+
+  def has_org_admin_permissions_only_for_own_organization?
+    return false if user.nil?
+
+    roles_granting_org_admin_permissions.any? {|role| role.organization_id.present? }
+  end
 end
