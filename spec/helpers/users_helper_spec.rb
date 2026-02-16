@@ -38,6 +38,19 @@ RSpec.describe UsersHelper do
   end
 
   describe "#users_index_label" do
+    let(:has_org_admin_permissions_for_all_organizations) { false }
+    before do
+      expect(policy).to receive(:has_org_admin_permissions_for_all_organizations?).and_return(has_org_admin_permissions_for_all_organizations)
+    end
+
+    context "when the user has org admin permissions for all organizations" do
+      let(:has_org_admin_permissions_for_all_organizations) { true }
+
+      it "returns Users" do
+        expect(helper.users_index_label).to eq("Users")
+      end
+    end
+
     context "when there are multiple organizations" do
       before do
         allow(policy).to receive(:roles_granting_org_admin_permissions)
