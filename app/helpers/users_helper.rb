@@ -6,6 +6,7 @@ module UsersHelper
   end
 
   memoize def users_index_label
+    return "Users" if view_users_policy.has_org_admin_permissions_for_all_organizations?
     return "Users" if permitted_org_abbreviations.count > 1
     return nil if permitted_org_abbreviations.empty?
     abbreviation = permitted_org_abbreviations.first

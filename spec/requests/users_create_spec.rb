@@ -11,7 +11,7 @@ RSpec.describe "Users create", type: :request do
   before { configure_request_host! }
 
   describe "GET /users/new" do
-    context "when the signed-in user is an org admin" do
+    context "when only one organization is available to the current user" do
       let(:current_user) { create(:user, email: "udo-admin@example.com") }
 
       before do
@@ -28,7 +28,7 @@ RSpec.describe "Users create", type: :request do
       end
     end
 
-    context "when the signed-in user is a vanita admin" do
+    context "when multiple organizations are available to the current user" do
       let(:current_user) { create(:user, email: "vanita@example.com") }
 
       before do
@@ -48,7 +48,7 @@ RSpec.describe "Users create", type: :request do
       end
     end
 
-    context "when the signed-in user is a ride requester" do
+    context "when the current user is not allowed to create users" do
       let(:current_user) { create(:user, email: "requester@example.com") }
 
       before do
