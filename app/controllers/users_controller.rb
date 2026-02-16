@@ -7,23 +7,22 @@ class UsersController < ApplicationController
   end
 
   def new
-    authorize User, :create?
     @user = User.new
+    authorize User, :create?
     @selected_organization_id = nil
     load_form_organizations
   end
 
   def create
-    authorize User, :create?
-    @user = User.new(email: create_user_params.fetch(:email))
+    @user = User.new
+    @user.email = create_user_params.fetch(:email)
+    @user.user_roles.build(
+      role: create_user_params[:role],
+      organization_id: create_user_params[:organization_id]
+    )
+    authorize @user
     @selected_organization_id = create_user_params[:organization_id]
     load_form_organizations
-
-    organization_id = resolve_organization_id
-    if organization_id.blank?
-      set_errors(:organization, "is required")
-      return render(:new, status: :unprocessable_entity)
-    end
 
     result = UnitsOfWork::CreateUser.execute(
       executor_id: current_user.id,
@@ -32,7 +31,7 @@ class UsersController < ApplicationController
         full_name: "Unknown",
         phone: "",
         sortable_name: "Unknown",
-        roles: [ {role: UserRole::RIDE_REQUESTER, organization_id:} ]
+        roles: @user.user_roles.map {|user_role| {role: user_role.role, organization_id: user_role.organization_id} }
       }
     )
 
@@ -47,23 +46,12 @@ class UsersController < ApplicationController
   private
 
   def load_form_organizations
-    @organizations = Organization.order(:name)
+    @organizations = Organization.where(id: permitted_org_ids_for_creation).order(:name)
     @default_organization_id = permitted_org_ids_for_creation.first
   end
 
   def create_user_params
     params.require(:user).permit(:email, :organization_id, :role)
-  end
-
-  def resolve_organization_id
-    return permitted_org_ids_for_creation.first if permitted_org_ids_for_creation.size == 1
-
-    organization_id = create_user_params[:organization_id]
-    return if organization_id.blank?
-    return organization_id if permitted_org_ids_for_creation.include?(organization_id)
-
-    set_errors(:organization, "is not allowed")
-    nil
   end
 
   memoize def permitted_org_ids_for_creation

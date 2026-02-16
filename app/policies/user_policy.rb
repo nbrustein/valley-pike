@@ -4,11 +4,23 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    has_org_admin_permissions?
+    if record == User
+      return user.has_role_permissions?(UserRole::ORG_ADMIN)
+    end
+    return false if user.nil? || record.nil?
+    return false unless record.user_roles.size == 1
+
+    user_role = record.user_roles.first
+    return false unless user_role.role == UserRole::RIDE_REQUESTER
+
+    organization_id = user_role.organization_id
+    return false if organization_id.blank?
+
+    permitted_org_ids_for_role_management.include?(organization_id)
   end
 
   def can_manage_all_users?
-    user.has_role_permissions?(UserRole::VANITA_ADMIN)
+    user&.has_role_permissions?(UserRole::VANITA_ADMIN) || false
   end
 
   def has_org_admin_permissions_for_all_organizations?
