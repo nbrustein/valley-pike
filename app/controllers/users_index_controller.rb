@@ -1,15 +1,12 @@
 class UsersIndexController < ApplicationController
   include Memery
-  before_action :authorize_user_view
 
   def index
-    authorize User, :index?
-    @users = policy_scope(User)
-  end
-
-  private
-
-  def authorize_user_view
-    raise PolicyBase::NotAuthorizedError unless UserViewPolicy.new(current_user).index?
+    authorize(User, :index?, policy_class: UserViewPolicy)
+    @users = policy_scope(User, policy_scope_class: UserViewPolicy::Scope)
+      .joins(:human)
+      .includes(:human, user_roles: :organization)
+      .order(humans: {sortable_name: :asc})
+      .distinct
   end
 end

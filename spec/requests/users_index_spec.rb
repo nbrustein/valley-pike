@@ -32,8 +32,21 @@ RSpec.describe "Users index", type: :request do
 
     context "when the current_user can index users" do
       let(:role) { UserRole::VANITA_ADMIN }
-      let!(:alpha_user) { create(:user) }
-      let!(:zeta_user) { create(:user) }
+
+      let!(:zeta_user) do
+        create(
+          :user,
+          human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")
+        )
+      end
+      let!(:alpha_user) do
+        create(
+          :user,
+          human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")
+        )
+      end
+      let!(:alpha_user_role) { create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:) }
+      let!(:zeta_user_role) { create(:user_role, user: zeta_user, role: UserRole::RIDE_REQUESTER, organization:) }
 
       context "when requesting the users index" do
         before { act }
@@ -89,9 +102,7 @@ RSpec.describe "Users index", type: :request do
         before { act }
 
         it "shows no role pills" do
-          expect(response.body).to match(user_row_without_role_labels_regex(
-            full_name: no_role_user.human.full_name
-          ))
+          expect(response.body).not_to include(no_role_user.human.full_name)
         end
       end
     end
