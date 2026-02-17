@@ -18,7 +18,7 @@ class UserRole < ApplicationRecord
   # drivers can accept ride requests
   DRIVER = "driver"
 
-  ROLES = [ DEVELOPER, VANITA_ADMIN, ORG_ADMIN, RIDE_REQUESTER, DRIVER ].freeze
+  ROLES = [ DEVELOPER, VANITA_ADMIN, ORG_ADMIN, RIDE_REQUESTER, DRIVER ].to_set.freeze
 
   belongs_to :user
   belongs_to :organization, optional: true
