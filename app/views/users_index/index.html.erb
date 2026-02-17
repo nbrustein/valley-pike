@@ -1,0 +1,33 @@
+<section class="surface-card">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= users_index_label %></h1>
+    <% if policy(User).create? %>
+      <%= link_to "Create", new_user_path, class: "rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800" %>
+    <% end %>
+  </div>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="min-w-full border-collapse text-left text-sm">
+      <thead>
+        <tr class="border-b border-forest-900/15 text-xs uppercase tracking-wide text-forest-900/70">
+          <th class="px-3 py-2 font-semibold">Full name</th>
+          <th class="px-3 py-2 font-semibold">Roles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr class="border-b border-forest-900/10 align-top">
+            <td class="px-3 py-3 text-forest-900"><%= user.human.full_name %></td>
+            <td class="px-3 py-3">
+              <div class="flex flex-wrap gap-2">
+                <% user.user_roles.each do |user_role| %>
+                  <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900"><%= user_role.pill_label %></span>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

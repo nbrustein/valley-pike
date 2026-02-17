@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user, :user_signed_in?
 
   rescue_from Pundit::NotAuthorizedError, with: :render_not_found
+  rescue_from PolicyBase::NotAuthorizedError, with: :render_not_found
 
   def current_user
     current_identity&.user

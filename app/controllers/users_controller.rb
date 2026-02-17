@@ -1,11 +1,6 @@
 class UsersController < ApplicationController
   include Memery
 
-  def index
-    authorize User, :index?
-    @users = policy_scope(User)
-  end
-
   def new
     @user = User.new
     authorize User, :create?

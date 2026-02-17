@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   post "identity/magic_link_identity", to: "create_magic_link_identity#create_magic_link_identity", as: :identity_magic_link_identity
   post "auth/password_session", to: "auth#create_password_session", as: :password_session
   resource :profile, only: %i[show update]
-  resources :users, only: %i[index new create]
+  resources :users, only: %i[new create]
+  get "users", to: "users_index#index", as: nil
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
