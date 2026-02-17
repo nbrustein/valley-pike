@@ -2,7 +2,8 @@ require "rails_helper"
 
 RSpec.describe UserViewPolicy do
   let(:current_user) { create(:user) }
-  let(:policy) { UserViewPolicy.new(current_user) }
+  let(:policy) { UserViewPolicy.new(current_user, User) }
+  let(:scope) { described_class::Scope.new(current_user, User).resolve }
 
   describe "#index?" do
     context "when there is no current user" do
@@ -57,7 +58,7 @@ RSpec.describe UserViewPolicy do
       let(:current_user) { nil }
 
       it "returns an empty query" do
-        expect(policy.scope).to be_empty
+        expect(scope).to be_empty
       end
     end
 
@@ -78,7 +79,7 @@ RSpec.describe UserViewPolicy do
       end
 
       it "returns all users" do
-        users = policy.scope.to_a
+        users = scope.to_a
         expect(users).to include(
           ride_requester_for_org_1,
           ride_requester_for_org_2,
@@ -99,7 +100,7 @@ RSpec.describe UserViewPolicy do
       end
 
       it "returns ride requesters for the current user's organization" do
-        users = policy.scope.to_a
+        users = scope.to_a
         expect(users).to include(ride_requester_for_org_1)
         expect(users).not_to include(ride_requester_for_org_2)
       end
@@ -111,7 +112,7 @@ RSpec.describe UserViewPolicy do
       end
 
       it "returns an empty query" do
-        expect(policy.scope).to be_empty
+        expect(scope).to be_empty
       end
     end
   end
