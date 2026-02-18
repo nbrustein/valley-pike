@@ -12,7 +12,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
     let(:roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
-        {role: UserRole::DRIVER, organization_id: nil}
+        {role: UserRole::DRIVER, organization_id: nil},
       ]
     end
     let(:password) { nil }
@@ -85,7 +85,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
         phone:,
         sortable_name:,
         roles:,
-        password:
+        password:,
       }
     )
   end

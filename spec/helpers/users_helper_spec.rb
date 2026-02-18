@@ -56,7 +56,7 @@ RSpec.describe UsersHelper do
         allow(policy).to receive(:roles_granting_org_admin_permissions)
           .and_return([
             instance_double(UserRole, organization: instance_double(Organization, abbreviation: "UDO")),
-            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "VDO"))
+            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "VDO")),
           ])
       end
 
@@ -79,7 +79,7 @@ RSpec.describe UsersHelper do
       before do
         allow(policy).to receive(:roles_granting_org_admin_permissions)
           .and_return([
-            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "UDO"))
+            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "UDO")),
           ])
       end
 

@@ -1,0 +1,43 @@
+<section class="surface-card">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Create ride requester</h1>
+    <p class="mt-1 text-sm text-forest-900/70">Invite a new ride requester by email.</p>
+  </div>
+
+  <% if @errors&.any? %>
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <p class="font-semibold">Please fix the following:</p>
+      <ul class="mt-2 list-disc pl-5">
+        <% @errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with scope: :user, url: users_path, method: :post, local: true, class: "space-y-5" do |form| %>
+    <div>
+      <%= form.label :email, "Email", class: "block text-sm font-semibold text-forest-900" %>
+      <%= form.email_field :email, value: @user.email, required: true, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+    </div>
+
+    <%= form.hidden_field :role, value: UserRole::RIDE_REQUESTER %>
+
+    <% if @organizations.size > 1 %>
+      <div>
+        <%= form.label :organization_id, "Organization", class: "block text-sm font-semibold text-forest-900" %>
+        <%= form.select :organization_id,
+                        options_from_collection_for_select(@organizations, :id, :name, @selected_organization_id),
+                        {include_blank: "Select an organization"},
+                        class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+      </div>
+    <% else %>
+      <%= form.hidden_field :organization_id, value: @default_organization_id %>
+    <% end %>
+
+    <div class="flex items-center justify-end gap-3">
+      <%= link_to "Cancel", users_path, class: "text-sm font-semibold text-forest-900/70 hover:text-forest-900" %>
+      <%= form.submit "Create ride requester", class: "rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800" %>
+    </div>
+  <% end %>
+</section>

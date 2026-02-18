@@ -168,7 +168,7 @@ RSpec.describe UserPolicy do
         policy = described_class.new(current_user, nil)
         expect(policy.permitted_org_ids_for_role_management).to match_array([
           organization.id,
-          other_organization.id
+          other_organization.id,
         ])
       end
     end

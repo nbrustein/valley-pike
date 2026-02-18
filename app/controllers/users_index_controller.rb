@@ -2,7 +2,7 @@ class UsersIndexController < ApplicationController
   include Memery
 
   def index
-    authorize(User, :index?, policy_class: UserViewPolicy)
+    authorize(nil, :index?, policy_class: UserViewPolicy)
     @users = policy_scope(User, policy_scope_class: UserViewPolicy::Scope)
       .joins(:human)
       .includes(:human, user_roles: :organization)
