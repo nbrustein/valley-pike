@@ -45,7 +45,7 @@ class UserPolicy < ApplicationPolicy
       return users.joins(:user_roles).where(
         user_roles: {
           role: UserRole::RIDE_REQUESTER,
-          organization_id: organization_ids_with_org_admin_permissions
+          organization_id: organization_ids_with_org_admin_permissions,
         }
       )
 

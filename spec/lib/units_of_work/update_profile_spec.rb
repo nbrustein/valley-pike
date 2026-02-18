@@ -11,7 +11,7 @@ RSpec.describe UnitsOfWork::UpdateProfile do
         user_id: user.id,
         email: new_email,
         password: new_password,
-        password_confirmation: new_password_confirmation
+        password_confirmation: new_password_confirmation,
       })
     end
 
@@ -69,7 +69,7 @@ RSpec.describe UnitsOfWork::UpdateProfile do
           user_id: user.id,
           email: new_email,
           password: "[FILTERED]",
-          password_confirmation: "[FILTERED]"
+          password_confirmation: "[FILTERED]",
         })
       end
     end

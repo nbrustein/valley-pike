@@ -8,10 +8,10 @@ RSpec.describe UnitsOfWork::CreateUser do
     let(:full_name) { "New User" }
     let(:phone) { "555-1212" }
     let(:sortable_name) { "User" }
-    let(:roles) do
+    let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
-        {role: UserRole::DRIVER, organization_id: nil}
+        {role: UserRole::DRIVER, organization_id: nil},
       ]
     end
     let(:password) { nil }
@@ -72,8 +72,8 @@ RSpec.describe UnitsOfWork::CreateUser do
         full_name:,
         phone:,
         sortable_name:,
-        roles:,
-        password:
+        user_roles:,
+        password:,
       }
     )
   end

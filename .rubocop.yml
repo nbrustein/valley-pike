@@ -5,6 +5,12 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 Layout/LineLength:
   Max: 120
 
+# Enforce 2-space indentation and no tabs.
+Layout/IndentationWidth:
+  Width: 2
+Layout/IndentationStyle:
+  EnforcedStyle: spaces
+
 # Too short methods lead to extraction of single-use methods, which can make
 # the code easier to read (by naming things), but can also clutter the class
 Metrics/MethodLength: 
@@ -38,6 +44,13 @@ Layout/HashAlignment:
 # Mixing the styles looks just silly.
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
 
 # has_key? and has_value? are far more readable than key? and value?
 Style/PreferredHashMethods:

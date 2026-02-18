@@ -55,7 +55,7 @@ module UnitsOfWork
           phone:,
           sortable_name:,
           roles: roles.map {|role, organization_id| {role:, organization_id:} },
-          password:
+          password:,
         }
       )
     end
