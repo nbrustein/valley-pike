@@ -8,13 +8,13 @@ module UnitsOfWork
       @full_name = params.fetch(:full_name)
       @phone = params.fetch(:phone)
       @sortable_name = params.fetch(:sortable_name)
-      @roles = normalize_roles(params.fetch(:roles))
+      @user_roles = params.fetch(:user_roles)
       @password = params[:password]
     end
 
     private
 
-    attr_reader :email, :full_name, :phone, :sortable_name, :roles, :password
+    attr_reader :email, :full_name, :phone, :sortable_name, :user_roles, :password
 
     memoize def normalized_email
       Identity.normalize_email(email)
@@ -40,9 +40,6 @@ module UnitsOfWork
     def audit_params
       filtered = params.deep_dup
       filtered[:password] = "[FILTERED]" if filtered[:password].present?
-      filtered[:roles] = roles.map do |role, organization_id|
-        {role:, organization_id:}
-      end
       filtered
     end
 
@@ -54,7 +51,7 @@ module UnitsOfWork
           full_name:,
           phone:,
           sortable_name:,
-          roles: roles.map {|role, organization_id| {role:, organization_id:} },
+          user_roles:,
           password:,
         }
       )
@@ -71,16 +68,14 @@ module UnitsOfWork
     end
 
     def sync_roles(user, errors)
-      desired_pairs = roles.uniq
-
       user.user_roles.find_each do |user_role|
-        next if desired_pairs.include?([ user_role.role, user_role.organization_id ])
+        next if user_roles.include?(role: user_role.role, organization_id: user_role.organization_id)
 
         user_role.destroy!
       end
 
-      desired_pairs.each do |role, organization_id|
-        user_role = user.user_roles.find_or_initialize_by(role:, organization_id:)
+      user_roles.each do |role_attrs|
+        user_role = user.user_roles.find_or_initialize_by(role_attrs)
         next if user_role.persisted?
         next if user_role.save
 
@@ -98,17 +93,6 @@ module UnitsOfWork
       return if identity.save
 
       merge_errors(errors, identity)
-    end
-
-    def normalize_roles(role_params)
-      role_params.map do |entry|
-        if entry.is_a?(Hash)
-          [ entry.fetch(:role), entry[:organization_id] ]
-        else
-          role, organization = entry
-          [ role, organization&.id ]
-        end
-      end
     end
 
     def merge_errors(errors, record)

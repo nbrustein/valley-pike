@@ -9,7 +9,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
     let(:full_name) { "Existing User" }
     let(:phone) { "555-9898" }
     let(:sortable_name) { "User" }
-    let(:roles) do
+    let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
         {role: UserRole::DRIVER, organization_id: nil},
@@ -84,7 +84,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
         full_name:,
         phone:,
         sortable_name:,
-        roles:,
+        user_roles:,
         password:,
       }
     )

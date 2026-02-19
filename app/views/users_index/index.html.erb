@@ -1,7 +1,7 @@
 <section class="surface-card">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= users_index_label %></h1>
-    <% if policy(User).create? %>
+  <% if user_create_allowed? %>
       <%= link_to "Create", new_user_path, class: "rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800" %>
     <% end %>
   </div>
