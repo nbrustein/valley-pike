@@ -1,27 +1,8 @@
 <% if @roles_for_global_role_input.present? %>
-  <div class="space-y-2">
-    <p class="text-sm font-semibold text-forest-900">Admin Role</p>
-    <div class="space-y-2">
-      <label class="flex items-center gap-2 text-sm text-forest-900" for="user_global_role_none">
-        <input type="radio"
-               name="user[global_role]"
-               id="user_global_role_none"
-               value=""
-               required>
-        None
-      </label>
-
-      <% @roles_for_global_role_input.each do |role| %>
-        <% input_id = "user_global_role_#{role}" %>
-        <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= input_id %>">
-          <input type="radio"
-                 name="user[global_role]"
-                 id="<%= input_id %>"
-                 value="<%= role %>"
-                 required>
-          <%= role.humanize %>
-        </label>
-      <% end %>
-    </div>
-  </div>
+  <%= render "users_mutate/global_role_select" %>
 <% end %>
+
+<div style="display: none;" data-organization-roles>
+  <p class="text-sm font-semibold text-forest-900">Organization Roles</p>
+</div>
+<%= render "users_mutate/js/toggle_organization_role_visibility" %>

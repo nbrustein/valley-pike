@@ -1,0 +1,19 @@
+<script>
+  document.addEventListener("turbo:load", () => {
+    const organizationRoles = document.querySelector("[data-organization-roles]");
+    const roleInputs = document.querySelectorAll("[data-global-role]");
+    if (!organizationRoles || roleInputs.length === 0) return;
+
+    const updateVisibility = () => {
+      const selected = Array.from(roleInputs).find((input) => input.checked);
+      const value = selected ? selected.value : null;
+      const shouldShow = value === "" || value === "<%= UserRole::VANITA_VIEWER %>";
+      organizationRoles.style.display = shouldShow ? "block" : "none";
+    };
+
+    roleInputs.forEach((input) => {
+      input.addEventListener("change", updateVisibility);
+    });
+    updateVisibility();
+  });
+</script>

@@ -67,23 +67,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
       RAILS_ENV: test
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
@@ -91,16 +77,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
+      - name: Build image
+        run: docker compose build
 
-      - name: Build Tailwind assets
-        run: bin/rails tailwindcss:build
+      - name: Start database
+        run: docker compose up -d db
+
+      - name: Install gems
+        run: docker compose run --rm web bundle install
 
       - name: Prepare database
-        run: bin/rails db:prepare
+        run: docker compose run --rm -e RAILS_ENV=test web bin/rails db:prepare
 
       - name: Run test suite
-        run: bundle exec rspec
+        run: docker compose run --rm -e RAILS_ENV=test web script/rspec_with_assets
