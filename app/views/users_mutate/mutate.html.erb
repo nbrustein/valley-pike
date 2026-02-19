@@ -9,21 +9,7 @@
   <%= form_with scope: :user, url: users_path, method: :post, local: true, class: "space-y-5" do |form| %>
     <%= render "users_mutate/email_field", form: form %>
 
-    <%= form.fields_for :user_roles do |user_role_fields| %>
-      <%= user_role_fields.hidden_field :role %>
-
-      <%# if @organizations.size > 1 %>
-      <%#   <div> %>
-      <%#     user_role_fields.label :organization_id, "Organization", class: "block text-sm font-semibold text-forest-900" %>
-      <%#     user_role_fields.select :organization_id, %>
-      <%#                                 options_from_collection_for_select(@organizations, :id, :name, @selected_organization_id), %>
-      <%#                                 {include_blank: "Select an organization"}, %>
-      <%#                                 class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
-      <%#   </div> %>
-      <%# else %>
-      <%#   user_role_fields.hidden_field :organization_id, value: @default_organization_id %>
-      <%# end %>
-    <% end %>
+    <%= render "users_mutate/user_roles_inputs", form: form %>
 
     <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: "Create ride requester" %>
   <% end %>

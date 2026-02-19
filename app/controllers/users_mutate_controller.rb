@@ -30,8 +30,12 @@ class UsersMutateController < ApplicationController
     UserMutatePolicy.new(current_user, nil)
   end
 
+  memoize def roles_for_global_role_input
+    [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
+  end
+
   memoize def setup_instance_vars
-    @show_global_role_input = (user_mutate_policy.manageable_roles & [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ]).any?
+    @roles_for_global_role_input = roles_for_global_role_input
   end
 
   # when we are rendering the form after a submission led to an error, we want to fill in fields
@@ -60,12 +64,11 @@ class UsersMutateController < ApplicationController
   def create_user_params
     params.require(:user).permit(
       :email,
-      # user_roles: %i[role organization_id]
+      user_roles: %i[role organization_id]
     ).merge(
       full_name: "John Doe",
       phone: "",
       sortable_name: "Doe, John",
-      user_roles: []
     )
   end
 end

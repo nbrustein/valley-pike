@@ -31,7 +31,7 @@ class UserMutatePolicy < ApplicationPolicy
   end
 
   def manageable_roles
-    return UserRole::ROLES if user&.has_role_permissions?(UserRole::DEVELOPER)
+    return UserRole::ROLES.to_a if user&.has_role_permissions?(UserRole::DEVELOPER)
     return [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER, UserRole::DRIVER ] if user&.has_role_permissions?(UserRole::VANITA_ADMIN)
     return [ UserRole::RIDE_REQUESTER ] if user&.has_role_permissions?(UserRole::ORG_ADMIN)
     []

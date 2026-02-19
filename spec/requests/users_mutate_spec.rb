@@ -27,34 +27,30 @@ RSpec.describe "UsersMutate", type: :request do
 
       it "renders the form" do
         assert_success { act(path: new_user_path) }
-        expect(response.body).to include("form")
-        expect(response.body).to have_css("input[name='user[email]'][type='email']")
-        expect(response.body).to have_link("Cancel", href: users_path)
-        expect(response.body).to have_button("Create ride requester")
+        assert_form_rendered
       end
 
-      context "when the current user can only create ride requesters for a single organization" do
-        let(:current_user_role) { UserRole::ORG_ADMIN }
-        let(:current_user_organization) { organization }
+      context "when the curent user can add a global role" do
+        let(:current_user_role) { UserRole::DEVELOPER }
 
-        it "renders the form with hidden role and organization inputs" do
-          raise NotImplementedError
-          #   assert_success { act(path: new_user_path) }
-          #   expect(response.body).to have_css(
-          #     "input[name*='user_roles'][name$='[role]'][type='hidden']",
-          #     visible: :all
-          #   )
-          #   expect(response.body).to have_css(
-          #     "input[type='hidden'][value='#{organization.id}']",
-          #     visible: :all
-          #   )
-          #   expect(response.body).not_to have_css("select[name*='user_roles'][name$='[organization_id]']")
-        end
-      end
+        it "renders the global role input" do
+          assert_success { act(path: new_user_path) }
+          expect(response.body).to have_css("input[name='user[global_role]'][type='radio']")
 
-      context "when the current user can add multiple roles for different organizations" do
-        it "renders form elements for adding roles" do
-          raise NotImplementedError
+          expect_radio_option(
+            field_name: "user[global_role]",
+            value: "",
+            label_text: "None",
+            input_id: "user_global_role_none"
+          )
+          [ UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ].each do |role|
+            expect_radio_option(
+              field_name: "user[global_role]",
+              value: role,
+              label_text: role.humanize,
+              input_id: "user_global_role_#{role}"
+            )
+          end
         end
       end
     end
@@ -81,8 +77,8 @@ RSpec.describe "UsersMutate", type: :request do
           email: "new.user@example.com",
           user_roles: [
             {
-              role: UserRole::RIDE_REQUESTER,
-              organization_id: organization.id,
+              role: UserRole::VANITA_ADMIN,
+              organization_id: nil,
             },
           ],
         },
@@ -90,7 +86,8 @@ RSpec.describe "UsersMutate", type: :request do
     end
 
     context "when the current user is allowed to create users" do
-      let(:current_user_role) { UserRole::VANITA_ADMIN }
+      let(:current_user_role) { UserRole::DEVELOPER }
+      before { current_user } # make sure the current_user is created before we try to assert on the User count
 
       it "creates a user" do
         expect { assert_redirect_to_users_path }
@@ -98,7 +95,7 @@ RSpec.describe "UsersMutate", type: :request do
 
         created_user = User.find_by!(email: "new.user@example.com")
         expect(created_user.user_roles.pluck(:role, :organization_id))
-          .to contain_exactly([ UserRole::RIDE_REQUESTER, organization.id ])
+          .to contain_exactly([ UserRole::VANITA_ADMIN, nil ])
       end
 
       def assert_redirect_to_users_path
@@ -110,18 +107,17 @@ RSpec.describe "UsersMutate", type: :request do
       context "when there are errors" do
         before do
           errors = ActiveModel::Errors.new(User.new)
-          errors.add(:email, "already exists")
+          errors.add(:base, "An error occurred")
           result = UnitOfWork::Result.new(errors:)
           allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors:))
         end
 
         it "renders the form with errors" do
-          raise NotImplementedError # this won't work until we pass user_roles
           act(path: users_path, params: valid_create_params)
 
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.body).to include("Please fix the following:")
-          expect(response.body).to include("Email already exists")
+          expect(response.body).to include("An error occurred")
         end
       end
     end
@@ -139,5 +135,12 @@ RSpec.describe "UsersMutate", type: :request do
       sign_in current_user.identities.first
       post path, params:, headers:
     end
+  end
+
+  def assert_form_rendered
+    expect(response.body).to include("form")
+    expect(response.body).to have_css("input[name='user[email]'][type='email']")
+    expect(response.body).to have_link("Cancel", href: users_path)
+    expect(response.body).to have_button("Create ride requester")
   end
 end
