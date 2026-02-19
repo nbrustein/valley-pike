@@ -2,9 +2,9 @@ class UserViewPolicy < ApplicationPolicy
   include IsUserPolicy
 
   memoize def index?
-    user&.has_role_permissions?(UserRole::ORG_ADMIN) || 
-    user&.has_role_permissions?(UserRole::VANITA_VIEWER) ||
-    false
+    user&.has_role_permissions?(UserRole::ORG_ADMIN) ||
+      user&.has_role_permissions?(UserRole::VANITA_VIEWER) ||
+      false
   end
 
   class Scope < Scope
