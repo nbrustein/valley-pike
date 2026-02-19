@@ -58,8 +58,21 @@ module RequestsSpecHelper
     expect(response).to have_http_status(:ok)
     response
   end
+
+  def assert_redirect(to:)
+    raise_exceptions_for_request!
+    yield
+    raise_exception_from_response!
+    expect(response).to redirect_to(to), -> {
+      "Expected redirect to #{to}, got status #{response.status}, location #{response.location.inspect}"
+    }
+    response
+  end
 end
+
+require "capybara/rspec"
 
 RSpec.configure do |config|
   config.include RequestsSpecHelper, type: :request
+  config.include Capybara::RSpecMatchers, type: :request
 end

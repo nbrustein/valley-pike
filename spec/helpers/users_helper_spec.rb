@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe UsersHelper do
   let(:current_user) { build(:user) }
-  let(:policy) { instance_double(UserPolicy) }
-  let(:scope_instance) { instance_double(UserPolicy::Scope) }
+  let(:policy) { instance_double(UserViewPolicy) }
+  let(:scope_instance) { instance_double(UserViewPolicy::Scope) }
 
   before do
-    allow(UserPolicy::Scope).to receive(:new).with(current_user, User).and_return(scope_instance)
+    allow(UserViewPolicy::Scope).to receive(:new).with(current_user, nil).and_return(scope_instance)
     allow(helper).to receive(:view_users_policy).and_return(policy)
     user = current_user
     helper.define_singleton_method(:current_user) { user }
@@ -38,27 +38,19 @@ RSpec.describe UsersHelper do
   end
 
   describe "#users_index_label" do
-    let(:has_org_admin_permissions_for_all_organizations) { false }
-    before do
-      expect(policy).to receive(:has_org_admin_permissions_for_all_organizations?).and_return(has_org_admin_permissions_for_all_organizations)
+    let(:organizations) do
+      1.upto(organization_count).map {|i| instance_double(Organization, abbreviation: "DO#{i}") }
     end
-
-    context "when the user has org admin permissions for all organizations" do
-      let(:has_org_admin_permissions_for_all_organizations) { true }
-
-      it "returns Users" do
-        expect(helper.users_index_label).to eq("Users")
-      end
+    let(:organization_ids_with_org_admin_permissions) do
+      1.upto(organization_count).map {|i| i }
+    end
+    before do
+      allow(policy).to receive(:organization_ids_with_org_admin_permissions).and_return(organization_ids_with_org_admin_permissions)
+      allow(Organization).to receive(:where).with(id: organization_ids_with_org_admin_permissions).and_return(organizations)
     end
 
     context "when there are multiple organizations" do
-      before do
-        allow(policy).to receive(:roles_granting_org_admin_permissions)
-          .and_return([
-            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "UDO")),
-            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "VDO")),
-          ])
-      end
+      let(:organization_count) { 2 }
 
       it "returns Users" do
         expect(helper.users_index_label).to eq("Users")
@@ -66,9 +58,7 @@ RSpec.describe UsersHelper do
     end
 
     context "when there are no organizations" do
-      before do
-        allow(policy).to receive(:roles_granting_org_admin_permissions).and_return([])
-      end
+      let(:organization_count) { 0 }
 
       it "returns nil" do
         expect(helper.users_index_label).to be_nil
@@ -76,15 +66,10 @@ RSpec.describe UsersHelper do
     end
 
     context "when there is one organization" do
-      before do
-        allow(policy).to receive(:roles_granting_org_admin_permissions)
-          .and_return([
-            instance_double(UserRole, organization: instance_double(Organization, abbreviation: "UDO")),
-          ])
-      end
+      let(:organization_count) { 1 }
 
       it "returns the organization label" do
-        expect(helper.users_index_label).to eq("UDO Users")
+        expect(helper.users_index_label).to eq("#{organizations.first.abbreviation} Users")
       end
     end
   end

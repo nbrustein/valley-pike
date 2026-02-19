@@ -12,6 +12,21 @@ RSpec.describe "Users index", type: :request do
   before { configure_request_host! }
 
   describe "GET /users" do
+    let!(:zeta_user) do
+      create(
+        :user,
+        human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")
+      )
+    end
+    let!(:alpha_user) do
+      create(
+        :user,
+        human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")
+      )
+    end
+    let!(:alpha_user_role) { create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let!(:zeta_user_role) { create(:user_role, user: zeta_user, role: UserRole::RIDE_REQUESTER, organization:) }
+
     context "when signed out" do
       let(:current_user) { nil }
 
@@ -33,76 +48,71 @@ RSpec.describe "Users index", type: :request do
     context "when the current_user can index users" do
       let(:role) { UserRole::VANITA_ADMIN }
 
-      let!(:zeta_user) do
-        create(
-          :user,
-          human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")
-        )
-      end
-      let!(:alpha_user) do
-        create(
-          :user,
-          human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")
-        )
-      end
-      let!(:alpha_user_role) { create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:) }
-      let!(:zeta_user_role) { create(:user_role, user: zeta_user, role: UserRole::RIDE_REQUESTER, organization:) }
-
-      context "when requesting the users index" do
-        before { act }
-
-        it "shows a list of users ordered by sortable name" do
-          aggregate_failures do
-            expect(response).to have_http_status(:ok)
-            expect(response.body).to include(alpha_user.human.full_name)
-            expect(response.body).to include(zeta_user.human.full_name)
-            expect(alpha_user.human.sortable_name).to be < zeta_user.human.sortable_name # sanity check
-            expect(response.body.index(alpha_user.human.full_name)).to be < response.body.index(zeta_user.human.full_name)
-          end
-        end
-
-        it "shows a create button that links to the new user page" do
-          aggregate_failures do
-            expect(response).to have_http_status(:ok)
-            expect(response.body).to include("Create")
-            expect(response.body).to include(new_user_path)
-          end
+      it "shows a list of users ordered by sortable name" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_text(alpha_user.human.full_name)
+          expect(page).to have_text(zeta_user.human.full_name)
+          expect(alpha_user.human.sortable_name).to be < zeta_user.human.sortable_name # sanity check
+          expect(user_names.index(alpha_user.human.full_name)).to be < user_names.index(zeta_user.human.full_name)
         end
       end
 
-      context "when a user has a single role" do
+      context "when a user in the list has a single role" do
         let!(:single_role_user) { create(:user, email: "driver@example.com") }
         let!(:single_role) { create(:user_role, user: single_role_user, role: UserRole::DRIVER, organization:) }
         before { act }
 
         it "shows the role pill" do
-          expect(response.body).to match(user_row_with_role_labels_regex(
-            full_name: single_role_user.human.full_name,
-            role_labels: [ single_role.pill_label ]
-          ))
+          row = page.find("tr", text: single_role_user.human.full_name)
+          expect(row).to have_css("span", text: single_role.pill_label)
         end
       end
 
-      context "when a user has multiple roles" do
+      context "when a user in the list has multiple roles" do
         let!(:multi_role_user) { create(:user, email: "multi-role@example.com") }
         let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization:) }
         let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization:) }
         before { act }
 
         it "shows all the role pills" do
-          expect(response.body).to match(user_row_with_role_labels_regex(
-            full_name: multi_role_user.human.full_name,
-            role_labels: [ multi_role_one.pill_label, multi_role_two.pill_label ]
-          ))
+          row = page.find("tr", text: multi_role_user.human.full_name)
+          expect(row).to have_css("span", text: multi_role_one.pill_label)
+          expect(row).to have_css("span", text: multi_role_two.pill_label)
         end
       end
 
-      context "when a user has no roles" do
+      context "when a user in the list has no roles" do
         let!(:no_role_user) { create(:user, email: "no-roles@example.com") }
         before { act }
 
         it "shows no role pills" do
-          expect(response.body).not_to include(no_role_user.human.full_name)
+          expect(page).not_to have_text(no_role_user.human.full_name)
+        end
+      end
+    end
+
+    context 'when the current user can create users' do
+      let(:role) { UserRole::VANITA_ADMIN }
+
+      it "shows a create button that links to the new user page" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_link("Create", href: new_user_path)
+        end
+      end
+    end
+
+    context "when the current user cannot create users" do
+      let(:role) { UserRole::VANITA_VIEWER }
+
+      it "does not show a create button" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).not_to have_link("Create", href: new_user_path)
         end
       end
     end
@@ -124,34 +134,11 @@ RSpec.describe "Users index", type: :request do
     user
   end
 
-  def user_row_with_role_labels_regex(full_name:, role_labels:)
-    escaped_name = Regexp.escape(full_name)
-    labels_pattern = role_labels.map {|label| Regexp.escape(label) }.join(".*?")
-
-    /
-      <tr[^>]*>
-      .*?
-      #{escaped_name}
-      .*?
-      #{labels_pattern}
-      .*?
-      <\/tr>
-    /mx
+  def page
+    @page ||= Capybara.string(response.body)
   end
 
-  def user_row_without_role_labels_regex(full_name:)
-    escaped_name = Regexp.escape(full_name)
-
-    /
-      <tr[^>]*>
-      .*?
-      #{escaped_name}
-      .*?
-      <div[^>]*>
-      \s*
-      <\/div>
-      .*?
-      <\/tr>
-    /mx
+  def user_names
+    page.all("tbody tr td:first-child").map(&:text)
   end
 end
