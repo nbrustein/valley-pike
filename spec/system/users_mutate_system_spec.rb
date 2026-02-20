@@ -35,6 +35,7 @@ RSpec.describe "User create form", type: :system, js: true do
       it "reveals Organization Roles section which can be used to select an org admin role" do
         visit new_user_path
         act
+        expect(page).to have_current_path(users_path)
         expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
       end
 
