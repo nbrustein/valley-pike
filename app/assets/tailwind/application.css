@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./forms.css";
 
 @theme {
   --color-jade-500: #7B9669;
