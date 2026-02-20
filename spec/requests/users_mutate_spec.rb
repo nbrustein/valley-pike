@@ -119,6 +119,11 @@ RSpec.describe "UsersMutate", type: :request do
           expect(response.body).to include("Please fix the following:")
           expect(response.body).to include("An error occurred")
         end
+
+        it 'has specs for the org admin form inputs' do
+          # assert on the various labels
+          raise NotImplementedError
+        end
       end
     end
 

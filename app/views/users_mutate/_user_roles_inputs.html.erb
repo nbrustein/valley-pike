@@ -2,7 +2,7 @@
   <%= render "users_mutate/global_role_select" %>
 <% end %>
 
-<div style="display: none;" data-organization-roles>
-  <p class="text-sm font-semibold text-forest-900">Organization Roles</p>
+<div style="display: none;" data-organization-roles data-org-admin-user-role-inputs>
+  <%= render "users_mutate/org_admin_user_role_inputs", form: form %>
 </div>
-<%= render "users_mutate/js/toggle_organization_role_visibility" %>
+<%= render "users_mutate/js/toggle_org_admin_user_role_inputs_visibility" %>
