@@ -60,12 +60,6 @@ RSpec.describe "User create form", type: :system, js: true do
     def select_radio_with_value(value)
       find("input[type='radio'][value='#{value}']").click
     end
-
-    def expect_user_to_have_roles(email, role_pairs)
-      user = User.find_by(email:)
-      expect(user).to be_present
-      expect(user.user_roles.map {|ur| [ ur.role, ur.organization_id ] }).to eq(role_pairs)
-    end
   end
 
   context "when only the ride requester role is available" do 
@@ -75,11 +69,12 @@ RSpec.describe "User create form", type: :system, js: true do
     it "does not show any role inputs and creates a user with the ride requester role" do
       act
       expect(page).to have_current_path(users_path)
-      expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, nil ] ])
+      expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
     end
 
     def act
       visit_and_fill_in_basic_fields
+      click_button "Create ride requester"
     end
 
   end
@@ -92,5 +87,11 @@ RSpec.describe "User create form", type: :system, js: true do
   def visit_and_fill_in_basic_fields
     visit new_user_path
     fill_in "Email", with: email
+  end
+
+  def expect_user_to_have_roles(email, role_pairs)
+    user = User.find_by(email:)
+    expect(user).to be_present
+    expect(user.user_roles.map {|ur| [ ur.role, ur.organization_id ] }).to eq(role_pairs)
   end
 end
