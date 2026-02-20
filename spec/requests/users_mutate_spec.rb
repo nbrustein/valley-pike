@@ -132,12 +132,42 @@ RSpec.describe "UsersMutate", type: :request do
         end
       end
 
-      context 'when there are org admin user roles available' do 
-        let!(:organizations) { [organization, create(:organization, name: "VDO Org", abbreviation: "VDO")] }
+      context "when there are org admin user roles available" do
+        let!(:organizations) { [ organization, create(:organization, name: "VDO Org", abbreviation: "VDO") ] }
 
-        it 'has specs for the org admin form inputs' do
-          # assert on the various labels
-          raise NotImplementedError
+        # The org admin role inputs are hidden, and can only be revealed by js, but we cna 
+        # still assert here that the fields are rendered. The user_mutate_system_spec tests 
+        # the functionality of those fields.
+        it "renders the org admin role inputs" do
+          sign_in current_user.identities.first
+          get new_user_path, headers: headers
+
+          page = Capybara.string(response.body)
+          inputs_section = page.find("[data-org-admin-user-role-inputs]", visible: :all)
+
+          expect_headers(inputs_section, [ "Organization", "None", "Org admin", "Ride requester" ])
+
+          organizations.each do |organization|
+            expect_organization_row(inputs_section, organization)
+          end
+        end
+
+        def expect_headers(inputs_section, headers)
+          headers.each do |header|
+            expect(inputs_section).to have_css("th", text: header, visible: :all)
+          end
+        end
+      
+        def expect_organization_row(inputs_section, organization)
+          row = inputs_section.find(
+            :xpath,
+            ".//tr[td[contains(., '#{organization.name}')]]",
+            visible: :all
+          )
+          expect(row).to have_css("td", text: organization.name, visible: :all)
+          expect(row).to have_css("input[type='radio'][value='']", count: 1, visible: :all)
+          expect(row).to have_css("input[type='radio'][value='org_admin']", count: 1, visible: :all)
+          expect(row).to have_css("input[type='radio'][value='ride_requester']", count: 1, visible: :all)
         end
       end
     end
