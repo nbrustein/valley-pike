@@ -4,9 +4,13 @@ require "warden/test/helpers"
 RSpec.describe "User create form", type: :system, js: true do
   include Warden::Test::Helpers
 
+  let(:current_user_role) { UserRole::DEVELOPER }
+  let(:current_user_role_organization) { nil }
+  let(:email) { "new.user@example.com" }
+  let!(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
   let(:identity) do
     user = create(:user, email: "udo-admin@example.com")
-    create(:user_role, user:, role: UserRole::DEVELOPER)
+    create(:user_role, user:, role: current_user_role, organization: current_user_role_organization)
     create(:identity, :magic_link, user:, email: user.email)
   end
 
@@ -27,19 +31,16 @@ RSpec.describe "User create form", type: :system, js: true do
   end
 
   context "when a global role is selected that does not grant org admin privileges" do
-    let!(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
     let!(:other_organization) { create(:organization, name: "VDO Org", abbreviation: "VDO") }
-    let(:email) { "ride.requester@example.com" }
 
     it "reveals Organization Roles section which can be used to select an org admin role" do
-      visit new_user_path
       act
       expect(page).to have_current_path(users_path)
       expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
     end
 
     def act
-      fill_in "Email", with: email
+      visit_and_fill_in_basic_fields
 
       # select a global role
       choose "None"
@@ -67,8 +68,29 @@ RSpec.describe "User create form", type: :system, js: true do
     end
   end
 
+  context "when only the ride requester role is available" do 
+    let(:current_user_role) { UserRole::ORG_ADMIN }
+    let(:current_user_role_organization) { organization }
+
+    it "does not show any role inputs and creates a user with the ride requester role" do
+      act
+      expect(page).to have_current_path(users_path)
+      expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, nil ] ])
+    end
+
+    def act
+      visit_and_fill_in_basic_fields
+    end
+
+  end
+
   def expect_org_admin_user_role_inputs(visibility)
     visible = visibility == :visible ? true : false
     expect(page).to have_css("[data-org-admin-user-role-inputs]", visible:)
+  end
+
+  def visit_and_fill_in_basic_fields
+    visit new_user_path
+    fill_in "Email", with: email
   end
 end
