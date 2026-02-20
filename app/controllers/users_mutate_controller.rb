@@ -13,9 +13,12 @@ class UsersMutateController < ApplicationController
       result = execute_create_user_unit_of_work
       if result.success?
         redirect_to users_path, notice: "User created."
+        return
       else
         @errors = result.errors
       end
+    rescue Pundit::NotAuthorizedError
+      raise
     rescue StandardError
       @errors = ActiveModel::Errors.new(User.new)
       @errors.add(:base, "An error occurred")
