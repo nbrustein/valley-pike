@@ -28,7 +28,8 @@
                   <%= hidden_field_tag "user[org_admin_user_roles][#{index}][organization_id]", organization.id %>
                   <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", "", true,
                                         id: "user_org_admin_user_roles_#{index}_role_none",
-                                        class: "h-4 w-4 border-forest-900/30 text-forest-900" %>
+                                        class: "h-4 w-4 border-forest-900/30 text-forest-900",
+                                        required: true %>
                 </div>
               </td>
               <% roles.each do |role| %>
@@ -37,6 +38,7 @@
                     <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", role, false,
                                           id: "user_org_admin_user_roles_#{index}_role_#{role}",
                                           class: "h-4 w-4 border-forest-900/30 text-forest-900",
+                                          required: true,
                                           data: {org_role_input: true} %>
                   </div>
                 </td>

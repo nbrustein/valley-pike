@@ -75,12 +75,7 @@ RSpec.describe "UsersMutate", type: :request do
       {
         user: {
           email: "new.user@example.com",
-          user_roles: [
-            {
-              role: UserRole::VANITA_ADMIN,
-              organization_id: nil,
-            },
-          ],
+          global_role: UserRole::VANITA_ADMIN,
         },
       }
     end
@@ -104,7 +99,7 @@ RSpec.describe "UsersMutate", type: :request do
         }
       end
 
-      context "when there are errors" do
+      context "when there are validation errors" do
         before do
           errors = ActiveModel::Errors.new(User.new)
           errors.add(:base, "An error occurred")
@@ -119,13 +114,41 @@ RSpec.describe "UsersMutate", type: :request do
           expect(response.body).to include("Please fix the following:")
           expect(response.body).to include("An error occurred")
         end
+      end
 
-        it 'has specs for the org admin form inputs' do
-          # assert on the various labels
-          raise NotImplementedError
+      context "when there is a runtime error" do
+        before do
+          allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute)
+            .and_raise(StandardError, "Sensitive details")
+        end
+
+        it "renders the form with a generic error" do
+          act(path: users_path, params: valid_create_params)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include("Please fix the following:")
+          expect(response.body).to include("An error occurred")
+          expect(response.body).not_to include("Sensitive details")
         end
       end
+
+      context 'when disallowd params are provided' do
+        it 'renders the form with a specific error' do
+          act(path: users_path, params: valid_create_params.merge({user: {something_else: true}}))
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include("Please fix the following:")
+          expect(response.body).to include("Something else is not allowed")
+        end
+      end
+
+      it 'has specs for the org admin form inputs' do
+        # assert on the various labels
+        raise NotImplementedError
+      end
     end
+
+
 
     context "when the current user is not allowed to create users" do
       let(:current_user_role) { UserRole::DRIVER }
