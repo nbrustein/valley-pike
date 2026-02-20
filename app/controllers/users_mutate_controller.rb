@@ -30,12 +30,10 @@ class UsersMutateController < ApplicationController
     UserMutatePolicy.new(current_user, nil)
   end
 
-  memoize def roles_for_global_role_input
-    [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
-  end
-
   memoize def setup_instance_vars
-    @roles_for_global_role_input = roles_for_global_role_input
+    @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
+    @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
+    @organizations_for_org_role_inputs = UserMutatePolicy::OrganizationScope.new(current_user, nil).resolve
   end
 
   # when we are rendering the form after a submission led to an error, we want to fill in fields
@@ -49,26 +47,32 @@ class UsersMutateController < ApplicationController
     render :mutate, status:
   end
 
-  # memoize def permitted_roles
-  #   user_mutate_policy.permits_users_with_roles
-  # end
-
-  # memoize def permitted_organizations
-  #   UserMutatePolicy::OrganizationScope.new(current_user, nil).resolve
-  # end
-
-  # memoize def default_organization
-  #   permitted_organizations.size == 1 ? permitted_organizations.first.id : nil
-  # end
-
   def create_user_params
-    params.require(:user).permit(
+    permitted = params.require(:user).permit(
       :email,
-      user_roles: %i[role organization_id]
-    ).merge(
+      org_admin_user_roles: %i[role organization_id]
+    )
+    user_roles = normalize_user_roles(permitted[:org_admin_user_roles])
+    permitted.to_h.merge(
       full_name: "John Doe",
       phone: "",
       sortable_name: "Doe, John",
+      user_roles:
     )
+  end
+
+  def normalize_user_roles(org_admin_user_roles)
+    return [] if org_admin_user_roles.blank?
+
+    # The inputs for org_admin_user_roles area list of radio inputs,
+    # so they end up here as a hash whose values are hashes, but we want 
+    # an array of hashes
+    org_admin_user_roles.values.filter_map do |entry|
+      role = entry[:role]
+      organization_id = entry[:organization_id]
+      next if role.blank?
+
+      {role:, organization_id:}
+    end
   end
 end
