@@ -62,7 +62,7 @@ RSpec.describe "User create form", type: :system, js: true do
     end
   end
 
-  context "when only the ride requester role is available" do 
+  context "when only the ride requester role is available" do
     let(:current_user_role) { UserRole::ORG_ADMIN }
     let(:current_user_role_organization) { organization }
 
@@ -76,7 +76,6 @@ RSpec.describe "User create form", type: :system, js: true do
       visit_and_fill_in_basic_fields
       click_button "Create ride requester"
     end
-
   end
 
   def expect_org_admin_user_role_inputs(visibility)

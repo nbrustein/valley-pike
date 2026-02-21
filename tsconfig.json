@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2020",
+    "baseUrl": "app/javascript",
+    "paths": {
+      "*": ["*"]
+    }
+  },
+  "include": ["app/javascript/**/*"]
+}

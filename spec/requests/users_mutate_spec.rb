@@ -135,8 +135,8 @@ RSpec.describe "UsersMutate", type: :request do
       context "when there are org admin user roles available" do
         let!(:organizations) { [ organization, create(:organization, name: "VDO Org", abbreviation: "VDO") ] }
 
-        # The org admin role inputs are hidden, and can only be revealed by js, but we cna 
-        # still assert here that the fields are rendered. The user_mutate_system_spec tests 
+        # The org admin role inputs are hidden, and can only be revealed by js, but we can
+        # still assert here that the fields are rendered. The user_mutate_system_spec tests
         # the functionality of those fields.
         it "renders the org admin role inputs" do
           sign_in current_user.identities.first
@@ -157,7 +157,7 @@ RSpec.describe "UsersMutate", type: :request do
             expect(inputs_section).to have_css("th", text: header, visible: :all)
           end
         end
-      
+
         def expect_organization_row(inputs_section, organization)
           row = inputs_section.find(
             :xpath,

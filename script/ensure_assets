@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if command -v yarn >/dev/null 2>&1; then
+  yarn install
+elif command -v corepack >/dev/null 2>&1; then
+  corepack yarn install
+else
+  echo "yarn is required to build JavaScript assets" >&2
+  exit 1
+fi
+
+bin/rails javascript:build
 bin/rails tailwindcss:build

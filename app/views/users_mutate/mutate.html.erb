@@ -14,3 +14,12 @@
     <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: "Create ride requester" %>
   <% end %>
 </section>
+
+<script>
+  document.addEventListener("turbo:load", () => {
+    window.usersMutate.initialize({
+      organizationRolesElement: document.querySelector("[data-org-admin-user-role-inputs]"),
+      globalRoleInputElement: document.querySelectorAll("[data-global-role]")
+    }); 
+  });
+</script>
