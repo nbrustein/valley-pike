@@ -31,13 +31,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
+        run: docker compose run --rm web yarn audit
 
   lint:
     runs-on: ubuntu-latest
@@ -91,3 +86,19 @@ jobs:
 
       - name: Run test suite
         run: docker compose run --rm -e RAILS_ENV=test web script/rspec_with_assets
+
+      - name: Run Jest
+        run: docker compose run --rm -e RAILS_ENV=test web yarn test
+
+  jest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Build image
+        run: docker compose build
+
+      - name: Run Jest
+        run: docker compose run --rm web yarn test
