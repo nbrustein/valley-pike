@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  exec docker compose run --rm web yarn test
+fi
+
+exec docker compose run --rm web yarn test --runTestsByPath "$@"
