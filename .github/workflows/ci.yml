@@ -32,7 +32,9 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: docker compose run --rm web yarn audit
+        run: |
+          docker compose run --rm web yarn install --frozen-lockfile
+          docker compose run --rm web yarn audit --groups dependencies
 
   lint:
     runs-on: ubuntu-latest
@@ -87,9 +89,6 @@ jobs:
       - name: Run test suite
         run: docker compose run --rm -e RAILS_ENV=test web script/rspec_with_assets
 
-      - name: Run Jest
-        run: docker compose run --rm -e RAILS_ENV=test web yarn test
-
   jest:
     runs-on: ubuntu-latest
 
@@ -101,4 +100,6 @@ jobs:
         run: docker compose build
 
       - name: Run Jest
-        run: docker compose run --rm web yarn test
+        run: |
+          docker compose run --rm web yarn install --frozen-lockfile
+          docker compose run --rm web yarn test
