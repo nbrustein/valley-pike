@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
     "baseUrl": "app/javascript",
     "paths": {
       "*": ["*"]
