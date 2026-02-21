@@ -2,13 +2,15 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
+    attr_reader :user_roles, :email, :full_name, :phone, :sortable_name, :password
+
     def initialize(executor_id:, params:)
       super
       @email = params.fetch(:email)
       @full_name = params.fetch(:full_name)
       @phone = params.fetch(:phone)
       @sortable_name = params.fetch(:sortable_name)
-      @roles = normalize_roles(params.fetch(:roles))
+      @user_roles = params.fetch(:user_roles)
       @password = params[:password]
     end
 
@@ -32,9 +34,6 @@ module UnitsOfWork
     def audit_params
       filtered = params.deep_dup
       filtered[:password] = "[FILTERED]" if filtered[:password].present?
-      filtered[:roles] = roles.map do |role, organization_id|
-        {role:, organization_id:}
-      end
       filtered
     end
 
@@ -64,8 +63,8 @@ module UnitsOfWork
     end
 
     def create_roles(user, errors)
-      roles.uniq.each do |role, organization_id|
-        user_role = user.user_roles.build(role:, organization_id:)
+      user_roles.uniq.each do |user_role_params|
+        user_role = user.user_roles.build(user_role_params)
         next if user_role.save
 
         merge_errors(errors, user_role)
@@ -82,17 +81,6 @@ module UnitsOfWork
       return if identity.save
 
       merge_errors(errors, identity)
-    end
-
-    def normalize_roles(role_params)
-      role_params.map do |entry|
-        if entry.is_a?(Hash)
-          [ entry.fetch(:role), entry[:organization_id] ]
-        else
-          role, organization = entry
-          [ role, organization&.id ]
-        end
-      end
     end
 
     def merge_errors(errors, record)

@@ -1,0 +1,52 @@
+<% roles = @roles_for_org_role_inputs %>
+<% organizations = @organizations_for_org_role_inputs %>
+<% if roles.present? && organizations.present? %>
+  <% if roles.size == 1 && organizations.size == 1 %>
+    <%= hidden_field_tag "user[org_admin_user_roles][1][role]", roles.first %>
+    <%= hidden_field_tag "user[org_admin_user_roles][1][organization_id]", organizations.first.id %>
+  <% else %>
+    <p class="text-sm font-semibold text-forest-900">Organization Roles</p>
+    <div class="mt-3 overflow-x-auto">
+      <table class="min-w-full border-collapse text-left text-sm">
+        <thead>
+          <tr class="border-b border-forest-900/15 text-xs uppercase tracking-wide text-forest-900/70">
+            <th class="px-3 py-2 font-semibold">Organization</th>
+            <th class="px-3 py-2 font-semibold">None</th>
+            <% roles.each do |role| %>
+              <th class="px-3 py-2 font-semibold"><%= role.humanize %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% index = 0 %>
+          <% organizations.each do |organization| %>
+            <% index += 1 %>
+            <tr class="border-b border-forest-900/10">
+              <td class="px-3 py-3 text-forest-900"><%= organization.name %></td>
+              <td class="px-3 py-3">
+                <div class="flex items-center">
+                  <%= hidden_field_tag "user[org_admin_user_roles][#{index}][organization_id]", organization.id %>
+                  <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", "", true,
+                                        id: "user_org_admin_user_roles_#{index}_role_none",
+                                        class: "h-4 w-4 border-forest-900/30 text-forest-900",
+                                        required: true %>
+                </div>
+              </td>
+              <% roles.each do |role| %>
+                <td class="px-3 py-3">
+                  <div class="flex items-center">
+                    <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", role, false,
+                                          id: "user_org_admin_user_roles_#{index}_role_#{role}",
+                                          class: "h-4 w-4 border-forest-900/30 text-forest-900",
+                                          required: true,
+                                          data: {org_role_input: true} %>
+                  </div>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+<% end %>

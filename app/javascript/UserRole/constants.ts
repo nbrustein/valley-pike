@@ -1,0 +1,1 @@
+export const VANITA_VIEWER = "vanita_viewer";

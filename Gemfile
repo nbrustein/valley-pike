@@ -12,8 +12,8 @@ gem "propshaft"
 gem "pg", "~> 1.5"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "importmap-rails"
+# Bundle JavaScript with esbuild [https://github.com/rails/jsbundling-rails]
+gem "jsbundling-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
@@ -52,6 +52,8 @@ group :development, :test do
 
   gem "rspec-rails"
   gem "factory_bot_rails"
+  gem "capybara"
+  gem "selenium-webdriver"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false

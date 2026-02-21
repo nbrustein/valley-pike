@@ -6,102 +6,139 @@ RSpec.describe "Users index", type: :request do
 
   let(:headers) { request_headers }
   let(:organization) { create(:organization, abbreviation: "UDO") }
-  let(:other_organization) { create(:organization, abbreviation: "VDO") }
+  let(:role) { UserRole::VANITA_ADMIN }
+  let(:current_user) { create_current_user_with_role(role:) }
 
   before { configure_request_host! }
 
   describe "GET /users" do
+    let!(:zeta_user) do
+      create(
+        :user,
+        human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")
+      )
+    end
+    let!(:alpha_user) do
+      create(
+        :user,
+        human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")
+      )
+    end
+    let!(:alpha_user_role) { create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let!(:zeta_user_role) { create(:user_role, user: zeta_user, role: UserRole::RIDE_REQUESTER, organization:) }
+
     context "when signed out" do
+      let(:current_user) { nil }
+
       it "returns not found" do
-        get users_path, headers: headers
+        act
         expect(response).to have_http_status(:not_found)
       end
     end
 
-    context "when the signed-in user does not have org_admin permissions" do
-      let(:user) { create(:user, email: "driver@example.com") }
-
-      before do
-        create(:user_role, user:, role: UserRole::DRIVER)
-        create(:identity, :magic_link, user:, email: user.email)
-      end
+    context "when the current_user can't index users" do
+      let(:role) { UserRole::DRIVER }
 
       it "returns not found" do
-        act_get_users(user:)
+        act
         expect(response).to have_http_status(:not_found)
       end
     end
 
-    context "when the signed-in user has global org_admin permissions" do
-      let(:user) do
-        create(
-          :user,
-          email: "vanita@example.com",
-          human: build(:human, full_name: "Vanita Admin", sortable_name: "Vanita")
-        )
-      end
-      let!(:alpha_user) { create(:user, email: "alpha@example.com", human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")) }
-      let!(:zeta_user) { create(:user, email: "zeta@example.com", human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")) }
-      let!(:nameless_user) { create(:user, email: "nameless@example.com") }
+    context "when the current_user can index users" do
+      let(:role) { UserRole::VANITA_ADMIN }
 
-      before do
-        nameless_user.human.destroy!
-        create(:user_role, user:, role: UserRole::VANITA_ADMIN)
-        create(:user_role, user: alpha_user, role: UserRole::DEVELOPER)
-        create(:user_role, user: alpha_user, role: UserRole::ORG_ADMIN)
-        create(:user_role, user: alpha_user, role: UserRole::DRIVER)
-        create(:user_role, user: alpha_user, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: zeta_user, role: UserRole::DRIVER, organization:)
-        create(:identity, :magic_link, user:, email: user.email)
+      it "shows a list of users ordered by sortable name" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_text(alpha_user.human.full_name)
+          expect(page).to have_text(zeta_user.human.full_name)
+          expect(alpha_user.human.sortable_name).to be < zeta_user.human.sortable_name # sanity check
+          expect(user_names.index(alpha_user.human.full_name)).to be < user_names.index(zeta_user.human.full_name)
+        end
       end
 
-      it "shows all users with humans sorted by sortable name and role pills" do
-        act_get_users(user:)
+      context "when a user in the list has a single role" do
+        let!(:single_role_user) { create(:user, email: "driver@example.com") }
+        let!(:single_role) { create(:user_role, user: single_role_user, role: UserRole::DRIVER, organization:) }
+        before { act }
 
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Alpha Person")
-        expect(response.body).to include("Vanita Admin")
-        expect(response.body).to include("Zeta Person")
-        expect(response.body).not_to include("nameless@example.com")
+        it "shows the role pill" do
+          row = page.find("tr", text: single_role_user.human.full_name)
+          expect(row).to have_css("span", text: single_role.pill_label)
+        end
+      end
 
-        expect(response.body.index("Alpha Person")).to be < response.body.index("Vanita Admin")
-        expect(response.body.index("Vanita Admin")).to be < response.body.index("Zeta Person")
+      context "when a user in the list has multiple roles" do
+        let!(:multi_role_user) { create(:user, email: "multi-role@example.com") }
+        let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization:) }
+        let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization:) }
+        before { act }
 
-        expect(response.body).to include("dev")
-        expect(response.body).to include("vanita")
-        expect(response.body).to include("admin")
-        expect(response.body).to include("driver")
-        expect(response.body).to include("udo admin")
-        expect(response.body).to include("udo driver")
+        it "shows all the role pills" do
+          row = page.find("tr", text: multi_role_user.human.full_name)
+          expect(row).to have_css("span", text: multi_role_one.pill_label)
+          expect(row).to have_css("span", text: multi_role_two.pill_label)
+        end
+      end
+
+      context "when a user in the list has no roles" do
+        let!(:no_role_user) { create(:user, email: "no-roles@example.com") }
+        before { act }
+
+        it "shows no role pills" do
+          expect(page).not_to have_text(no_role_user.human.full_name)
+        end
       end
     end
 
-    context "when the signed-in user only has organization-scoped org_admin permissions" do
-      let(:user) { create(:user, email: "udo-admin@example.com") }
-      let!(:udo_admin_user) { create(:user, human: build(:human, full_name: "UDO Admin", sortable_name: "Admin")) }
-      let!(:vdo_admin_user) { create(:user, human: build(:human, full_name: "VDO Admin", sortable_name: "Admin")) }
+    context 'when the current user can create users' do
+      let(:role) { UserRole::VANITA_ADMIN }
 
-      before do
-        create(:user_role, user:, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: udo_admin_user, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: vdo_admin_user, role: UserRole::ORG_ADMIN, organization: other_organization)
-        create(:identity, :magic_link, user:, email: user.email)
+      it "shows a create button that links to the new user page" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_link("Create", href: new_user_path)
+        end
       end
+    end
 
-      it "shows only users with org_admin roles in the same organization" do
-        act_get_users(user:)
+    context "when the current user cannot create users" do
+      let(:role) { UserRole::VANITA_VIEWER }
 
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include("UDO Admin")
-        expect(response.body).not_to include("VDO Admin")
+      it "does not show a create button" do
+        aggregate_failures do
+          act
+          expect(response).to have_http_status(:ok)
+          expect(page).not_to have_link("Create", href: new_user_path)
+        end
       end
     end
   end
 
   private
 
-  def act_get_users(user:)
-    sign_in user.identities.find_by!(kind: "magic_link")
+  def act
+    sign_in current_user.identities.find_by!(kind: "magic_link") if current_user.present?
     get users_path, headers: headers
+  end
+
+  def create_current_user_with_role(role:)
+    user = create(:user, email: "current-user@example.com")
+    role_attrs = {user:, role:}
+    role_attrs[:organization] = organization if role.in?([ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ])
+    create(:user_role, **role_attrs)
+    create(:identity, :magic_link, user:, email: user.email)
+    user
+  end
+
+  def page
+    @page ||= Capybara.string(response.body)
+  end
+
+  def user_names
+    page.all("tbody tr td:first-child").map(&:text)
   end
 end

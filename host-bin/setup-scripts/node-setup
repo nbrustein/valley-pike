@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+tool_versions_file="$root_dir/.tool-versions"
+
+cd "$root_dir"
+
+echo "== Host Node.js setup =="
+
+if [ ! -f "$tool_versions_file" ]; then
+  echo "Missing .tool-versions at $tool_versions_file"
+  exit 1
+fi
+
+node_version="$(awk '$1 == "nodejs" {print $2; exit}' "$tool_versions_file")"
+if [ -z "$node_version" ]; then
+  echo "No nodejs version found in .tool-versions"
+  exit 1
+fi
+
+if ! command -v asdf >/dev/null 2>&1; then
+  echo "asdf is required to install nodejs. Re-run host-bin/setup and accept the asdf prompt."
+  exit 1
+fi
+
+if ! asdf plugin list | tr -d ' \t' | grep -qx nodejs; then
+  asdf plugin add nodejs
+fi
+
+current_asdf_version="$(asdf current nodejs 2>/dev/null | awk '{print $2}' | head -n 1 || true)"
+if [ "$current_asdf_version" = "$node_version" ]; then
+  echo "Node.js $node_version already active in asdf."
+else
+  asdf install nodejs "$node_version"
+  asdf reshim nodejs "$node_version"
+fi
+
+current_version="$(asdf exec node -v 2>/dev/null || true)"
+if [ "$current_version" != "v$node_version" ]; then
+  echo "Node.js $node_version is installed, but current shell is still using: ${current_version:-none}."
+  echo "Try opening a new shell and ensure asdf is initialized."
+  exit 1
+fi
+
+echo "Node.js active version: $(asdf exec node --version)"

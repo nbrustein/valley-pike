@@ -1,0 +1,7 @@
+<% if @roles_for_global_role_input.present? %>
+  <%= render "users_mutate/global_role_select" %>
+<% end %>
+
+<div style="display: none;" data-organization-roles data-org-admin-user-role-inputs>
+  <%= render "users_mutate/org_admin_user_role_inputs", form: form %>
+</div>

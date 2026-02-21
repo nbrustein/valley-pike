@@ -1,0 +1,25 @@
+<section class="surface-card">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Create ride requester</h1>
+    <p class="mt-1 text-sm text-forest-900/70">Invite a new ride requester by email.</p>
+  </div>
+
+  <%= render "shared/form_errors", errors: @errors %>
+
+  <%= form_with scope: :user, url: users_path, method: :post, local: true, class: "space-y-5" do |form| %>
+    <%= render "users_mutate/email_field", form: form %>
+
+    <%= render "users_mutate/user_roles_inputs", form: form %>
+
+    <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: "Create ride requester" %>
+  <% end %>
+</section>
+
+<script>
+  document.addEventListener("turbo:load", () => {
+    window.usersMutate.initialize({
+      organizationRolesElement: document.querySelector("[data-org-admin-user-role-inputs]"),
+      globalRoleInputElement: document.querySelectorAll("[data-global-role]")
+    }); 
+  });
+</script>

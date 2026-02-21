@@ -40,7 +40,7 @@ organizations = {
     name: "Vetted Driver Org",
     abbreviation: "VDO",
     require_vetted_drivers: true
-  )
+  ),
 }
 
 user_definitions = [
@@ -49,64 +49,81 @@ user_definitions = [
     full_name: "dev deverson",
     phone: "555-0101",
     sortable_name: "deverson",
-    roles: [ [ UserRole::DEVELOPER, nil ] ]
+    user_roles: [ {role: UserRole::DEVELOPER, organization_id: nil} ],
   },
   {
     email: "vanita.leader@#{EMAIL_DOMAIN}",
     full_name: "vanita leader",
     phone: "555-0102",
     sortable_name: "leader",
-    roles: [ [ UserRole::VANITA_ADMIN, nil ], [ UserRole::DRIVER, nil ] ]
+    user_roles: [
+      {role: UserRole::VANITA_ADMIN, organization_id: nil},
+      {role: UserRole::DRIVER, organization_id: nil},
+    ],
   },
   {
     email: "vanita.driverless@#{EMAIL_DOMAIN}",
     full_name: "vanita driverless",
     phone: "555-0103",
     sortable_name: "driverless",
-    roles: [ [ UserRole::VANITA_ADMIN, nil ] ]
+    user_roles: [ {role: UserRole::VANITA_ADMIN, organization_id: nil} ],
   },
   {
     email: "udo.admin@#{EMAIL_DOMAIN}",
     full_name: "udo admin",
     phone: "555-0104",
     sortable_name: "admin",
-    roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("udo") ] ]
+    user_roles: [ {role: UserRole::ORG_ADMIN, organization_id: organizations.fetch("udo").id} ],
+  },
+  {
+    email: "udo.ride.requester@#{EMAIL_DOMAIN}",
+    full_name: "udo ride requester",
+    phone: "555-0110",
+    sortable_name: "requester",
+    user_roles: [ {role: UserRole::RIDE_REQUESTER, organization_id: organizations.fetch("udo").id} ],
   },
   {
     email: "vdo.admin@#{EMAIL_DOMAIN}",
     full_name: "vdo admin",
     phone: "555-0105",
     sortable_name: "admin",
-    roles: [ [ UserRole::ORG_ADMIN, organizations.fetch("vdo") ] ]
+    user_roles: [ {role: UserRole::ORG_ADMIN, organization_id: organizations.fetch("vdo").id} ],
+  },
+  {
+    email: "vdo.ride.requester@#{EMAIL_DOMAIN}",
+    full_name: "vdo ride requester",
+    phone: "555-0111",
+    sortable_name: "requester",
+    user_roles: [ {role: UserRole::RIDE_REQUESTER, organization_id: organizations.fetch("vdo").id} ],
   },
   {
     email: "unvetted.driver.1@#{EMAIL_DOMAIN}",
     full_name: "unvetted driver 1",
     phone: "555-0106",
     sortable_name: "driver 1",
-    roles: [ [ UserRole::DRIVER, nil ] ]
+    user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
   },
   {
     email: "vdo.vetted.driver.1@#{EMAIL_DOMAIN}",
     full_name: "vdo vetted driver 1",
     phone: "555-0107",
     sortable_name: "driver 1",
-    roles: [ [ UserRole::DRIVER, organizations.fetch("vdo") ] ]
+    user_roles: [ {role: UserRole::DRIVER, organization_id: organizations.fetch("vdo").id} ],
   },
   {
     email: "unvetted.driver.2@#{EMAIL_DOMAIN}",
     full_name: "unvetted driver 2",
     phone: "555-0108",
     sortable_name: "driver 2",
-    roles: [ [ UserRole::DRIVER, nil ] ]
+    user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
   },
   {
     email: "vdo.vetted.driver.2@#{EMAIL_DOMAIN}",
     full_name: "vdo vetted driver 2",
     phone: "555-0109",
     sortable_name: "driver 2",
-    roles: [ [ UserRole::DRIVER, organizations.fetch("vdo") ] ]
-  }
+    user_roles: [ {role: UserRole::DRIVER, organization_id: organizations.fetch("vdo").id} ],
+  },
 ]
 
 begin
@@ -120,8 +137,8 @@ begin
         full_name: user_definition.fetch(:full_name),
         phone: user_definition.fetch(:phone),
         sortable_name: user_definition.fetch(:sortable_name),
-        roles: user_definition.fetch(:roles),
-        password: DEFAULT_PASSWORD
+        user_roles: user_definition.fetch(:user_roles),
+        password: DEFAULT_PASSWORD,
       }
     )
     next if result.success?

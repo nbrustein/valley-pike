@@ -1,5 +1,10 @@
 <section class="surface-card">
-  <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Users</h1>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= users_index_label %></h1>
+  <% if user_create_allowed? %>
+      <%= link_to "Create", new_user_path, class: "rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800" %>
+    <% end %>
+  </div>
 
   <div class="mt-6 overflow-x-auto">
     <table class="min-w-full border-collapse text-left text-sm">

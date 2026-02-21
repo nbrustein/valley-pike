@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_19_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -74,7 +74,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_130000) do
     t.uuid "user_id", null: false
     t.index ["organization_id"], name: "index_user_roles_on_organization_id"
     t.index ["user_id"], name: "index_user_roles_on_user_id"
-    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'org_admin'::character varying::text, 'driver'::character varying::text])", name: "user_roles_role_check"
+    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying]::text[])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying, 'ride_requester'::character varying]::text[])) AND organization_id IS NOT NULL OR role::text = 'driver'::text", name: "user_roles_organization_id_check"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'org_admin'::character varying, 'ride_requester'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
