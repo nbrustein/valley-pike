@@ -4,8 +4,8 @@ require "warden/test/helpers"
 RSpec.describe "User create form", type: :system, js: true do
   include Warden::Test::Helpers
 
-  let(:current_user_role) { UserRole::DEVELOPER }
-  let(:current_user_role_organization) { nil }
+  let(:current_user_role) { UserRole::ORG_ADMIN }
+  let(:current_user_role_organization) { organization }
   let(:email) { "new.user@example.com" }
   let!(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
   let(:identity) do
@@ -23,6 +23,8 @@ RSpec.describe "User create form", type: :system, js: true do
   end
 
   context "when current user has permission to select any role" do
+    let(:current_user_role) { UserRole::DEVELOPER }
+    let(:current_user_role_organization) { nil }
     let!(:other_organization) { create(:organization, name: "VDO Org", abbreviation: "VDO") }
 
     it "allows for selecting an org admin role" do
