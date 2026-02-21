@@ -5,9 +5,7 @@ module.exports = {
   testMatch: ["**/*.spec.ts", "**/*.test.ts"],
   moduleDirectories: ["node_modules", "app/javascript"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.jest.json"
-    }
+  transform: {
+    "^.+\\.ts$": ["ts-jest", { tsconfig: "tsconfig.jest.json" }]
   }
 };
