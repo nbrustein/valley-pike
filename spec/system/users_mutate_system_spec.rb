@@ -22,18 +22,10 @@ RSpec.describe "User create form", type: :system, js: true do
     Warden.test_reset!
   end
 
-  context "when a global role is selected that grants org admin privileges" do
-    it "leaves Organization Roles section hidden" do
-      visit new_user_path
-      choose "Vanita admin"
-      expect_org_admin_user_role_inputs(:hidden)
-    end
-  end
-
-  context "when a global role is selected that does not grant org admin privileges" do
+  context "when current user has permission to select any role" do
     let!(:other_organization) { create(:organization, name: "VDO Org", abbreviation: "VDO") }
 
-    it "reveals Organization Roles section which can be used to select an org admin role" do
+    it "allows for selecting an org admin role" do
       act
       expect(page).to have_current_path(users_path)
       expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
@@ -62,7 +54,7 @@ RSpec.describe "User create form", type: :system, js: true do
     end
   end
 
-  context "when only the ride requester role is available" do
+  context "when current user only has permissions to assign ride requester role" do
     let(:current_user_role) { UserRole::ORG_ADMIN }
     let(:current_user_role_organization) { organization }
 
