@@ -22,5 +22,6 @@ if [ -n "$bundler_version" ]; then
 else
   docker compose run --rm web bundle install
 fi
+docker compose run --rm web yarn install
 docker compose run --rm web bin/rails db:prepare
 docker compose run --rm web bin/rails db:seed

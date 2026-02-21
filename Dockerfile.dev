@@ -11,6 +11,8 @@ RUN apt-get update -qq && \
       git \
       libpq-dev \
       libyaml-dev \
+      nodejs \
+      npm \
       curl \
       chromium \
       chromium-driver \
@@ -30,6 +32,8 @@ RUN apt-get update -qq && \
       libxrandr2 \
       libxshmfence1 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+RUN corepack enable
 
 WORKDIR /rails
 
