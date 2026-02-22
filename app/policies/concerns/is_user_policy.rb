@@ -7,7 +7,7 @@ module IsUserPolicy
 
   def organization_ids_with_org_admin_permissions
     if roles_granting_org_admin_permissions.any? {|role| role.organization_id.nil? }
-      return Organization.ids + [nil]
+      return Organization.ids + [ nil ]
     end
 
     roles_granting_org_admin_permissions.filter_map(&:organization_id).compact.uniq
