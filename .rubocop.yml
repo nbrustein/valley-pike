@@ -1,5 +1,7 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+plugins:
+  - rubocop-erb
 
 # Commonly used screens these days easily fit more than 80 characters.
 Layout/LineLength:

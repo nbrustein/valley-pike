@@ -2,21 +2,21 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
-    attr_reader :user_roles, :email, :full_name, :phone, :sortable_name, :password
+    attr_reader :user_roles, :email, :full_name, :preferred_name, :phone, :password
 
     def initialize(executor_id:, params:)
       super
       @email = params.fetch(:email)
       @full_name = params.fetch(:full_name)
+      @preferred_name = params.fetch(:preferred_name)
       @phone = params.fetch(:phone)
-      @sortable_name = params.fetch(:sortable_name)
       @user_roles = params.fetch(:user_roles)
       @password = params[:password]
     end
 
     private
 
-    attr_reader :email, :full_name, :phone, :sortable_name, :roles, :password
+    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password
 
     def execute_unit_of_work(errors:)
       user = build_user(errors)
@@ -51,8 +51,8 @@ module UnitsOfWork
       user.email = normalized_email
       human = user.build_human
       human.full_name = full_name
+      human.preferred_name = preferred_name
       human.phone = phone
-      human.sortable_name = sortable_name
       user
     end
 

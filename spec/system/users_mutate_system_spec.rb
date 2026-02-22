@@ -7,6 +7,9 @@ RSpec.describe "User create form", type: :system, js: true do
   let(:current_user_role) { UserRole::ORG_ADMIN }
   let(:current_user_role_organization) { organization }
   let(:email) { "new.user@example.com" }
+  let(:full_name) { "Jane Doe" }
+  let(:preferred_name) { "Jane" }
+  let(:phone) { "" }
   let!(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
   let(:identity) do
     user = create(:user, email: "udo-admin@example.com")
@@ -20,6 +23,18 @@ RSpec.describe "User create form", type: :system, js: true do
 
   after do
     Warden.test_reset!
+  end
+
+  it "assigns basic field values to new user" do
+    visit new_user_path
+    fill_in "Email", with: email
+    fill_in "Full Name", with: "John Doe"
+
+    click_button "Create ride requester"
+
+    user = User.find_by!(email:)
+    expect(user.human.full_name).to eq("John Doe")
+    expect(user.human.preferred_name).to eq("John")
   end
 
   context "when current user has permission to select any role" do
@@ -80,6 +95,9 @@ RSpec.describe "User create form", type: :system, js: true do
   def visit_and_fill_in_basic_fields
     visit new_user_path
     fill_in "Email", with: email
+    fill_in "Full Name", with: full_name
+    fill_in "Preferred Name", with: preferred_name
+    fill_in "Phone", with: phone if phone.present?
   end
 
   def expect_user_to_have_roles(email, role_pairs)

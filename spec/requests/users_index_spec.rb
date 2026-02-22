@@ -12,20 +12,22 @@ RSpec.describe "Users index", type: :request do
   before { configure_request_host! }
 
   describe "GET /users" do
-    let!(:zeta_user) do
+    let!(:user_1) do
       create(
         :user,
-        human: build(:human, full_name: "Zeta Person", sortable_name: "Zeta")
+        human: build(:human, full_name: "Andrew", preferred_name: "Yadawa")
       )
     end
-    let!(:alpha_user) do
+    let!(:user_2) do
       create(
         :user,
-        human: build(:human, full_name: "Alpha Person", sortable_name: "Alpha")
+        human: build(:human, full_name: "Benita", preferred_name: "Xavier")
       )
     end
-    let!(:alpha_user_role) { create(:user_role, user: alpha_user, role: UserRole::RIDE_REQUESTER, organization:) }
-    let!(:zeta_user_role) { create(:user_role, user: zeta_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let!(:user_2_role) { create(:user_role, user: user_2, role: UserRole::RIDE_REQUESTER, organization: user_2_role_organization) }
+    let!(:user_1_role) { create(:user_role, user: user_1, role: UserRole::RIDE_REQUESTER, organization: user_1_role_organization) }
+    let(:user_1_role_organization) { organization }
+    let(:user_2_role_organization) { organization }
 
     context "when signed out" do
       let(:current_user) { nil }
@@ -48,14 +50,51 @@ RSpec.describe "Users index", type: :request do
     context "when the current_user can index users" do
       let(:role) { UserRole::VANITA_ADMIN }
 
-      it "shows a list of users ordered by sortable name" do
+      it "shows a list of users ordered by full_name" do
         aggregate_failures do
           act
           expect(response).to have_http_status(:ok)
-          expect(page).to have_text(alpha_user.human.full_name)
-          expect(page).to have_text(zeta_user.human.full_name)
-          expect(alpha_user.human.sortable_name).to be < zeta_user.human.sortable_name # sanity check
-          expect(user_names.index(alpha_user.human.full_name)).to be < user_names.index(zeta_user.human.full_name)
+          expect(page).to have_text(user_2.human.full_name)
+          expect(page).to have_text(user_1.human.full_name)
+          expect(user_1.human.full_name).to be < user_2.human.full_name # sanity check
+          expect(user_names.index(user_1.human.full_name)).to be < user_names.index(user_2.human.full_name)
+        end
+      end
+
+      context 'when the user is restricted to certain organizations' do
+        let(:role) { UserRole::ORG_ADMIN }
+        let(:another_organization) { create(:organization) }
+        let(:user_1_role_organization) { organization }
+        let(:user_2_role_organization) { another_organization }
+        let!(:user_3) { create(:user, email: "user_3@example.com") }
+        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_VIEWER, organization: nil) }
+
+        before { act }
+        it 'shows a user from a permitted organization' do
+          expect(page).to have_text(user_1.human.full_name)
+        end
+        it 'hides a user from a different organization' do
+          expect(page).not_to have_text(user_2.human.full_name)
+        end
+        it 'hides a user whose role has no organization' do
+          expect(page).not_to have_text(user_3.human.full_name)
+        end
+      end
+
+      context 'when the user can see users in all organizations' do
+        let(:role) { UserRole::DEVELOPER }
+        let(:another_organization) { create(:organization) }
+        let(:user_1_role_organization) { organization }
+        let(:user_2_role_organization) { another_organization }
+        let!(:user_3) { create(:user, email: "user_3@example.com") }
+        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_VIEWER, organization: nil) }
+
+        before { act }
+        it 'shows a user whose role has an organization' do
+          expect(page).to have_text(user_1.human.full_name)
+        end
+        it 'shows a user whose role has no organization' do
+          expect(page).to have_text(user_3.human.full_name)
         end
       end
 

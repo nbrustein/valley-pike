@@ -43,8 +43,8 @@ RSpec.describe UserMutatePolicy do
       {
         email: "new.user@example.com",
         full_name: "New User",
+        preferred_name: "New",
         phone: "555-1212",
-        sortable_name: "User",
         user_roles: [],
       }
     end
