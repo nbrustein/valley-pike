@@ -53,6 +53,9 @@ class UsersMutateController < ApplicationController
   # with the inputted values
   memoize def setup_create_instance_vars
     @email = create_user_params&.dig(:email)
+    @full_name = create_user_params&.dig(:full_name)
+    @preferred_name = create_user_params&.dig(:preferred_name)
+    @phone = create_user_params&.dig(:phone)
   end
 
   memoize def render_form(status: :ok)
@@ -63,6 +66,9 @@ class UsersMutateController < ApplicationController
   def create_user_params
     permitted = params.require(:user).permit(
       :email,
+      :full_name,
+      :preferred_name,
+      :phone,
       :global_role,
       org_admin_user_roles: %i[role organization_id]
     )
@@ -71,9 +77,6 @@ class UsersMutateController < ApplicationController
       global_role: permitted[:global_role]
     )
     permitted.to_h.except("global_role", "org_admin_user_roles").merge(
-      full_name: "John Doe",
-      phone: "",
-      sortable_name: "Doe, John",
       user_roles:
     )
   end

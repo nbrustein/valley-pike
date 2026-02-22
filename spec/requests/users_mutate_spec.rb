@@ -75,6 +75,9 @@ RSpec.describe "UsersMutate", type: :request do
       {
         user: {
           email: "new.user@example.com",
+          full_name: "New User",
+          preferred_name: "New",
+          phone: "555-1212",
           global_role: UserRole::VANITA_ADMIN,
         },
       }
@@ -91,6 +94,9 @@ RSpec.describe "UsersMutate", type: :request do
         created_user = User.find_by!(email: "new.user@example.com")
         expect(created_user.user_roles.pluck(:role, :organization_id))
           .to contain_exactly([ UserRole::VANITA_ADMIN, nil ])
+        expect(created_user.human.full_name).to eq("New User")
+        expect(created_user.human.preferred_name).to eq("New")
+        expect(created_user.human.phone).to eq("555-1212")
       end
 
       def assert_redirect_to_users_path

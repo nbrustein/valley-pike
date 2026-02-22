@@ -6,8 +6,8 @@ RSpec.describe UnitsOfWork::CreateUser do
     let(:organization) { create(:organization, abbreviation: "UDO") }
     let(:email) { "new.user@example.com" }
     let(:full_name) { "New User" }
+    let(:preferred_name) { "New" }
     let(:phone) { "555-1212" }
-    let(:sortable_name) { "User" }
     let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
@@ -25,8 +25,8 @@ RSpec.describe UnitsOfWork::CreateUser do
         user = User.find_by(email:)
         expect(user).to be_present
         expect(user.human.full_name).to eq(full_name)
+        expect(user.human.preferred_name).to eq(preferred_name)
         expect(user.human.phone).to eq(phone)
-        expect(user.human.sortable_name).to eq(sortable_name)
         expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
@@ -70,8 +70,8 @@ RSpec.describe UnitsOfWork::CreateUser do
       params: {
         email:,
         full_name:,
+        preferred_name:,
         phone:,
-        sortable_name:,
         user_roles:,
         password:,
       }

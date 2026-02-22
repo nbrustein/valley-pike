@@ -7,8 +7,8 @@ RSpec.describe UnitsOfWork::UpsertUser do
     let(:other_organization) { create(:organization, abbreviation: "VDO") }
     let(:email) { "existing.user@example.com" }
     let(:full_name) { "Existing User" }
+    let(:preferred_name) { "Existing" }
     let(:phone) { "555-9898" }
-    let(:sortable_name) { "User" }
     let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
@@ -37,7 +37,11 @@ RSpec.describe UnitsOfWork::UpsertUser do
       let!(:user) { create(:user, email:) }
 
       before do
-        user.human.update!(full_name: "Old Name", phone: "555-0000", sortable_name: "Old")
+        user.human.update!(
+          full_name: "Old Name",
+          preferred_name: "Old",
+          phone: "555-0000"
+        )
         create(:user_role, user:, role: UserRole::VANITA_ADMIN)
         create(:user_role, user:, role: UserRole::ORG_ADMIN, organization: other_organization)
       end
@@ -49,8 +53,8 @@ RSpec.describe UnitsOfWork::UpsertUser do
 
         user.reload
         expect(user.human.full_name).to eq(full_name)
+        expect(user.human.preferred_name).to eq(preferred_name)
         expect(user.human.phone).to eq(phone)
-        expect(user.human.sortable_name).to eq(sortable_name)
         expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
@@ -82,8 +86,8 @@ RSpec.describe UnitsOfWork::UpsertUser do
       params: {
         email:,
         full_name:,
+        preferred_name:,
         phone:,
-        sortable_name:,
         user_roles:,
         password:,
       }

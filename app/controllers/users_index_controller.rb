@@ -6,7 +6,7 @@ class UsersIndexController < ApplicationController
     @users = policy_scope(User, policy_scope_class: UserViewPolicy::Scope)
       .joins(:human)
       .includes(:human, user_roles: :organization)
-      .order(humans: {sortable_name: :asc})
+      .order(humans: {full_name: :asc})
       .distinct
   end
 end
