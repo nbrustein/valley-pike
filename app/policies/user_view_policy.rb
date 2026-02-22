@@ -29,7 +29,7 @@ class UserViewPolicy < ApplicationPolicy
 
     memoize def viewable_roles
       return UserRole::ROLES if user&.has_role_permissions?(UserRole::VANITA_VIEWER)
-      return [ UserRole::RIDE_REQUESTER ] if user&.has_role_permissions?(UserRole::ORG_ADMIN)
+      return [ UserRole::RIDE_REQUESTER, UserRole::ORG_ADMIN ] if user&.has_role_permissions?(UserRole::ORG_ADMIN)
       []
     end
   end
