@@ -80,6 +80,12 @@ user_definitions = [
     user_roles: [ {role: UserRole::ORG_ADMIN, organization_id: organizations.fetch("udo").id} ],
   },
   {
+    email: "udo.admin2@#{EMAIL_DOMAIN}",
+    full_name: "udo admin 2",
+    phone: "555-0106",
+    user_roles: [ {role: UserRole::ORG_ADMIN, organization_id: organizations.fetch("udo").id} ],
+  },
+  {
     email: "udo.ride.requester@#{EMAIL_DOMAIN}",
     full_name: "udo ride requester",
     phone: "555-0110",

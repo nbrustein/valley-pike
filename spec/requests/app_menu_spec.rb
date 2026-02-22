@@ -9,34 +9,46 @@ RSpec.describe "App menu", type: :request do
 
   before { configure_request_host! }
 
+  let!(:target_user) do
+    target_user = create(:user)
+    create(:user_role, user: target_user, role: UserRole::DRIVER)
+    create(:identity, :magic_link, user: target_user, email: target_user.email)
+    target_user
+  end
+
+  let(:current_user) do
+    current_user = create(:user)
+    create(:user_role, user: current_user, role: current_user_role)
+    create(:identity, :magic_link, user: current_user, email: current_user.email)
+    current_user
+  end
+
   describe "navigation links" do
-    context "when the signed-in user is an org admin with ride requesters" do
-      let(:current_user) { create(:user, email: "udo-admin@example.com") }
-      let!(:ride_requester) { create(:user) }
+    let(:users_index_label) { "Users" }
+    before do
+      view_class = ApplicationController.view_context_class
+      allow_any_instance_of(view_class)
+        .to receive(:users_index_label)
+        .and_return(users_index_label)
+    end
 
-      before do
-        create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
-        create(:user_role, user: ride_requester, role: UserRole::RIDE_REQUESTER, organization:)
-        create(:identity, :magic_link, user: current_user, email: current_user.email)
-      end
+    context "when the signed-in user has viewable users" do
+      let(:current_user_role) { UserRole::DEVELOPER }
 
-      it "shows the users link" do
+      it "shows the users link with the label" do
         act_get_profile(current_user:)
-        expect(response.body).to include("UDO Users")
+        page = Capybara.string(response.body)
+        expect(page).to have_link(users_index_label, href: users_path)
       end
     end
 
-    context "when the signed-in user is an org admin with no ride requesters" do
-      let(:current_user) { create(:user, email: "no-requesters@example.com") }
-
-      before do
-        create(:user_role, user: current_user, role: UserRole::ORG_ADMIN, organization:)
-        create(:identity, :magic_link, user: current_user, email: current_user.email)
-      end
+    context "when the signed-in user has no viewable users" do
+      let(:current_user_role) { UserRole::DRIVER }
 
       it "does not show the users link" do
         act_get_profile(current_user:)
-        expect(response.body).not_to include("UDO Users")
+        page = Capybara.string(response.body)
+        expect(page).not_to have_link(users_index_label, href: users_path)
       end
     end
 
@@ -65,6 +77,6 @@ RSpec.describe "App menu", type: :request do
 
   def act_get_profile(current_user:)
     sign_in current_user.identities.find_by!(kind: "magic_link")
-    get profile_path, headers: headers
+    get root_path, headers: headers
   end
 end
