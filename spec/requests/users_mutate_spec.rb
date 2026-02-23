@@ -99,12 +99,6 @@ RSpec.describe "UsersMutate", type: :request do
         expect(created_user.human.phone).to eq("555-1212")
       end
 
-      def assert_redirect_to_users_path
-        assert_redirect(to: users_path) {
-          act(path: users_path, params: valid_create_params)
-        }
-      end
-
       context "when there are validation errors" do
         before do
           errors = ActiveModel::Errors.new(User.new)
@@ -117,6 +111,7 @@ RSpec.describe "UsersMutate", type: :request do
           act(path: users_path, params: valid_create_params)
 
           expect(response).to have_http_status(:unprocessable_content)
+          assert_form_rendered
           expect(response.body).to include("Please fix the following:")
           expect(response.body).to include("An error occurred")
         end
@@ -132,53 +127,19 @@ RSpec.describe "UsersMutate", type: :request do
           act(path: users_path, params: valid_create_params)
 
           expect(response).to have_http_status(:unprocessable_content)
+          assert_form_rendered
           expect(response.body).to include("Please fix the following:")
           expect(response.body).to include("An error occurred")
           expect(response.body).not_to include("Sensitive details")
         end
       end
 
-      context "when there are org admin user roles available" do
-        let!(:organizations) { [ organization, create(:organization, name: "VDO Org", abbreviation: "VDO") ] }
-
-        # The org admin role inputs are hidden, and can only be revealed by js, but we can
-        # still assert here that the fields are rendered. The user_mutate_system_spec tests
-        # the functionality of those fields.
-        it "renders the org admin role inputs" do
-          sign_in current_user.identities.first
-          get new_user_path, headers: headers
-
-          page = Capybara.string(response.body)
-          inputs_section = page.find("[data-org-admin-user-role-inputs]", visible: :all)
-
-          expect_headers(inputs_section, [ "Organization", "None", "Org admin", "Ride requester" ])
-
-          organizations.each do |organization|
-            expect_organization_row(inputs_section, organization)
-          end
-        end
-
-        def expect_headers(inputs_section, headers)
-          headers.each do |header|
-            expect(inputs_section).to have_css("th", text: header, visible: :all)
-          end
-        end
-
-        def expect_organization_row(inputs_section, organization)
-          row = inputs_section.find(
-            :xpath,
-            ".//tr[td[contains(., '#{organization.name}')]]",
-            visible: :all
-          )
-          expect(row).to have_css("td", text: organization.name, visible: :all)
-          expect(row).to have_css("input[type='radio'][value='']", count: 1, visible: :all)
-          expect(row).to have_css("input[type='radio'][value='org_admin']", count: 1, visible: :all)
-          expect(row).to have_css("input[type='radio'][value='ride_requester']", count: 1, visible: :all)
-        end
+      def assert_redirect_to_users_path
+        assert_redirect(to: users_path) {
+          act(path: users_path, params: valid_create_params)
+        }
       end
     end
-
-
 
     context "when the current user is not allowed to create users" do
       let(:current_user_role) { UserRole::DRIVER }
@@ -192,6 +153,58 @@ RSpec.describe "UsersMutate", type: :request do
     def act(path:, params:)
       sign_in current_user.identities.first
       post path, params:, headers:
+    end
+  end
+
+  # This stuff is shared between the users/new and POST /users endpoints, so putting it in a separate describe block
+  describe "form rendering" do
+    before do 
+      sign_in current_user.identities.first
+      get new_user_path, headers: headers
+      assert_form_rendered
+    end
+      
+    it "renders the human fields" do
+      raise NotImplementedError
+    end
+
+    context "when there are org admin user roles available" do
+      let!(:organizations) { [ organization, create(:organization, name: "VDO Org", abbreviation: "VDO") ] }
+
+      # The org admin role inputs are hidden, and can only be revealed by js, but we can
+      # still assert here that the fields are rendered. The user_mutate_system_spec tests
+      # the functionality of those fields.
+      it "renders the org admin role inputs" do
+        sign_in current_user.identities.first
+        get new_user_path, headers: headers
+
+        page = Capybara.string(response.body)
+        inputs_section = page.find("[data-org-admin-user-role-inputs]", visible: :all)
+
+        expect_headers(inputs_section, [ "Organization", "None", "Org admin", "Ride requester" ])
+
+        organizations.each do |organization|
+          expect_organization_row(inputs_section, organization)
+        end
+      end
+
+      def expect_headers(inputs_section, headers)
+        headers.each do |header|
+          expect(inputs_section).to have_css("th", text: header, visible: :all)
+        end
+      end
+
+      def expect_organization_row(inputs_section, organization)
+        row = inputs_section.find(
+          :xpath,
+          ".//tr[td[contains(., '#{organization.name}')]]",
+          visible: :all
+        )
+        expect(row).to have_css("td", text: organization.name, visible: :all)
+        expect(row).to have_css("input[type='radio'][value='']", count: 1, visible: :all)
+        expect(row).to have_css("input[type='radio'][value='org_admin']", count: 1, visible: :all)
+        expect(row).to have_css("input[type='radio'][value='ride_requester']", count: 1, visible: :all)
+      end
     end
   end
 
