@@ -29,8 +29,22 @@ RSpec.describe "User create form", type: :system, js: true do
     visit new_user_path
     fill_in "Email", with: email
     fill_in "Full Name", with: "John Doe"
+    expect(page).to have_field("Preferred Name", with: "John")
+    expect(page).to have_field(
+      "user[org_admin_user_roles][1][role]",
+      type: "hidden",
+      with: UserRole::RIDE_REQUESTER,
+      visible: false
+    )
+    expect(page).to have_field(
+      "user[org_admin_user_roles][1][organization_id]",
+      type: "hidden",
+      with: organization.id,
+      visible: false
+    )
 
     click_button "Create ride requester"
+    expect(page).to have_current_path(users_path)
 
     user = User.find_by!(email:)
     expect(user.human.full_name).to eq("John Doe")

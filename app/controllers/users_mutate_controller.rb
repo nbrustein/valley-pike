@@ -76,9 +76,11 @@ class UsersMutateController < ApplicationController
       org_admin_user_roles: permitted[:org_admin_user_roles],
       global_role: permitted[:global_role]
     )
-    permitted.to_h.except("global_role", "org_admin_user_roles").merge(
-      user_roles:
-    )
+    permitted
+      .to_h
+      .except("global_role", "org_admin_user_roles")
+      .deep_symbolize_keys
+      .merge(user_roles:)
   end
 
   def normalize_user_roles(org_admin_user_roles:, global_role:)
@@ -93,8 +95,8 @@ class UsersMutateController < ApplicationController
     # so they end up here as a hash whose values are hashes, but we want
     # an array of hashes.
     org_admin_user_roles.values.filter_map do |entry|
-      role = entry[:role]
-      organization_id = entry[:organization_id]
+      role = entry["role"] || entry[:role]
+      organization_id = entry["organization_id"] || entry[:organization_id]
       next if role.blank?
 
       {role:, organization_id:}
