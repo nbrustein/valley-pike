@@ -35,4 +35,8 @@
   label:has(input[type="radio"]):active {
     opacity: 0.7;
   }
+
+  label:has(input[type="checkbox"]:disabled) {
+    opacity: 0.5;
+  }
 }
