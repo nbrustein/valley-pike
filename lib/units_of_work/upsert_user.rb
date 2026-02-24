@@ -9,12 +9,13 @@ module UnitsOfWork
       @preferred_name = params.fetch(:preferred_name)
       @phone = params.fetch(:phone)
       @user_roles = params.fetch(:user_roles)
+      @driver_qualifications = params.fetch(:driver_qualifications, [])
       @password = params[:password]
     end
 
     private
 
-    attr_reader :email, :full_name, :preferred_name, :phone, :user_roles, :password
+    attr_reader :email, :full_name, :preferred_name, :phone, :user_roles, :driver_qualifications, :password
 
     memoize def normalized_email
       Identity.normalize_email(email)
@@ -32,6 +33,9 @@ module UnitsOfWork
       return if errors.any?
 
       sync_roles(user, errors)
+      return if errors.any?
+
+      sync_driver_qualifications(user, errors)
       return if errors.any?
 
       upsert_password_identity(user, errors) if password.present?
@@ -53,6 +57,7 @@ module UnitsOfWork
           phone:,
           user_roles:,
           password:,
+          driver_qualifications:,
         }
       )
     end
@@ -80,6 +85,22 @@ module UnitsOfWork
         next if user_role.save
 
         merge_errors(errors, user_role)
+      end
+    end
+
+    def sync_driver_qualifications(user, errors)
+      user.driver_qualifications.find_each do |driver_qualification|
+        next if driver_qualifications.include?(driver_qualification.qualification)
+
+        driver_qualification.destroy!
+      end
+
+      driver_qualifications.each do |qualification|
+        driver_qualification = user.driver_qualifications.find_or_initialize_by(qualification:)
+        next if driver_qualification.persisted?
+        next if driver_qualification.save
+
+        merge_errors(errors, driver_qualification)
       end
     end
 

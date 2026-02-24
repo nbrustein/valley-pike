@@ -100,7 +100,7 @@ RSpec.describe "Users index", type: :request do
 
       context "when a user in the list has a single role" do
         let!(:single_role_user) { create(:user, email: "driver@example.com") }
-        let!(:single_role) { create(:user_role, user: single_role_user, role: UserRole::DRIVER, organization:) }
+        let!(:single_role) { create(:user_role, user: single_role_user, role: UserRole::DRIVER, organization: nil) }
         before { act }
 
         it "shows the role pill" do

@@ -2,7 +2,7 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
-    attr_reader :user_roles, :email, :full_name, :preferred_name, :phone, :password
+    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name, :phone, :password
 
     def initialize(executor_id:, params:)
       super
@@ -11,12 +11,13 @@ module UnitsOfWork
       @preferred_name = params.fetch(:preferred_name)
       @phone = params.fetch(:phone)
       @user_roles = params.fetch(:user_roles)
+      @driver_qualifications = params.fetch(:driver_qualifications, [])
       @password = params[:password]
     end
 
     private
 
-    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password
+    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password, :driver_qualifications
 
     def execute_unit_of_work(errors:)
       user = build_user(errors)
@@ -26,6 +27,9 @@ module UnitsOfWork
       return if errors.any?
 
       create_roles(user, errors)
+      return if errors.any?
+
+      create_driver_qualifications(user, errors)
       return if errors.any?
 
       create_password_identity(user, errors) if password.present?
@@ -81,6 +85,15 @@ module UnitsOfWork
       return if identity.save
 
       merge_errors(errors, identity)
+    end
+
+    def create_driver_qualifications(user, errors)
+      driver_qualifications.uniq.each do |qualification|
+        driver_qualification = user.driver_qualifications.build(qualification:)
+        next if driver_qualification.save
+
+        merge_errors(errors, driver_qualification)
+      end
     end
 
     def merge_errors(errors, record)

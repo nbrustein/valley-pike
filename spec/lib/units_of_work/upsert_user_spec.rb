@@ -9,6 +9,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
     let(:full_name) { "Existing User" }
     let(:preferred_name) { "Existing" }
     let(:phone) { "555-9898" }
+    let(:driver_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
     let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
@@ -30,6 +31,8 @@ RSpec.describe UnitsOfWork::UpsertUser do
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
         )
+        expect(user.driver_qualifications.pluck(:qualification))
+          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
       end
     end
 
@@ -59,6 +62,8 @@ RSpec.describe UnitsOfWork::UpsertUser do
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
         )
+        expect(user.driver_qualifications.pluck(:qualification))
+          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
       end
 
       context "when a password is provided" do
@@ -75,6 +80,24 @@ RSpec.describe UnitsOfWork::UpsertUser do
           expect(identity.valid_password?(password)).to be(true)
         end
       end
+
+      context "when the user already has a driver qualification" do
+        let(:driver_qualifications) { [] }
+
+        before do
+          DriverQualification.create!(
+            user:,
+            qualification: DriverQualification::QUALIFICATION_CWS_VETTED
+          )
+        end
+
+        it "passing an empty driver_qualifications array removes the qualification" do
+          result = act
+
+          assert_success(result)
+          expect(user.reload.driver_qualifications).to be_empty
+        end
+      end
     end
   end
 
@@ -89,6 +112,7 @@ RSpec.describe UnitsOfWork::UpsertUser do
         preferred_name:,
         phone:,
         user_roles:,
+        driver_qualifications:,
         password:,
       }
     )

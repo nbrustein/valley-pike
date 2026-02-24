@@ -8,6 +8,7 @@ RSpec.describe UnitsOfWork::CreateUser do
     let(:full_name) { "New User" }
     let(:preferred_name) { "New" }
     let(:phone) { "555-1212" }
+    let(:driver_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
     let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
@@ -31,6 +32,8 @@ RSpec.describe UnitsOfWork::CreateUser do
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
         )
+        expect(user.driver_qualifications.pluck(:qualification))
+          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
       end
 
       context "when a password is provided" do
@@ -73,6 +76,7 @@ RSpec.describe UnitsOfWork::CreateUser do
         preferred_name:,
         phone:,
         user_roles:,
+        driver_qualifications:,
         password:,
       }
     )

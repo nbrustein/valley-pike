@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_21_121500) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "driver_qualifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "qualification", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["user_id", "qualification"], name: "index_driver_qualifications_on_user_id_and_qualification", unique: true
+    t.index ["user_id"], name: "index_driver_qualifications_on_user_id"
+    t.check_constraint "qualification::text = 'cws_vetted'::text", name: "driver_qualifications_qualification_check"
+  end
 
   create_table "humans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -49,8 +59,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_121500) do
     t.string "abbreviation", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
-    t.boolean "require_vetted_drivers", default: false, null: false
+    t.text "required_qualifications", default: [], null: false, array: true
     t.datetime "updated_at", null: false
+    t.check_constraint "required_qualifications <@ ARRAY['cws_vetted'::text]", name: "organizations_required_qualifications_check"
   end
 
   create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -74,8 +85,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_121500) do
     t.uuid "user_id", null: false
     t.index ["organization_id"], name: "index_user_roles_on_organization_id"
     t.index ["user_id"], name: "index_user_roles_on_user_id"
-    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying]::text[])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying, 'ride_requester'::character varying]::text[])) AND organization_id IS NOT NULL OR role::text = 'driver'::text", name: "user_roles_organization_id_check"
-    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'org_admin'::character varying, 'ride_requester'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
+    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'driver'::character varying]::text[])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying, 'ride_requester'::character varying]::text[])) AND organization_id IS NOT NULL", name: "user_roles_organization_id_check"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'vanita_viewer'::character varying::text, 'org_admin'::character varying::text, 'ride_requester'::character varying::text, 'driver'::character varying::text])", name: "user_roles_role_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -86,6 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_121500) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "driver_qualifications", "users"
   add_foreign_key "humans", "users"
   add_foreign_key "identities", "users"
   add_foreign_key "unit_of_work_executions", "users", column: "executor_id"
