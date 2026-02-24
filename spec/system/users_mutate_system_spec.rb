@@ -1,7 +1,7 @@
 require "rails_helper"
 require "warden/test/helpers"
 
-RSpec.describe "User create form", type: :system do
+RSpec.describe "User mutate form", type: :system do
   include Warden::Test::Helpers
 
   let(:current_user_role) { UserRole::ORG_ADMIN }

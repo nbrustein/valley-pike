@@ -14,6 +14,17 @@ RSpec.describe "UsersMutate", type: :request do
   end
   let(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
   let(:current_user_role) { UserRole::VANITA_ADMIN }
+  let(:valid_create_params) do
+    {
+      user: {
+        email: "new.user@example.com",
+        full_name: "New User",
+        preferred_name: "New",
+        phone: "555-1212",
+        global_role: UserRole::VANITA_ADMIN,
+      },
+    }
+  end
 
   before { configure_request_host! }
 
@@ -47,62 +58,20 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "POST /users" do
-    let(:valid_create_params) do
-      {
-        user: {
-          email: "new.user@example.com",
-          full_name: "New User",
-          preferred_name: "New",
-          phone: "555-1212",
-          global_role: UserRole::VANITA_ADMIN,
-        },
-      }
-    end
 
     context "when the current user is allowed to create users" do
       let(:current_user_role) { UserRole::DEVELOPER }
-      before { current_user } # make sure the current_user is created before we try to assert on the User count
 
-      context "when there are validation errors" do
-        before do
-          errors = ActiveModel::Errors.new(User.new)
-          errors.add(:base, "An error occurred")
-          result = UnitOfWork::Result.new(errors:)
-          allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors:))
-        end
-
-        it "renders the form with errors" do
-          act(path: users_path, params: valid_create_params)
-
-          expect(response).to have_http_status(:unprocessable_content)
-          assert_form_rendered
-          expect(response.body).to include("Please fix the following:")
-          expect(response.body).to include("An error occurred")
-        end
+      before do 
+        allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)))
       end
 
-      context "when there is a runtime error" do
-        before do
-          allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute)
-            .and_raise(StandardError, "Sensitive details")
-        end
-
-        it "renders the form with a generic error" do
-          act(path: users_path, params: valid_create_params)
-
-          expect(response).to have_http_status(:unprocessable_content)
-          assert_form_rendered
-          expect(response.body).to include("Please fix the following:")
-          expect(response.body).to include("An error occurred")
-          expect(response.body).not_to include("Sensitive details")
-        end
-      end
-
-      def assert_redirect_to_users_path
+      it "Calls CreateUser and redirects to users_path" do
         assert_redirect(to: users_path) {
           act(path: users_path, params: valid_create_params)
         }
       end
+
     end
 
     context "when the current user is not allowed to create users" do
@@ -111,6 +80,53 @@ RSpec.describe "UsersMutate", type: :request do
       it "returns not found" do
         act(path: users_path, params: valid_create_params)
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:, params:)
+      sign_in current_user.identities.first
+      post path, params:, headers:
+    end
+
+
+  end
+
+  # These tests cover behavior that is shared between multiple endpoints
+  describe "form rendering" do 
+    let(:current_user_role) { UserRole::DEVELOPER }
+
+    context "when there are validation errors" do
+      before do
+        errors = ActiveModel::Errors.new(User.new)
+        errors.add(:base, "An error occurred")
+        result = UnitOfWork::Result.new(errors:)
+        allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors:))
+      end
+
+      it "renders the form with errors" do
+        act(path: users_path, params: valid_create_params)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        assert_form_rendered
+        expect(response.body).to include("Please fix the following:")
+        expect(response.body).to include("An error occurred")
+      end
+    end
+
+    context "when there is a runtime error" do
+      before do
+        allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute)
+          .and_raise(StandardError, "Sensitive details")
+      end
+
+      it "renders the form with a generic error" do
+        act(path: users_path, params: valid_create_params)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        assert_form_rendered
+        expect(response.body).to include("Please fix the following:")
+        expect(response.body).to include("An error occurred")
+        expect(response.body).not_to include("Sensitive details")
       end
     end
 
