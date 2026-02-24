@@ -16,6 +16,10 @@ class UserMutatePolicy < ApplicationPolicy
     true
   end
 
+  def manage_drivers?
+    user&.has_role_permissions?(UserRole::VANITA_ADMIN) || false
+  end
+
   class OrganizationScope < Scope
     include IsUserPolicy
 

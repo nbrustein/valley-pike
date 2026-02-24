@@ -99,6 +99,22 @@ RSpec.describe "UsersMutate", type: :request do
         expect(created_user.human.phone).to eq("555-1212")
       end
 
+      context "when Driver checkbox is checked" do
+        let(:create_params) do
+          valid_create_params.deep_merge(user: { driver_role: UserRole::DRIVER })
+        end
+
+        it "adds a driver role" do
+          assert_redirect(to: users_path) {
+            act(path: users_path, params: create_params)
+          }
+
+          created_user = User.find_by!(email: "new.user@example.com")
+          expect(created_user.user_roles.pluck(:role, :organization_id))
+            .to contain_exactly([ UserRole::VANITA_ADMIN, nil ], [ UserRole::DRIVER, nil ])
+        end
+      end
+
       context "when there are validation errors" do
         before do
           errors = ActiveModel::Errors.new(User.new)
@@ -165,7 +181,21 @@ RSpec.describe "UsersMutate", type: :request do
     end
       
     it "renders the human fields" do
-      raise NotImplementedError
+      page = Capybara.string(response.body)
+
+      expect(page).to have_css("input[name='user[email]'][type='email']")
+      expect(page).to have_css("input[name='user[full_name]'][type='text']")
+      expect(page).to have_css("input[name='user[preferred_name]'][type='text']")
+      expect(page).to have_css("input[name='user[phone]'][type='tel']")
+    end
+
+    it "renders driver role section" do
+      page = Capybara.string(response.body)
+      driver_roles_section = page.find("[data-driver-roles]", visible: :all)
+
+      expect(driver_roles_section).to have_css("p", text: "Driver Role", visible: :all)
+      expect(driver_roles_section)
+        .to have_css("input[type='checkbox'][name='user[driver_role]'][value='driver']", visible: :all)
     end
 
     context "when there are org admin user roles available" do

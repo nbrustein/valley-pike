@@ -47,6 +47,7 @@ class UsersMutateController < ApplicationController
     @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
     @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
     @organizations_for_org_role_inputs = UserMutatePolicy::OrganizationScope.new(current_user, nil).resolve
+    @show_driver_role_input = user_mutate_policy.manage_drivers?
   end
 
   # when we are rendering the form after a submission led to an error, we want to fill in fields
@@ -70,22 +71,25 @@ class UsersMutateController < ApplicationController
       :preferred_name,
       :phone,
       :global_role,
+      :driver_role,
       org_admin_user_roles: %i[role organization_id]
     )
     user_roles = normalize_user_roles(
       org_admin_user_roles: permitted[:org_admin_user_roles],
-      global_role: permitted[:global_role]
+      global_role: permitted[:global_role],
+      driver_role: permitted[:driver_role]
     )
     permitted
       .to_h
-      .except("global_role", "org_admin_user_roles")
+      .except("global_role", "org_admin_user_roles", "driver_role")
       .deep_symbolize_keys
       .merge(user_roles:)
   end
 
-  def normalize_user_roles(org_admin_user_roles:, global_role:)
+  def normalize_user_roles(org_admin_user_roles:, global_role:, driver_role:)
     normalize_org_admin_user_roles(org_admin_user_roles) +
-      normalize_global_user_roles(global_role)
+      normalize_global_user_roles(global_role) +
+      normalize_driver_user_roles(driver_role)
   end
 
   def normalize_org_admin_user_roles(org_admin_user_roles)
@@ -107,5 +111,11 @@ class UsersMutateController < ApplicationController
     return [] if global_role.blank?
 
     [ {role: global_role, organization_id: nil} ]
+  end
+
+  def normalize_driver_user_roles(driver_role)
+    return [] if driver_role != UserRole::DRIVER
+
+    [ {role: UserRole::DRIVER, organization_id: nil} ]
   end
 end
