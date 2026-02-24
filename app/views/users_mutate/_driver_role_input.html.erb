@@ -4,14 +4,18 @@
     <input type="checkbox"
            name="user[driver_role]"
            id="user_driver_role_driver"
-           value="<%= UserRole::DRIVER %>">
+           value="<%= UserRole::DRIVER %>"
+           data-driver-role-input>
     Driver
   </label>
-  <label class="flex items-center gap-2 text-sm text-forest-900" for="user_driver_qualifications_cws_vetted">
-    <input type="checkbox"
-           name="user[driver_qualifications][]"
-           id="user_driver_qualifications_cws_vetted"
-           value="<%= DriverQualification::QUALIFICATION_CWS_VETTED %>">
-    CWS vetted
-  </label>
+  <div class="ml-6 border-l border-forest-900/20 pl-4">
+    <label class="flex items-center gap-2 text-sm text-forest-900" for="user_driver_qualifications_cws_vetted">
+      <input type="checkbox"
+             name="user[driver_qualifications][]"
+             id="user_driver_qualifications_cws_vetted"
+             value="<%= DriverQualification::QUALIFICATION_CWS_VETTED %>"
+             data-driver-qualification-input>
+      CWS vetted
+    </label>
+  </div>
 </div>
