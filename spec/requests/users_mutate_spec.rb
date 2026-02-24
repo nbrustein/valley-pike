@@ -29,30 +29,6 @@ RSpec.describe "UsersMutate", type: :request do
         assert_success { act(path: new_user_path) }
         assert_form_rendered
       end
-
-      context "when the curent user can add a global role" do
-        let(:current_user_role) { UserRole::DEVELOPER }
-
-        it "renders the global role input" do
-          assert_success { act(path: new_user_path) }
-          expect(response.body).to have_css("input[name='user[global_role]'][type='radio']")
-
-          expect_radio_option(
-            field_name: "user[global_role]",
-            value: "",
-            label_text: "None",
-            input_id: "user_global_role_none"
-          )
-          [ UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ].each do |role|
-            expect_radio_option(
-              field_name: "user[global_role]",
-              value: role,
-              label_text: role.humanize,
-              input_id: "user_global_role_#{role}"
-            )
-          end
-        end
-      end
     end
 
     context "when the current user is not allowed to create users" do

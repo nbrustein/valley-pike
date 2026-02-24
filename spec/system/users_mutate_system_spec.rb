@@ -56,13 +56,19 @@ RSpec.describe "User create form", type: :system, js: true do
     let(:current_user_role_organization) { nil }
     let!(:other_organization) { create(:organization, name: "VDO Org", abbreviation: "VDO") }
 
-    it "allows for selecting an org admin role" do
-      act
+    it "allows for selecting an organization-specific admin role" do
+      complete_form_with_org_specific_admin_role
       expect(page).to have_current_path(users_path)
       expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
     end
 
-    def act
+    it "allows for selecting a global admin role" do
+      complete_form_with_global_admin_role
+      expect(page).to have_current_path(users_path)
+      expect_user_to_have_roles(email, [ [ UserRole::VANITA_VIEWER, nil ] ])
+    end
+
+    def complete_form_with_org_specific_admin_role
       visit_and_fill_in_basic_fields
 
       # select a global role
@@ -73,6 +79,13 @@ RSpec.describe "User create form", type: :system, js: true do
       within_org_admin_row(organization.name) do
         select_radio_with_value("ride_requester")
       end
+      click_button "Create ride requester"
+    end
+
+    def complete_form_with_global_admin_role
+      visit_and_fill_in_basic_fields
+
+      choose "Vanita viewer"
       click_button "Create ride requester"
     end
 
