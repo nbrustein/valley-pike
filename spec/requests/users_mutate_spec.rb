@@ -63,34 +63,6 @@ RSpec.describe "UsersMutate", type: :request do
       let(:current_user_role) { UserRole::DEVELOPER }
       before { current_user } # make sure the current_user is created before we try to assert on the User count
 
-      it "creates a user" do
-        expect { assert_redirect_to_users_path }
-          .to change(User, :count).by(1)
-
-        created_user = User.find_by!(email: "new.user@example.com")
-        expect(created_user.user_roles.pluck(:role, :organization_id))
-          .to contain_exactly([ UserRole::VANITA_ADMIN, nil ])
-        expect(created_user.human.full_name).to eq("New User")
-        expect(created_user.human.preferred_name).to eq("New")
-        expect(created_user.human.phone).to eq("555-1212")
-      end
-
-      context "when Driver checkbox is checked" do
-        let(:create_params) do
-          valid_create_params.deep_merge(user: { driver_role: UserRole::DRIVER })
-        end
-
-        it "adds a driver role" do
-          assert_redirect(to: users_path) {
-            act(path: users_path, params: create_params)
-          }
-
-          created_user = User.find_by!(email: "new.user@example.com")
-          expect(created_user.user_roles.pluck(:role, :organization_id))
-            .to contain_exactly([ UserRole::VANITA_ADMIN, nil ], [ UserRole::DRIVER, nil ])
-        end
-      end
-
       context "when there are validation errors" do
         before do
           errors = ActiveModel::Errors.new(User.new)

@@ -68,6 +68,12 @@ RSpec.describe "User create form", type: :system, js: true do
       expect_user_to_have_roles(email, [ [ UserRole::VANITA_VIEWER, nil ] ])
     end
 
+    it "allows for selecting a driver role" do
+      complete_form_with_driver_role
+      expect(page).to have_current_path(users_path)
+      expect_user_to_have_roles(email, [ [ UserRole::DRIVER, nil ] ])
+    end
+
     def complete_form_with_org_specific_admin_role
       visit_and_fill_in_basic_fields
 
@@ -86,6 +92,14 @@ RSpec.describe "User create form", type: :system, js: true do
       visit_and_fill_in_basic_fields
 
       choose "Vanita viewer"
+      click_button "Create ride requester"
+    end
+
+    def complete_form_with_driver_role
+      visit_and_fill_in_basic_fields
+
+      choose "None" # select the required global role radio
+      check "Driver"
       click_button "Create ride requester"
     end
 
