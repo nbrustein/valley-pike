@@ -75,3 +75,11 @@ When there are more than one assertion to make given a single set of actions in 
 For performance, avoid actually creating and saving things to the database unless necessary. We don't want to trigger callbacks that take time when it's not necessary. Prefer using `build_stubbed`.
 
 Use FactoryBot to initialize/create objects.
+
+## Request specs and system specs
+
+In general, things that can be tested in request specs should be. 
+
+System specs should be used for 
+ * form interactions
+ * js integration

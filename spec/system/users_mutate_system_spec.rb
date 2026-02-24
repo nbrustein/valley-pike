@@ -79,7 +79,7 @@ RSpec.describe "User create form", type: :system, js: true do
 
       # select a global role
       choose "None"
-      expect_org_admin_user_role_inputs(:visible)
+      expect_org_admin_user_role_inputs(organizations: [ organization, other_organization ])
 
       # select an org admin role
       within_org_admin_row(organization.name) do
@@ -128,16 +128,25 @@ RSpec.describe "User create form", type: :system, js: true do
     end
   end
 
-  def expect_org_admin_user_role_inputs(visibility)
-    visible = visibility == :visible ? true : false
-    expect(page).to have_css("[data-org-admin-user-role-inputs]", visible:)
+  def expect_org_admin_user_role_inputs(organizations:)
+    inputs_section = page.find("[data-org-admin-user-role-inputs]", visible: :all)
+
+    expect_org_admin_table_headers(inputs_section, [ "Organization", "None", "Org admin", "Ride requester" ])
+
+    organizations.each do |organization|
+      expect_organization_row(inputs_section, organization)
+    end
   end
 
   def visit_and_fill_in_basic_fields
     visit new_user_path
+    expect(page).to have_field("Email", type: "email")
     fill_in "Email", with: email
+    expect(page).to have_field("Full Name", type: "text")
     fill_in "Full Name", with: full_name
+    expect(page).to have_field("Preferred Name", type: "text")
     fill_in "Preferred Name", with: preferred_name
+    expect(page).to have_field("Phone", type: "tel")
     fill_in "Phone", with: phone if phone.present?
   end
 
@@ -145,5 +154,23 @@ RSpec.describe "User create form", type: :system, js: true do
     user = User.find_by(email:)
     expect(user).to be_present
     expect(user.user_roles.map {|ur| [ ur.role, ur.organization_id ] }).to eq(role_pairs)
+  end
+
+  def expect_org_admin_table_headers(inputs_section, headers)
+    headers.each do |header|
+      expect(inputs_section).to have_css("th", text: header, visible: :all)
+    end
+  end
+
+  def expect_organization_row(inputs_section, organization)
+    row = inputs_section.find(
+      :xpath,
+      ".//tr[td[contains(., '#{organization.name}')]]",
+      visible: :all
+    )
+    expect(row).to have_css("td", text: organization.name, visible: :all)
+    expect(row).to have_css("input[type='radio'][value='']", count: 1, visible: :all)
+    expect(row).to have_css("input[type='radio'][value='org_admin']", count: 1, visible: :all)
+    expect(row).to have_css("input[type='radio'][value='ride_requester']", count: 1, visible: :all)
   end
 end
