@@ -66,11 +66,9 @@ RSpec.describe UserMutatePolicy do
     end
 
     context 'when a user_role has a disallowed role' do
-      let(:organization) { create(:organization) }
-
       # ORG_ADMINs are not allowed to create DRIVERs
-      let(:uow_params) { default_uow_params.merge({user_roles: [ {role: UserRole::DRIVER, organization_id: organization.id} ]}) }
-      let(:executor_role) { build(:user_role, role: UserRole::ORG_ADMIN, organization:) }
+      let(:uow_params) { default_uow_params.merge({user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ]}) }
+      let(:executor_role) { build(:user_role, role: UserRole::ORG_ADMIN, organization: create(:organization)) }
 
       it 'is false' do
         expect(policy.create?).to be(false)

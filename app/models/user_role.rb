@@ -29,7 +29,7 @@ class UserRole < ApplicationRecord
 
   validates :role, inclusion: {in: ROLES}
   validates :organization, presence: true, if: -> { role.in?([ ORG_ADMIN, RIDE_REQUESTER ]) }
-  validates :organization, absence: true, if: -> { role.in?([ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER ]) }
+  validates :organization, absence: true, if: -> { role.in?([ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER, DRIVER ]) }
 
   def self.has_role_permissions?(role, target_role)
     # only drivers act as drivers. Not even developers can be drivers unless

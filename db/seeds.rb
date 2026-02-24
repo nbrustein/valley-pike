@@ -30,10 +30,10 @@ def default_preferred_name(full_name)
   full_name.split.first
 end
 
-def upsert_organization!(name:, abbreviation:, require_vetted_drivers:)
+def upsert_organization!(name:, abbreviation:, required_qualifications:)
   organization = Organization.find_or_initialize_by(abbreviation:)
   organization.name = name
-  organization.require_vetted_drivers = require_vetted_drivers
+  organization.required_qualifications = required_qualifications
   organization.save!
   organization
 end
@@ -42,12 +42,12 @@ organizations = {
   "udo" => upsert_organization!(
     name: "Unvetted Driver Org",
     abbreviation: "UDO",
-    require_vetted_drivers: false
+    required_qualifications: []
   ),
   "vdo" => upsert_organization!(
     name: "Vetted Driver Org",
     abbreviation: "VDO",
-    require_vetted_drivers: true
+    required_qualifications: [ DriverQualification::QUALIFICATION_CWS_VETTED ]
   ),
 }
 
@@ -108,24 +108,28 @@ user_definitions = [
     full_name: "unvetted driver 1",
     phone: "555-0106",
     user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
+    driver_qualifications: [],
   },
   {
     email: "vdo.vetted.driver.1@#{EMAIL_DOMAIN}",
     full_name: "vdo vetted driver 1",
     phone: "555-0107",
-    user_roles: [ {role: UserRole::DRIVER, organization_id: organizations.fetch("vdo").id} ],
+    user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
+    driver_qualifications: [ DriverQualification::QUALIFICATION_CWS_VETTED ],
   },
   {
     email: "unvetted.driver.2@#{EMAIL_DOMAIN}",
     full_name: "unvetted driver 2",
     phone: "555-0108",
     user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
+    driver_qualifications: [],
   },
   {
     email: "vdo.vetted.driver.2@#{EMAIL_DOMAIN}",
     full_name: "vdo vetted driver 2",
     phone: "555-0109",
-    user_roles: [ {role: UserRole::DRIVER, organization_id: organizations.fetch("vdo").id} ],
+    user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
+    driver_qualifications: [ DriverQualification::QUALIFICATION_CWS_VETTED ],
   },
 ]
 
@@ -141,6 +145,7 @@ begin
         preferred_name: default_preferred_name(user_definition.fetch(:full_name)),
         phone: user_definition.fetch(:phone),
         user_roles: user_definition.fetch(:user_roles),
+        driver_qualifications: user_definition.fetch(:driver_qualifications, []),
         password: DEFAULT_PASSWORD,
       }
     )

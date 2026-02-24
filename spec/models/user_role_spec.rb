@@ -60,8 +60,10 @@ RSpec.describe UserRole do
       context "with driver role and organization" do
         let(:user_role) { build(:user_role, role: UserRole::DRIVER, organization:) }
 
-        it "is valid" do
-          expect(user_role).to be_valid
+        before { user_role.valid? }
+
+        it "is invalid" do
+          expect(user_role.errors[:organization]).to include("must be blank")
         end
       end
     end

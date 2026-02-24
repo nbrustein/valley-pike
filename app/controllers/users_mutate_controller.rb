@@ -72,6 +72,7 @@ class UsersMutateController < ApplicationController
       :phone,
       :global_role,
       :driver_role,
+      driver_qualifications: [],
       org_admin_user_roles: %i[role organization_id]
     )
     user_roles = normalize_user_roles(
@@ -83,7 +84,7 @@ class UsersMutateController < ApplicationController
       .to_h
       .except("global_role", "org_admin_user_roles", "driver_role")
       .deep_symbolize_keys
-      .merge(user_roles:)
+      .merge(user_roles:, driver_qualifications: normalize_driver_qualifications(permitted[:driver_qualifications]))
   end
 
   def normalize_user_roles(org_admin_user_roles:, global_role:, driver_role:)
@@ -117,5 +118,9 @@ class UsersMutateController < ApplicationController
     return [] if driver_role != UserRole::DRIVER
 
     [ {role: UserRole::DRIVER, organization_id: nil} ]
+  end
+
+  def normalize_driver_qualifications(driver_qualifications)
+    Array(driver_qualifications).compact_blank.uniq
   end
 end
