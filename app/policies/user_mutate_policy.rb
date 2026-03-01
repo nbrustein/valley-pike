@@ -1,6 +1,4 @@
 class UserMutatePolicy < ApplicationPolicy
-  include IsUserPolicy
-
   # Methods that are run on form submission (i.e. create? and update?) are instantiated with
   # the record being the UnitOfWork that will be executed to process the form submission.
   # Methods that are run on form display (i.e. edit? and new?) are instantiated with the nullable
@@ -14,7 +12,8 @@ class UserMutatePolicy < ApplicationPolicy
   end
 
   def new?
-    user&.has_role_permissions?(UserRole::ORG_ADMIN) || false
+    user&.has_role_permissions?(UserRole::VANITA_ADMIN) ||
+      false
   end
 
   def create?
@@ -41,56 +40,24 @@ class UserMutatePolicy < ApplicationPolicy
     user&.has_role_permissions?(UserRole::VANITA_ADMIN) || false
   end
 
-  class OrganizationScope < Scope
-    include IsUserPolicy
-
-    def resolve
-      Organization.where(id: organization_ids_with_org_admin_permissions)
-    end
-
-    private
-
-    memoize def policy
-      UserMutatePolicy.new(user, nil)
-    end
-  end
-
   def manageable_roles
     return UserRole::ROLES.to_a if user&.has_role_permissions?(UserRole::DEVELOPER)
-    return [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER, UserRole::DRIVER ] if user&.has_role_permissions?(UserRole::VANITA_ADMIN)
-    return [ UserRole::RIDE_REQUESTER ] if user&.has_role_permissions?(UserRole::ORG_ADMIN)
+    return [
+      UserRole::ORG_ADMIN,
+      UserRole::RIDE_REQUESTER,
+      UserRole::DRIVER,
+      UserRole::VANITA_VIEWER,
+    ] if user&.has_role_permissions?(UserRole::VANITA_ADMIN)
     []
   end
 
   private
 
   def can_create?(user_roles:)
-    roles_allowed?(user_roles)
-  end
-
-  def roles_allowed?(user_roles)
-    roles, organization_ids = roles_and_organization_ids(user_roles)
+    roles = user_roles.map {|user_role| user_role[:role] || user_role["role"] }
     return false if roles.empty?
     return false if (roles.uniq - manageable_roles).any?
-    return false if (organization_ids.compact.uniq - organization_ids_with_org_admin_permissions).any?
 
     true
-  end
-
-  def roles_and_organization_ids(user_roles)
-    roles = []
-    organization_ids = []
-
-    user_roles.each do |user_role|
-      if user_role.respond_to?(:role)
-        roles << user_role.role
-        organization_ids << user_role.organization_id
-      else
-        roles << (user_role[:role] || user_role["role"])
-        organization_ids << (user_role[:organization_id] || user_role["organization_id"])
-      end
-    end
-
-    [ roles, organization_ids ]
   end
 end

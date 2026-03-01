@@ -4,8 +4,8 @@ require "warden/test/helpers"
 RSpec.describe "User mutate form", type: :system do
   include Warden::Test::Helpers
 
-  let(:current_user_role) { UserRole::ORG_ADMIN }
-  let(:current_user_role_organization) { organization }
+  let(:current_user_role) { UserRole::DEVELOPER }
+  let(:current_user_role_organization) { nil }
   let(:email) { "new.user@example.com" }
   let(:full_name) { "Jane Doe" }
   let(:preferred_name) { "Jane" }
@@ -31,18 +31,11 @@ RSpec.describe "User mutate form", type: :system do
       fill_in "Email", with: email
       fill_in "Full Name", with: "John Doe"
       expect(page).to have_field("Preferred Name", with: "John")
-      expect(page).to have_field(
-        "user[org_admin_user_roles][1][role]",
-        type: "hidden",
-        with: UserRole::RIDE_REQUESTER,
-        visible: false
-      )
-      expect(page).to have_field(
-        "user[org_admin_user_roles][1][organization_id]",
-        type: "hidden",
-        with: organization.id,
-        visible: false
-      )
+      choose "None"
+      expect_org_admin_user_role_inputs(organizations: [ organization ])
+      within_org_admin_row(organization.name) do
+        select_radio_with_value("ride_requester")
+      end
 
       click_button "Create ride requester"
       expect(page).to have_current_path(users_path)
@@ -139,22 +132,6 @@ RSpec.describe "User mutate form", type: :system do
 
       choose "None" # select the required global role radio
       check "Driver"
-      click_button "Create ride requester"
-    end
-  end
-
-  context "when current user only has permissions to assign ride requester role" do
-    let(:current_user_role) { UserRole::ORG_ADMIN }
-    let(:current_user_role_organization) { organization }
-
-    it "does not show any role inputs and creates a user with the ride requester role" do
-      act
-      expect(page).to have_current_path(users_path)
-      expect_user_to_have_roles(email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
-    end
-
-    def act
-      visit_and_fill_in_basic_fields
       click_button "Create ride requester"
     end
   end

@@ -1,5 +1,12 @@
 class ApplicationPolicy
+  include Memery
+
+  # FIXME: let's rename user to executor
   attr_reader :user, :record
+
+  class Scope
+    include Memery
+  end
 
   def initialize(user, record)
     @user = user

@@ -10,8 +10,13 @@ class UserRole < ApplicationRecord
   # vanita viewers can view all ride requests, but cannot edit them
   VANITA_VIEWER = "vanita_viewer"
 
-  # org admins manage ride requesters in their organization and also act as
-  # ride requesters themselves
+  # org admins can manage ride requests
+  # We considered allowing org admins to manage ride requesters for their organization, but
+  # * The roles added some complexity, but it was manageable
+  # * It got confusing around a user who was a ride requester and a driver. How does the org admin remove
+  #   their requesting priveleges without removing their driver priveleges? Solvable, but it started to seem
+  #   like more complexity that it was worth compared with just requiring vanita admins to manage ride requesters
+  #   on behalf of organizations.
   ORG_ADMIN = "org_admin"
 
   # ride requesters can manage ride requests
@@ -31,6 +36,10 @@ class UserRole < ApplicationRecord
   validates :organization, presence: true, if: -> { role.in?([ ORG_ADMIN, RIDE_REQUESTER ]) }
   validates :organization, absence: true, if: -> { role.in?([ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER, DRIVER ]) }
 
+  # This method sets up a hierarchy of role permissions, allowing a role to automatically
+  # inherit all the permissions of other roles. This makes it unnecessary, for example, to
+  # check both DEVELOPER and VANITA_ADMIN permissions to determine whether a user can take some action.
+  # Checking VANITA_ADMIN is sufficient, since DEVELOPER inherits all those permissions.
   def self.has_role_permissions?(role, target_role)
     # only drivers act as drivers. Not even developers can be drivers unless
     # they also have that role explicitly

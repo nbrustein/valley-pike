@@ -5,10 +5,9 @@ RSpec.describe "UsersMutate", type: :request do
   include Devise::Test::IntegrationHelpers
 
   let(:headers) { request_headers }
-  let(:current_user_organization) { nil }
   let(:current_user) do
     user = create(:user, email: "udo-admin@example.com")
-    create(:user_role, user: user, role: current_user_role, organization: current_user_organization)
+    create(:user_role, user: user, role: current_user_role, organization: nil)
     create(:identity, :magic_link, user: user, email: user.email)
     user
   end
@@ -104,7 +103,6 @@ RSpec.describe "UsersMutate", type: :request do
     let(:target_global_role) { nil }
     let(:target_human) { target_user.human }
     let(:current_user_role) { UserRole::DEVELOPER }
-    let(:current_user_organization) { nil }
 
     context "when the current user is allowed to update the target user" do
       it "renders the form" do
@@ -157,7 +155,6 @@ RSpec.describe "UsersMutate", type: :request do
 
     context "when the current user is not allowed to update the target user" do
       let(:current_user_role) { UserRole::DRIVER }
-      let(:current_user_organization) { nil }
 
       it "returns not found" do
         act(path: edit_user_path(id: target_user.id))
@@ -183,8 +180,7 @@ RSpec.describe "UsersMutate", type: :request do
   describe "PATCH /users/:id" do
     let(:target_user) { create(:user, email: "target.user@example.com") }
     let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
-    let(:current_user_role) { UserRole::ORG_ADMIN }
-    let(:current_user_organization) { organization }
+    let(:current_user_role) { UserRole::DEVELOPER }
     let(:update_params) do
       {
         user: {
@@ -217,7 +213,6 @@ RSpec.describe "UsersMutate", type: :request do
 
     context "when the current user is not allowed to update the target user" do
       let(:current_user_role) { UserRole::DRIVER }
-      let(:current_user_organization) { nil }
 
       it "returns not found" do
         act(path: user_path(id: target_user.id), params: update_params)

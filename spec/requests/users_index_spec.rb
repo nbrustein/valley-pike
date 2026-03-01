@@ -78,26 +78,6 @@ RSpec.describe "Users index", type: :request do
         end
       end
 
-      context 'when the user is restricted to certain organizations' do
-        let(:role) { UserRole::ORG_ADMIN }
-        let(:another_organization) { create(:organization) }
-        let(:user_1_role_organization) { organization }
-        let(:user_2_role_organization) { another_organization }
-        let!(:user_3) { create(:user, email: "user_3@example.com") }
-        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_VIEWER, organization: nil) }
-
-        before { act }
-        it 'shows a user from a permitted organization' do
-          expect(page).to have_text(user_1.human.full_name)
-        end
-        it 'hides a user from a different organization' do
-          expect(page).not_to have_text(user_2.human.full_name)
-        end
-        it 'hides a user whose role has no organization' do
-          expect(page).not_to have_text(user_3.human.full_name)
-        end
-      end
-
       context 'when the user can see users in all organizations' do
         let(:role) { UserRole::DEVELOPER }
         let(:another_organization) { create(:organization) }
@@ -144,7 +124,8 @@ RSpec.describe "Users index", type: :request do
         before { act }
 
         it "shows no role pills" do
-          expect(page).not_to have_text(no_role_user.human.full_name)
+          row = page.find("tr[data-user-id='#{no_role_user.id}']")
+          expect(row).not_to have_css("[data-role-pill]")
         end
       end
     end

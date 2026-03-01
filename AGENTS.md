@@ -8,6 +8,6 @@ Read docs/coding_guidelines.md
 
 After changing code, run rubocop and eslint and fix issues
 
-## Running tests
+## Running commands
 
-Run tests with host-bin/test (see README.md)
+Run bin commands using host-bin (see README.md)

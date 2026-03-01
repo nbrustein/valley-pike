@@ -24,21 +24,13 @@ RSpec.describe "App menu", type: :request do
   end
 
   describe "navigation links" do
-    let(:users_index_label) { "Users" }
-    before do
-      view_class = ApplicationController.view_context_class
-      allow_any_instance_of(view_class)
-        .to receive(:users_index_label)
-        .and_return(users_index_label)
-    end
-
     context "when the signed-in user has viewable users" do
       let(:current_user_role) { UserRole::DEVELOPER }
 
       it "shows the users link with the label" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).to have_link(users_index_label, href: users_path)
+        expect(page).to have_link("Users", href: users_path)
       end
     end
 
@@ -48,7 +40,7 @@ RSpec.describe "App menu", type: :request do
       it "does not show the users link" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).not_to have_link(users_index_label, href: users_path)
+        expect(page).not_to have_link("Users", href: users_path)
       end
     end
 
