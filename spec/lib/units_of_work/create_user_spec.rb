@@ -16,6 +16,7 @@ RSpec.describe UnitsOfWork::CreateUser do
       ]
     end
     let(:password) { nil }
+    let(:send_login_link) { false }
 
     context "when the user does not exist" do
       it "creates a user with a human and roles" do
@@ -51,6 +52,28 @@ RSpec.describe UnitsOfWork::CreateUser do
           expect(identity.valid_password?(password)).to be(true)
         end
       end
+
+      context "when send_login_link is true" do
+        let(:send_login_link) { true }
+        let(:identity) { build_stubbed(:identity, :magic_link) }
+
+        before do
+          allow(Identity)
+            .to receive(:find_or_create_magic_link_identity_for_user!)
+            .and_return(identity)
+          allow(identity).to receive(:active_for_magic_link_authentication?).and_return(true)
+          allow(identity).to receive(:send_magic_link)
+        end
+
+        it "sends a magic link" do
+          result = act
+
+          assert_success(result)
+          user = User.find_by!(email:)
+          expect(Identity).to have_received(:find_or_create_magic_link_identity_for_user!).with(user)
+          expect(identity).to have_received(:send_magic_link)
+        end
+      end
     end
 
     context "when the user already exists" do
@@ -78,6 +101,7 @@ RSpec.describe UnitsOfWork::CreateUser do
         user_roles:,
         driver_qualifications:,
         password:,
+        send_login_link:,
       }
     )
   end

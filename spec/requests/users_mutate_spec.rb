@@ -39,6 +39,7 @@ RSpec.describe "UsersMutate", type: :request do
         assert_success { act(path: new_user_path) }
         assert_form_rendered
       end
+
     end
 
     context "when the current user is not allowed to create users" do
@@ -111,6 +112,11 @@ RSpec.describe "UsersMutate", type: :request do
         assert_form_rendered(submit_text: "Update user")
       end
 
+      it "renders the send login link button" do
+        assert_success { act(path: edit_user_path(id: target_user.id)) }
+        expect(response.body).to have_button("Send Login Link")
+      end
+
       it "fills the human fields with defaults from the user" do
         assert_success { act(path: edit_user_path(id: target_user.id)) }
 
@@ -149,6 +155,15 @@ RSpec.describe "UsersMutate", type: :request do
             )
             assert_org_role_checked(organization:, role_value: UserRole::RIDE_REQUESTER)
           end
+        end
+      end
+
+      context "when the target user is disabled" do
+        before { target_user.update!(disabled_at: Time.current) }
+
+        it "disables the send login link button" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+          expect(response.body).to have_button("Send Login Link", disabled: true)
         end
       end
     end
@@ -240,6 +255,7 @@ RSpec.describe "UsersMutate", type: :request do
         assert_redirect(to: users_path) {
           act(path: send_login_link_user_path(id: target_user.id))
         }
+        expect(flash[:notice]).to be_present
       end
     end
 
