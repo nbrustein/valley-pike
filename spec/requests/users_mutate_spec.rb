@@ -183,7 +183,7 @@ RSpec.describe "UsersMutate", type: :request do
   describe "PATCH /users/:id" do
     let(:target_user) { create(:user, email: "target.user@example.com") }
     let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
-    let(:current_user_role) { UserRole::ORG_ADMIN }
+    let(:current_user_role) { UserRole::DEVELOPER }
     let(:current_user_organization) { organization }
     let(:update_params) do
       {

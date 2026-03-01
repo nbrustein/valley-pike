@@ -14,7 +14,7 @@ module UserMutateConcerns
     def setup_instance_vars(mode:, target_user:)
       @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
       @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
-      @organizations_for_org_role_inputs = UserMutatePolicy::OrganizationScope.new(current_user, nil).resolve
+      @organizations_for_org_role_inputs = Organization.all
       @show_driver_role_input = user_mutate_policy.manage_drivers?
       if mode == :create
         @submit_text ||= "Create ride requester"
