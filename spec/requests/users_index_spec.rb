@@ -124,7 +124,8 @@ RSpec.describe "Users index", type: :request do
         before { act }
 
         it "shows no role pills" do
-          expect(page).not_to have_text(no_role_user.human.full_name)
+          row = page.find("tr[data-user-id='#{no_role_user.id}']")
+          expect(row).not_to have_css("[data-role-pill]")
         end
       end
     end

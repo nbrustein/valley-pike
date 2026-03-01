@@ -1,5 +1,6 @@
 <% editable = user_edit_allowed?(user) %>
-<tr class="border-b border-forest-900/10 align-top <%= "cursor-pointer transition hover:opacity-85 active:opacity-70" if editable %>">
+<tr class="border-b border-forest-900/10 align-top <%= "cursor-pointer transition hover:opacity-85 active:opacity-70" if editable %>"
+    data-user-id="<%= user.id %>">
   <td class="px-3 py-3 text-forest-900">
     <% if editable %>
       <%= link_to edit_user_path(id: user.id), class: "block" do %>
@@ -14,14 +15,14 @@
       <%= link_to edit_user_path(id: user.id), class: "block" do %>
         <div class="flex flex-wrap gap-2">
           <% user.user_roles.each do |user_role| %>
-            <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900"><%= user_role.pill_label %></span>
+            <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900" data-role-pill><%= user_role.pill_label %></span>
           <% end %>
         </div>
       <% end %>
     <% else %>
       <div class="flex flex-wrap gap-2">
         <% user.user_roles.each do |user_role| %>
-          <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900"><%= user_role.pill_label %></span>
+          <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900" data-role-pill><%= user_role.pill_label %></span>
         <% end %>
       </div>
     <% end %>
