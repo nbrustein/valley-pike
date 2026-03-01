@@ -32,18 +32,18 @@ development:
 test:
   primary:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_TEST_DB") { "valley_pike_test" } %>
+    database: <%= "#{ENV.fetch("POSTGRES_TEST_DB") { "valley_pike_test" }}#{ENV["TEST_ENV_NUMBER"]}" %>
   cache:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_TEST_CACHE_DB") { "valley_pike_test_cache" } %>
+    database: <%= "#{ENV.fetch("POSTGRES_TEST_CACHE_DB") { "valley_pike_test_cache" }}#{ENV["TEST_ENV_NUMBER"]}" %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_TEST_QUEUE_DB") { "valley_pike_test_queue" } %>
+    database: <%= "#{ENV.fetch("POSTGRES_TEST_QUEUE_DB") { "valley_pike_test_queue" }}#{ENV["TEST_ENV_NUMBER"]}" %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_TEST_CABLE_DB") { "valley_pike_test_cable" } %>
+    database: <%= "#{ENV.fetch("POSTGRES_TEST_CABLE_DB") { "valley_pike_test_cable" }}#{ENV["TEST_ENV_NUMBER"]}" %>
     migrations_paths: db/cable_migrate
 
 production:

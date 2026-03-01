@@ -17,10 +17,14 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
   exit 0
 fi
 
+# When no arguments are provided, run the test suite in parallel
 if [ $# -eq 0 ]; then
+  # exec docker compose run --rm \
+  #   -e RAILS_ENV=test \
+  #   web script/rspec_with_assets
   exec docker compose run --rm \
     -e RAILS_ENV=test \
-    web script/rspec_with_assets
+    web script/parallel_rspec_with_assets
 fi
 
 if [ "${1:-}" = "-n" ] || [ "${1:-}" = "--name" ]; then
