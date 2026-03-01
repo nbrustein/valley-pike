@@ -7,7 +7,7 @@ module ExecutesUnitsOfWork
       authorize(uow, policy_meth, policy_class:) if policy_meth.present?
       result = uow.execute
       if result.success?
-        return [true, result.errors]
+        return [ true, result.errors ]
       else
         @errors = result.errors
       end
@@ -18,6 +18,6 @@ module ExecutesUnitsOfWork
       @errors.add(:base, "An error occurred")
     end
 
-    return [false, @errors]
+    [ false, @errors ]
   end
 end

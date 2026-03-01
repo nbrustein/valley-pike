@@ -11,8 +11,8 @@ RSpec.describe UserMutatePolicy do
     end
     executor
   }
-  let(:target_user) { 
-    user = create(:user) 
+  let(:target_user) {
+    user = create(:user)
     create(:user_role, user:, role: UserRole::DRIVER)
     user
   }
@@ -145,7 +145,7 @@ RSpec.describe UserMutatePolicy do
       end
     end
   end
-  
+
   describe "#update?" do
     let(:uow_user_roles) { [ {role: UserRole::DRIVER, organization_id: nil} ] }
     let(:uow) { UnitsOfWork::UpdateUser.new(executor_id: executor.id, params: uow_params) }
@@ -174,7 +174,5 @@ RSpec.describe UserMutatePolicy do
         expect(policy.update?).to be(true)
       end
     end
-
-
   end
 end
