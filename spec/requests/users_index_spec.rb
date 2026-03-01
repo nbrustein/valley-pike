@@ -195,6 +195,6 @@ RSpec.describe "Users index", type: :request do
   end
 
   def user_names
-    page.all("tbody tr td:first-child").map { |node| node.text.strip }
+    page.all("tbody tr td:first-child").map {|node| node.text.strip }
   end
 end
