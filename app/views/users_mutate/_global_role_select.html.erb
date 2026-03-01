@@ -6,6 +6,7 @@
                name="user[global_role]"
                id="user_global_role_none"
                value=""
+               <%= "checked" if @selected_global_role.blank? %>
                required
                data-global-role>
         None
@@ -18,6 +19,7 @@
                  name="user[global_role]"
                  id="<%= input_id %>"
                  value="<%= role %>"
+                 <%= "checked" if @selected_global_role == role %>
                  required
                  data-global-role>
           <%= role.humanize %>

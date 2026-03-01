@@ -5,6 +5,7 @@
            name="user[driver_role]"
            id="user_driver_role_driver"
            value="<%= UserRole::DRIVER %>"
+           <%= "checked" if @selected_driver_role %>
            data-driver-role-input>
     Driver
   </label>
@@ -14,6 +15,7 @@
              name="user[driver_qualifications][]"
              id="user_driver_qualifications_cws_vetted"
              value="<%= DriverQualification::QUALIFICATION_CWS_VETTED %>"
+             <%= "checked" if @selected_driver_qualifications.include?(DriverQualification::QUALIFICATION_CWS_VETTED) %>
              data-driver-qualification-input>
       CWS vetted
     </label>
