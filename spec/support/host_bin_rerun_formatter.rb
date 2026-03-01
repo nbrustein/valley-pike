@@ -4,6 +4,7 @@ require "rspec/core/formatters/console_codes"
 require "rspec/core/notifications"
 
 module HostBinRerunCommands
+  # Show `host-bin/test` command
   def colorized_rerun_commands(colorizer=::RSpec::Core::Formatters::ConsoleCodes)
     commands = failed_examples.map do |example|
       command = "host-bin/test #{rerun_argument_for(example)}"
