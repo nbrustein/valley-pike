@@ -1,0 +1,27 @@
+<section class="surface-card">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= @header_text %></h1>
+    <p class="mt-1 text-sm text-forest-900/70"><%= @subheader_text %></p>
+  </div>
+
+  <%= render "shared/form_errors", errors: @errors %>
+
+  <%= form_with scope: :user, url: @form_action, method: @form_method, local: true, class: "space-y-5" do |form| %>
+    <%= render "users_mutate/human_fields", form: form %>
+    <%= render "users_mutate/user_roles_inputs", form: form %>
+    <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: @submit_text %>
+  <% end %>
+</section>
+
+<script>
+  document.addEventListener("turbo:load", () => {
+    window.usersMutate.initialize({
+      organizationRolesElement: document.querySelector("[data-organization-roles]"),
+      globalRoleInputElement: document.querySelectorAll("[data-global-role]"),
+      fullNameInputElement: document.querySelector("[data-full-name-input]"),
+      preferredNameInputElement: document.querySelector("[data-preferred-name-input]"),
+      driverRoleInputElement: document.querySelector("[data-driver-role-input]"),
+      driverQualificationInputElements: document.querySelectorAll("[data-driver-qualification-input]")
+    }); 
+  });
+</script>

@@ -1,0 +1,6 @@
+<% if show_users_index_link? %>
+  <%= link_to users_index_label, users_path, class: "menu-link" %>
+<% end %>
+<% if user_signed_in? %>
+  <%= link_to "Edit profile", profile_path, class: "menu-link" %>
+<% end %>

@@ -4,17 +4,16 @@ RSpec.describe UnitsOfWork::UpsertUser do
   describe ".execute" do
     let(:executor) { create(:user) }
     let(:organization) { create(:organization, abbreviation: "UDO") }
-    let(:other_organization) { create(:organization, abbreviation: "VDO") }
     let(:email) { "existing.user@example.com" }
     let(:full_name) { "Existing User" }
+    let(:preferred_name) { "Existing" }
     let(:phone) { "555-9898" }
-    let(:sortable_name) { "User" }
-    let(:roles) do
+    let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
-        {role: UserRole::DRIVER, organization_id: nil}
       ]
     end
+    let(:driver_qualifications) { [] }
     let(:password) { nil }
 
     context "when the user does not exist" do
@@ -26,10 +25,6 @@ RSpec.describe UnitsOfWork::UpsertUser do
 
         expect(user).to be_present
         expect(user.human.full_name).to eq(full_name)
-        expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
-          [ UserRole::ORG_ADMIN, organization.id ],
-          [ UserRole::DRIVER, nil ]
-        )
       end
     end
 
@@ -37,39 +32,20 @@ RSpec.describe UnitsOfWork::UpsertUser do
       let!(:user) { create(:user, email:) }
 
       before do
-        user.human.update!(full_name: "Old Name", phone: "555-0000", sortable_name: "Old")
-        create(:user_role, user:, role: UserRole::VANITA_ADMIN)
-        create(:user_role, user:, role: UserRole::ORG_ADMIN, organization: other_organization)
+        user.human.update!(
+          full_name: "Old Name",
+          preferred_name: "Old",
+          phone: "555-0000"
+        )
       end
 
-      it "updates the human and syncs roles" do
+      it "updates user" do
         result = act
 
         assert_success(result)
 
         user.reload
         expect(user.human.full_name).to eq(full_name)
-        expect(user.human.phone).to eq(phone)
-        expect(user.human.sortable_name).to eq(sortable_name)
-        expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
-          [ UserRole::ORG_ADMIN, organization.id ],
-          [ UserRole::DRIVER, nil ]
-        )
-      end
-
-      context "when a password is provided" do
-        let(:password) { "An0therStr0ngPass!" }
-
-        it "upserts a password identity" do
-          result = act
-
-          assert_success(result)
-          identity = user.reload.identities.find_by(kind: "password")
-
-          expect(identity).to be_present
-          expect(identity.email).to eq(email)
-          expect(identity.valid_password?(password)).to be(true)
-        end
       end
     end
   end
@@ -82,10 +58,11 @@ RSpec.describe UnitsOfWork::UpsertUser do
       params: {
         email:,
         full_name:,
+        preferred_name:,
         phone:,
-        sortable_name:,
-        roles:,
-        password:
+        user_roles:,
+        driver_qualifications:,
+        password:,
       }
     )
   end

@@ -2,19 +2,22 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
+    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name, :phone, :password
+
     def initialize(executor_id:, params:)
       super
       @email = params.fetch(:email)
       @full_name = params.fetch(:full_name)
+      @preferred_name = params.fetch(:preferred_name)
       @phone = params.fetch(:phone)
-      @sortable_name = params.fetch(:sortable_name)
-      @roles = normalize_roles(params.fetch(:roles))
+      @user_roles = params.fetch(:user_roles)
+      @driver_qualifications = params.fetch(:driver_qualifications, [])
       @password = params[:password]
     end
 
     private
 
-    attr_reader :email, :full_name, :phone, :sortable_name, :roles, :password
+    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password, :driver_qualifications
 
     def execute_unit_of_work(errors:)
       user = build_user(errors)
@@ -26,15 +29,15 @@ module UnitsOfWork
       create_roles(user, errors)
       return if errors.any?
 
+      create_driver_qualifications(user, errors)
+      return if errors.any?
+
       create_password_identity(user, errors) if password.present?
     end
 
     def audit_params
       filtered = params.deep_dup
       filtered[:password] = "[FILTERED]" if filtered[:password].present?
-      filtered[:roles] = roles.map do |role, organization_id|
-        {role:, organization_id:}
-      end
       filtered
     end
 
@@ -52,8 +55,8 @@ module UnitsOfWork
       user.email = normalized_email
       human = user.build_human
       human.full_name = full_name
+      human.preferred_name = preferred_name
       human.phone = phone
-      human.sortable_name = sortable_name
       user
     end
 
@@ -64,8 +67,8 @@ module UnitsOfWork
     end
 
     def create_roles(user, errors)
-      roles.uniq.each do |role, organization_id|
-        user_role = user.user_roles.build(role:, organization_id:)
+      user_roles.uniq.each do |user_role_params|
+        user_role = user.user_roles.build(user_role_params)
         next if user_role.save
 
         merge_errors(errors, user_role)
@@ -84,14 +87,12 @@ module UnitsOfWork
       merge_errors(errors, identity)
     end
 
-    def normalize_roles(role_params)
-      role_params.map do |entry|
-        if entry.is_a?(Hash)
-          [ entry.fetch(:role), entry[:organization_id] ]
-        else
-          role, organization = entry
-          [ role, organization&.id ]
-        end
+    def create_driver_qualifications(user, errors)
+      driver_qualifications.uniq.each do |qualification|
+        driver_qualification = user.driver_qualifications.build(qualification:)
+        next if driver_qualification.save
+
+        merge_errors(errors, driver_qualification)
       end
     end
 

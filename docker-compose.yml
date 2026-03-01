@@ -37,6 +37,24 @@ services:
     depends_on:
       - db
 
+  js:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bash -lc "bundle install && yarn install && yarn build --watch"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: valley_pike_development
+      RAILS_ENV: development
+      RUBYOPT: "--enable-frozen-string-literal"
+    depends_on:
+      - db
+
   db:
     image: postgres:16-alpine
     environment:

@@ -35,9 +35,9 @@ module IdentityConcerns
         identity: {
           email:,
           token:,
-          remember_me:
+          remember_me:,
         },
-        host:
+        host:,
       }
       options[:protocol] = protocol if protocol
 

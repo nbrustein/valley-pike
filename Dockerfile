@@ -35,8 +35,10 @@ ARG BUNDLER_VERSION=4.0.3
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config nodejs npm && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+RUN corepack enable
 
 # Keep Bundler aligned with Gemfile.lock
 RUN gem install --no-document bundler:${BUNDLER_VERSION}
@@ -44,11 +46,14 @@ RUN gem install --no-document bundler:${BUNDLER_VERSION}
 # Install application gems
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
+COPY package.json yarn.lock ./
 
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
+
+RUN yarn install --frozen-lockfile
 
 # Copy application code
 COPY . .

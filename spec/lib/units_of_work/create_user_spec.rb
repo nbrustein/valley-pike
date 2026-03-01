@@ -6,12 +6,13 @@ RSpec.describe UnitsOfWork::CreateUser do
     let(:organization) { create(:organization, abbreviation: "UDO") }
     let(:email) { "new.user@example.com" }
     let(:full_name) { "New User" }
+    let(:preferred_name) { "New" }
     let(:phone) { "555-1212" }
-    let(:sortable_name) { "User" }
-    let(:roles) do
+    let(:driver_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
+    let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
-        {role: UserRole::DRIVER, organization_id: nil}
+        {role: UserRole::DRIVER, organization_id: nil},
       ]
     end
     let(:password) { nil }
@@ -25,12 +26,14 @@ RSpec.describe UnitsOfWork::CreateUser do
         user = User.find_by(email:)
         expect(user).to be_present
         expect(user.human.full_name).to eq(full_name)
+        expect(user.human.preferred_name).to eq(preferred_name)
         expect(user.human.phone).to eq(phone)
-        expect(user.human.sortable_name).to eq(sortable_name)
         expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
           [ UserRole::ORG_ADMIN, organization.id ],
           [ UserRole::DRIVER, nil ]
         )
+        expect(user.driver_qualifications.pluck(:qualification))
+          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
       end
 
       context "when a password is provided" do
@@ -70,10 +73,11 @@ RSpec.describe UnitsOfWork::CreateUser do
       params: {
         email:,
         full_name:,
+        preferred_name:,
         phone:,
-        sortable_name:,
-        roles:,
-        password:
+        user_roles:,
+        driver_qualifications:,
+        password:,
       }
     )
   end

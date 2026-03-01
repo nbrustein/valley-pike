@@ -11,8 +11,29 @@ RUN apt-get update -qq && \
       git \
       libpq-dev \
       libyaml-dev \
-      curl && \
+      nodejs \
+      npm \
+      curl \
+      chromium \
+      chromium-driver \
+      libasound2 \
+      libatk1.0-0 \
+      libatk-bridge2.0-0 \
+      libcups2 \
+      libgbm1 \
+      libgtk-3-0 \
+      libnss3 \
+      libpangocairo-1.0-0 \
+      libx11-xcb1 \
+      libxcomposite1 \
+      libxdamage1 \
+      libxfixes3 \
+      libxkbcommon0 \
+      libxrandr2 \
+      libxshmfence1 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+RUN corepack enable
 
 WORKDIR /rails
 

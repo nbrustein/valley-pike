@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+bin/rails javascript:build
 bin/rails tailwindcss:build
