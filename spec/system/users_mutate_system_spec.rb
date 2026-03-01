@@ -25,30 +25,69 @@ RSpec.describe "User mutate form", type: :system do
     Warden.test_reset!
   end
 
-  it "assigns basic field values to new user" do
-    visit new_user_path
-    fill_in "Email", with: email
-    fill_in "Full Name", with: "John Doe"
-    expect(page).to have_field("Preferred Name", with: "John")
-    expect(page).to have_field(
-      "user[org_admin_user_roles][1][role]",
-      type: "hidden",
-      with: UserRole::RIDE_REQUESTER,
-      visible: false
-    )
-    expect(page).to have_field(
-      "user[org_admin_user_roles][1][organization_id]",
-      type: "hidden",
-      with: organization.id,
-      visible: false
-    )
+  context "when creating a new user" do
+    it "assigns basic field values to new user" do
+      visit new_user_path
+      fill_in "Email", with: email
+      fill_in "Full Name", with: "John Doe"
+      expect(page).to have_field("Preferred Name", with: "John")
+      expect(page).to have_field(
+        "user[org_admin_user_roles][1][role]",
+        type: "hidden",
+        with: UserRole::RIDE_REQUESTER,
+        visible: false
+      )
+      expect(page).to have_field(
+        "user[org_admin_user_roles][1][organization_id]",
+        type: "hidden",
+        with: organization.id,
+        visible: false
+      )
 
-    click_button "Create ride requester"
-    expect(page).to have_current_path(users_path)
+      click_button "Create ride requester"
+      expect(page).to have_current_path(users_path)
 
-    user = User.find_by!(email:)
-    expect(user.human.full_name).to eq("John Doe")
-    expect(user.human.preferred_name).to eq("John")
+      user = User.find_by!(email:)
+      expect(user.human.full_name).to eq("John Doe")
+      expect(user.human.preferred_name).to eq("John")
+    end
+  end
+
+  context "when editing an existing user" do
+    let(:current_user_role) { UserRole::DEVELOPER }
+    let(:current_user_role_organization) { nil }
+    let(:target_user) { create(:user, email: "target.user@example.com") }
+    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let(:updated_full_name) { "Updated Name" }
+    let(:updated_preferred_name) { "Updated" }
+
+    before { target_user_role }
+
+    it "allows for updating a basic field" do
+      visit edit_user_path(id: target_user.id)
+      expect(page).to have_field("Full Name", type: "text")
+      fill_in "Full Name", with: updated_full_name
+      choose "None"
+      within_org_admin_row(organization.name) do
+        select_radio_with_value("ride_requester")
+      end
+      click_button "Update user"
+
+      expect(page).to have_current_path(users_path)
+      expect(target_user.reload.human.full_name).to eq(updated_full_name)
+    end
+
+    it "allows for updating a role" do
+      visit edit_user_path(id: target_user.id)
+      choose "None"
+      within_org_admin_row(organization.name) do
+        select_radio_with_value("ride_requester")
+      end
+      click_button "Update user"
+
+      expect(page).to have_current_path(users_path)
+      expect_user_to_have_roles(target_user.email, [ [ UserRole::RIDE_REQUESTER, organization.id ] ])
+    end
   end
 
   context "when current user has permission to select any role" do
@@ -101,14 +140,6 @@ RSpec.describe "User mutate form", type: :system do
       choose "None" # select the required global role radio
       check "Driver"
       click_button "Create ride requester"
-    end
-
-    def within_org_admin_row(organization_name, &block)
-      within(:xpath, "//tr[td[contains(., '#{organization_name}')]]", &block)
-    end
-
-    def select_radio_with_value(value)
-      find("input[type='radio'][value='#{value}']").click
     end
   end
 
@@ -172,5 +203,13 @@ RSpec.describe "User mutate form", type: :system do
     expect(row).to have_css("input[type='radio'][value='']", count: 1, visible: :all)
     expect(row).to have_css("input[type='radio'][value='org_admin']", count: 1, visible: :all)
     expect(row).to have_css("input[type='radio'][value='ride_requester']", count: 1, visible: :all)
+  end
+
+  def within_org_admin_row(organization_name, &block)
+    within(:xpath, "//tr[td[contains(., '#{organization_name}')]]", &block)
+  end
+
+  def select_radio_with_value(value)
+    find("input[type='radio'][value='#{value}']").click
   end
 end

@@ -6,7 +6,7 @@
 
   <%= render "shared/form_errors", errors: @errors %>
 
-  <%= form_with scope: :user, url: @form_action, method: :post, local: true, class: "space-y-5" do |form| %>
+  <%= form_with scope: :user, url: @form_action, method: @form_method, local: true, class: "space-y-5" do |form| %>
     <%= render "users_mutate/human_fields", form: form %>
     <%= render "users_mutate/user_roles_inputs", form: form %>
     <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: @submit_text %>
