@@ -16,9 +16,20 @@ post password_session_path,
 
 use Memery, not @___ ||=
 
-## Models
+## Concerns
 
-Models that are likely to have much complexity (i.e. more than 60 lines) should be split up into concerns. See identity.rb for an example
+We make heavy use of concerns to keep each class small and readable. For an extreme example of this, see app/models/user.rb.
+
+When concerns are only used for one particular class, they should be scoped to a directory for that class. For example, app/models/user_concerns/has_email.rb.
+
+when concerns are shared, the should be in the top-level concerns directory. For example, app/controllers/concerns/executes_units_of_work.rb.
+
+## Controllers
+
+We sometimes do not follow the Rails standard of putting all of the endpoints related to a particular model into the same 
+controller. Instead, controllers should implement multiple endpoints only when those endpoints share a significant amount 
+of code. For example, we have a UsersIndexController that implements the index endpoint and then a UsersMutateController
+that implements 4 endpoints that all share the same form for creating and editing users.
 
 ## Migrations
 

@@ -11,7 +11,11 @@ RSpec.describe UserMutatePolicy do
     end
     executor
   }
-
+  let(:target_user) { 
+    user = create(:user) 
+    create(:user_role, user:, role: UserRole::DRIVER)
+    user
+  }
 
   describe "#new?" do
     context 'when there is no user on the policy' do
@@ -104,5 +108,73 @@ RSpec.describe UserMutatePolicy do
         expect(policy.create?).to be(true)
       end
     end
+  end
+
+  describe "#edit?" do
+    let(:policy) { described_class.new(executor, target_user) }
+    let(:executor_role) { build(:user_role, role: UserRole::VANITA_ADMIN) }
+
+    context "when executor cannot new?" do
+      let(:executor_role) { build(:user_role, role: UserRole::DRIVER) }
+
+      it "is false" do
+        expect(policy.edit?).to be(false)
+      end
+    end
+
+    context "when there is no target user" do
+      let(:target_user) { nil }
+
+      it "is false" do
+        expect(policy.edit?).to be(false)
+      end
+    end
+
+    context "when the executor cannot create a user with target user's user_roles" do
+      # org_admin is not allowed to create DRIVERs
+      let(:executor_role) { build(:user_role, role: UserRole::ORG_ADMIN, organization: create(:organization)) }
+
+      it "is false" do
+        expect(policy.edit?).to be(false)
+      end
+    end
+
+    context "when the user can create a user with the target user's user roles" do
+      it "is true" do
+        expect(policy.edit?).to be(true)
+      end
+    end
+  end
+  
+  describe "#update?" do
+    let(:uow_user_roles) { [ {role: UserRole::DRIVER, organization_id: nil} ] }
+    let(:uow) { UnitsOfWork::UpdateUser.new(executor_id: executor.id, params: uow_params) }
+    let(:uow_params) { {user_roles: uow_user_roles, id: target_user.id} }
+    let(:policy) { described_class.new(executor, uow) }
+    let(:executor_role) { build(:user_role, role: UserRole::VANITA_ADMIN) }
+
+    context "when user cannot edit target user" do
+      let(:executor_role) { build(:user_role, role: UserRole::DRIVER) }
+
+      it "is false" do
+        expect(policy.update?).to be(false)
+      end
+    end
+
+    context "when user cannot create given params passed to uow" do
+      let(:uow_user_roles) { [ {role: UserRole::VANITA_ADMIN, organization_id: nil} ] }
+
+      it "is false" do
+        expect(policy.update?).to be(false)
+      end
+    end
+
+    context "when user can edit and create" do
+      it "is true" do
+        expect(policy.update?).to be(true)
+      end
+    end
+
+
   end
 end

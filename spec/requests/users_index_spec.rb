@@ -61,6 +61,23 @@ RSpec.describe "Users index", type: :request do
         end
       end
 
+      context "when a user is editable" do
+        it "links row to the edit page" do
+          act
+          expect(page).to have_link(user_1.human.full_name, href: edit_user_path(id: user_1.id))
+        end
+      end
+
+      context "when a user is not editable" do
+        let!(:user_3) { create(:user, email: "vanita.admin@example.com") }
+        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_ADMIN, organization: nil) }
+
+        it "does not link row" do
+          act
+          expect(page).not_to have_link(user_3.human.full_name, href: edit_user_path(id: user_3.id))
+        end
+      end
+
       context 'when the user is restricted to certain organizations' do
         let(:role) { UserRole::ORG_ADMIN }
         let(:another_organization) { create(:organization) }
@@ -178,6 +195,6 @@ RSpec.describe "Users index", type: :request do
   end
 
   def user_names
-    page.all("tbody tr td:first-child").map(&:text)
+    page.all("tbody tr td:first-child").map { |node| node.text.strip }
   end
 end

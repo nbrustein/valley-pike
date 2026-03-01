@@ -1,67 +1,66 @@
 class UsersMutateController < ApplicationController
   include Memery
+  include ExecutesUnitsOfWork
+  include UserMutateConcerns::HasMutateUserForm
   helper UsersHelper
 
   def new
     authorize(nil, :new?, policy_class: UserMutatePolicy)
-    @user = User.new
-    render_form
+    render_form mode: :create, target_user: nil, submitted_params: nil
   end
 
   def create
-    begin
-      result = execute_create_user_unit_of_work
-      if result.success?
-        redirect_to users_path, notice: "User created."
-        return
-      else
-        @errors = result.errors
-      end
-    rescue Pundit::NotAuthorizedError
-      raise
-    rescue StandardError
-      @errors = ActiveModel::Errors.new(User.new)
-      @errors.add(:base, "An error occurred")
+    success, errors = execute_unit_of_work(
+      policy_meth: :create?,
+      policy_class: UserMutatePolicy
+    ) do
+      UnitsOfWork::CreateUser.new(
+        executor_id: current_user.id,
+        params: create_user_params
+      )
     end
+    return redirect_to users_path, notice: "User created." if success
 
-    setup_create_instance_vars
-    render_form status: :unprocessable_entity
+    render_form(
+      status: :unprocessable_entity,
+      mode: :create,
+      target_user: nil,
+      submitted_params: create_user_params
+    )
+  end
+
+  def edit
+    return render_not_found unless target_user.present?
+    authorize(target_user, :edit?, policy_class: UserMutatePolicy)
+    render_form mode: :edit, target_user:, submitted_params: nil
+  end
+
+  def update
+    return render_not_found unless target_user.present?
+
+    success, _errors = execute_unit_of_work(
+      policy_meth: :update?,
+      policy_class: UserMutatePolicy
+    ) do
+      UnitsOfWork::UpdateUser.new(
+        executor_id: current_user.id,
+        params: update_user_params
+      )
+    end
+    return redirect_to users_path, notice: "User updated." if success
+
+    render_form(
+      status: :unprocessable_entity,
+      mode: :edit,
+      target_user:,
+      submitted_params: update_user_params
+    )
   end
 
   private
 
-  def execute_create_user_unit_of_work
-    uow = UnitsOfWork::CreateUser.new(
-      executor_id: current_user.id,
-      params: create_user_params
-    )
-    authorize(uow, :create?, policy_class: UserMutatePolicy)
-    uow.execute
-  end
-
   memoize def user_mutate_policy
     UserMutatePolicy.new(current_user, nil)
-  end
-
-  memoize def setup_instance_vars
-    @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
-    @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
-    @organizations_for_org_role_inputs = UserMutatePolicy::OrganizationScope.new(current_user, nil).resolve
-    @show_driver_role_input = user_mutate_policy.manage_drivers?
-  end
-
-  # when we are rendering the form after a submission led to an error, we want to fill in fields
-  # with the inputted values
-  memoize def setup_create_instance_vars
-    @email = create_user_params&.dig(:email)
-    @full_name = create_user_params&.dig(:full_name)
-    @preferred_name = create_user_params&.dig(:preferred_name)
-    @phone = create_user_params&.dig(:phone)
-  end
-
-  memoize def render_form(status: :ok)
-    setup_instance_vars
-    render :mutate, status:
   end
 
   def create_user_params
@@ -75,6 +74,24 @@ class UsersMutateController < ApplicationController
       driver_qualifications: [],
       org_admin_user_roles: %i[role organization_id]
     )
+    normalized_user_params(permitted)
+  end
+
+  def update_user_params
+    permitted = params.require(:user).permit(
+      :email,
+      :full_name,
+      :preferred_name,
+      :phone,
+      :global_role,
+      :driver_role,
+      driver_qualifications: [],
+      org_admin_user_roles: %i[role organization_id]
+    )
+    normalized_user_params(permitted).merge(id: params[:id])
+  end
+
+  def normalized_user_params(permitted)
     user_roles = normalize_user_roles(
       org_admin_user_roles: permitted[:org_admin_user_roles],
       global_role: permitted[:global_role],
@@ -122,5 +139,9 @@ class UsersMutateController < ApplicationController
 
   def normalize_driver_qualifications(driver_qualifications)
     Array(driver_qualifications).compact_blank.uniq
+  end
+
+  memoize def target_user
+    User.find_by(id: params[:id])
   end
 end

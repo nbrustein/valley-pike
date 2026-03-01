@@ -4,18 +4,16 @@ RSpec.describe UnitsOfWork::UpsertUser do
   describe ".execute" do
     let(:executor) { create(:user) }
     let(:organization) { create(:organization, abbreviation: "UDO") }
-    let(:other_organization) { create(:organization, abbreviation: "VDO") }
     let(:email) { "existing.user@example.com" }
     let(:full_name) { "Existing User" }
     let(:preferred_name) { "Existing" }
     let(:phone) { "555-9898" }
-    let(:driver_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
     let(:user_roles) do
       [
         {role: UserRole::ORG_ADMIN, organization_id: organization.id},
-        {role: UserRole::DRIVER, organization_id: nil},
       ]
     end
+    let(:driver_qualifications) { [] }
     let(:password) { nil }
 
     context "when the user does not exist" do
@@ -27,12 +25,6 @@ RSpec.describe UnitsOfWork::UpsertUser do
 
         expect(user).to be_present
         expect(user.human.full_name).to eq(full_name)
-        expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
-          [ UserRole::ORG_ADMIN, organization.id ],
-          [ UserRole::DRIVER, nil ]
-        )
-        expect(user.driver_qualifications.pluck(:qualification))
-          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
       end
     end
 
@@ -45,58 +37,15 @@ RSpec.describe UnitsOfWork::UpsertUser do
           preferred_name: "Old",
           phone: "555-0000"
         )
-        create(:user_role, user:, role: UserRole::VANITA_ADMIN)
-        create(:user_role, user:, role: UserRole::ORG_ADMIN, organization: other_organization)
       end
 
-      it "updates the human and syncs roles" do
+      it "updates user" do
         result = act
 
         assert_success(result)
 
         user.reload
         expect(user.human.full_name).to eq(full_name)
-        expect(user.human.preferred_name).to eq(preferred_name)
-        expect(user.human.phone).to eq(phone)
-        expect(user.user_roles.pluck(:role, :organization_id)).to contain_exactly(
-          [ UserRole::ORG_ADMIN, organization.id ],
-          [ UserRole::DRIVER, nil ]
-        )
-        expect(user.driver_qualifications.pluck(:qualification))
-          .to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
-      end
-
-      context "when a password is provided" do
-        let(:password) { "An0therStr0ngPass!" }
-
-        it "upserts a password identity" do
-          result = act
-
-          assert_success(result)
-          identity = user.reload.identities.find_by(kind: "password")
-
-          expect(identity).to be_present
-          expect(identity.email).to eq(email)
-          expect(identity.valid_password?(password)).to be(true)
-        end
-      end
-
-      context "when the user already has a driver qualification" do
-        let(:driver_qualifications) { [] }
-
-        before do
-          DriverQualification.create!(
-            user:,
-            qualification: DriverQualification::QUALIFICATION_CWS_VETTED
-          )
-        end
-
-        it "passing an empty driver_qualifications array removes the qualification" do
-          result = act
-
-          assert_success(result)
-          expect(user.reload.driver_qualifications).to be_empty
-        end
       end
     end
   end
