@@ -226,6 +226,38 @@ RSpec.describe "UsersMutate", type: :request do
     end
   end
 
+  describe "POST /users/:id/send_login_link" do
+    let(:target_user) { create(:user, email: "target.user@example.com") }
+
+    context "when the current user is allowed to send login links" do
+      before do
+        allow_any_instance_of(UnitsOfWork::SendUserLoginLink)
+          .to receive(:execute)
+          .and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)))
+      end
+
+      it "calls SendUserLoginLink and redirects to users_path" do
+        assert_redirect(to: users_path) {
+          act(path: send_login_link_user_path(id: target_user.id))
+        }
+      end
+    end
+
+    context "when the current user is not allowed to send login links" do
+      let(:current_user_role) { UserRole::DRIVER }
+
+      it "returns not found" do
+        act(path: send_login_link_user_path(id: target_user.id))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:)
+      sign_in current_user.identities.first
+      post path, headers: headers
+    end
+  end
+
   # These tests cover behavior that is shared between multiple endpoints
   describe "form rendering" do
     let(:current_user_role) { UserRole::DEVELOPER }
