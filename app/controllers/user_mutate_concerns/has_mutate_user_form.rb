@@ -36,6 +36,7 @@ module UserMutateConcerns
       @full_name = get_input_default(target_user:, submitted_params:, key: :full_name)
       @preferred_name = get_input_default(target_user:, submitted_params:, key: :preferred_name)
       @phone = get_input_default(target_user:, submitted_params:, key: :phone)
+      setup_role_defaults(target_user:, submitted_params:)
     end
 
     def get_input_default(target_user:, submitted_params:, key:)
@@ -46,6 +47,57 @@ module UserMutateConcerns
       end
       return submitted_params.dig(key) if submitted_params.present?
       nil
+    end
+
+    def setup_role_defaults(target_user:, submitted_params:)
+      if submitted_params.present?
+        apply_role_defaults_from_user_roles(
+          user_roles: submitted_params[:user_roles] || [],
+          driver_qualifications: submitted_params[:driver_qualifications] || []
+        )
+        return
+      end
+
+      if target_user.present?
+        apply_role_defaults_from_user(target_user)
+        return
+      end
+
+      @selected_global_role = nil
+      @selected_org_admin_roles = {}
+      @selected_driver_role = false
+      @selected_driver_qualifications = []
+    end
+
+    def apply_role_defaults_from_user(target_user)
+      roles = target_user.user_roles.to_a
+      driver_qualifications = target_user.driver_qualifications.map(&:qualification)
+      apply_role_defaults_from_user_roles(user_roles: roles, driver_qualifications:)
+    end
+
+    def apply_role_defaults_from_user_roles(user_roles:, driver_qualifications:)
+      selected_global_role = user_roles.find do |role|
+        role_organization_id(role).nil? && @roles_for_global_role_input.include?(role_name(role))
+      end
+
+      @selected_global_role = selected_global_role ? role_name(selected_global_role) : nil
+      @selected_org_admin_roles = user_roles.each_with_object({}) do |role, acc|
+        organization_id = role_organization_id(role)
+        next if organization_id.nil?
+        next unless @roles_for_org_role_inputs.include?(role_name(role))
+
+        acc[organization_id] = role_name(role)
+      end
+      @selected_driver_role = user_roles.any? {|role| role_name(role) == UserRole::DRIVER }
+      @selected_driver_qualifications = Array(driver_qualifications)
+    end
+
+    def role_name(role)
+      role.respond_to?(:role) ? role.role : role[:role] || role["role"]
+    end
+
+    def role_organization_id(role)
+      role.respond_to?(:organization_id) ? role.organization_id : role[:organization_id] || role["organization_id"]
     end
   end
 end

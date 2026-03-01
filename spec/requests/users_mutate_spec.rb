@@ -88,18 +88,70 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "GET /users/:id/edit" do
-    let(:target_user) { create(:user, email: "target.user@example.com") }
-    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
-    let(:current_user_role) { UserRole::ORG_ADMIN }
-    let(:current_user_organization) { organization }
-
-    before { target_user_role }
+    let!(:target_user) do
+      target_user = create(:user, email: "target.user@example.com")
+      create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization: organization)
+      if target_global_role.present?
+        create(:user_role, user: target_user, role: target_global_role, organization: nil)
+      end
+      target_user.human.update!(
+        full_name: "Target Full",
+        preferred_name: "Target Preferred",
+        phone: "555-555-5555"
+      )
+      target_user
+    end
+    let(:target_global_role) { nil }
+    let(:target_human) { target_user.human }
+    let(:current_user_role) { UserRole::DEVELOPER }
+    let(:current_user_organization) { nil }
 
     context "when the current user is allowed to update the target user" do
       it "renders the form" do
         assert_success { act(path: edit_user_path(id: target_user.id)) }
         expect(response.body).to include("Edit user")
         assert_form_rendered(submit_text: "Update user")
+      end
+
+      it "fills the human fields with defaults from the user" do
+        assert_success { act(path: edit_user_path(id: target_user.id)) }
+
+        aggregate_failures do
+          expect(response.body).to have_field("Email", with: target_user.email)
+          expect(response.body).to have_field("Full Name", with: target_human.full_name)
+          expect(response.body).to have_field("Preferred Name", with: target_human.preferred_name)
+          expect(response.body).to have_field("Phone", with: target_human.phone)
+        end
+      end
+
+      context "when the target user has no global role" do
+        it "fills the role fields accordingly" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css(
+              "input[name='user[global_role]'][value=''][checked]",
+              visible: :all
+            )
+            assert_org_role_checked(organization:, role_value: UserRole::RIDE_REQUESTER)
+          end
+        end
+      end
+
+      context "when the target user has a global role" do
+        let(:target_global_role) { UserRole::VANITA_VIEWER }
+
+        it "fills the role fields accordingly" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css(
+              "input[name='user[global_role]'][value='#{target_global_role}'][checked]",
+              visible: :all
+            )
+            assert_org_role_checked(organization:, role_value: UserRole::RIDE_REQUESTER)
+          end
+        end
       end
     end
 
@@ -116,6 +168,15 @@ RSpec.describe "UsersMutate", type: :request do
     def act(path:)
       sign_in current_user.identities.first
       get path, headers: headers
+    end
+
+    def assert_org_role_checked(organization:, role_value:)
+      page = Capybara.string(response.body)
+      row = page.find(:xpath, ".//tr[td[contains(., '#{organization.name}')]]", visible: :all)
+      expect(row).to have_css(
+        "input[type='radio'][value='#{role_value}'][checked]",
+        visible: :all
+      )
     end
   end
 

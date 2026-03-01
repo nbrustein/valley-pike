@@ -21,12 +21,13 @@
           <% index = 0 %>
           <% organizations.each do |organization| %>
             <% index += 1 %>
+            <% selected_role = @selected_org_admin_roles[organization.id] %>
             <tr class="border-b border-forest-900/10">
               <td class="px-3 py-3 text-forest-900"><%= organization.name %></td>
               <td class="px-3 py-3">
                 <div class="flex items-center">
                   <%= hidden_field_tag "user[org_admin_user_roles][#{index}][organization_id]", organization.id %>
-                  <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", "", true,
+                  <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", "", selected_role.blank?,
                                         id: "user_org_admin_user_roles_#{index}_role_none",
                                         class: "h-4 w-4 border-forest-900/30 text-forest-900",
                                         required: true %>
@@ -35,7 +36,7 @@
               <% roles.each do |role| %>
                 <td class="px-3 py-3">
                   <div class="flex items-center">
-                    <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", role, false,
+                    <%= radio_button_tag "user[org_admin_user_roles][#{index}][role]", role, selected_role == role,
                                           id: "user_org_admin_user_roles_#{index}_role_#{role}",
                                           class: "h-4 w-4 border-forest-900/30 text-forest-900",
                                           required: true,
