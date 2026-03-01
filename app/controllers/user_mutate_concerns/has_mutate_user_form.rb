@@ -21,11 +21,13 @@ module UserMutateConcerns
         @header_text ||= "Create ride requester"
         @subheader_text ||= "Invite a new ride requester by email."
         @form_action ||= users_path
+        @form_method ||= :post
       else
         @submit_text ||= "Update user"
         @header_text ||= "Edit user"
         @subheader_text ||= "Update user details and roles."
         @form_action ||= user_path(id: target_user.id)
+        @form_method ||= :patch
       end
     end
 
