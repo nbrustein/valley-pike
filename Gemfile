@@ -54,6 +54,7 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "capybara"
   gem "selenium-webdriver"
+  gem "parallel_tests"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false

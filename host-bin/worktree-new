@@ -11,6 +11,28 @@ shift
 
 dir="${1:-../valley-pike-$branch}"
 
+# Ensure main is up to date in this worktree before creating another.
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$current_branch" = "HEAD" ]; then
+  echo "Refusing to update main while in detached HEAD state."
+  exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Working tree is dirty. Commit or stash changes before updating main."
+  exit 1
+fi
+
+if [ "$current_branch" != "main" ]; then
+  git checkout main
+fi
+
+git pull --ff-only
+
+if [ "$current_branch" != "main" ]; then
+  git checkout "$current_branch"
+fi
+
 # Find a value for WEB_PORT that is not already being used
 # by an existing worktree
 used_ports=" 3000 "
