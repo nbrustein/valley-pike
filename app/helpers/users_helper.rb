@@ -17,6 +17,10 @@ module UsersHelper
     UserMutatePolicy.new(current_user, nil).new?
   end
 
+  def user_edit_allowed?(target_user)
+    UserMutatePolicy.new(current_user, target_user).edit?
+  end
+
   private
 
   memoize def view_users_policy

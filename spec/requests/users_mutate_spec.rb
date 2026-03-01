@@ -58,11 +58,10 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "POST /users" do
-
     context "when the current user is allowed to create users" do
       let(:current_user_role) { UserRole::DEVELOPER }
 
-      before do 
+      before do
         allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)))
       end
 
@@ -71,7 +70,6 @@ RSpec.describe "UsersMutate", type: :request do
           act(path: users_path, params: valid_create_params)
         }
       end
-
     end
 
     context "when the current user is not allowed to create users" do
@@ -87,12 +85,93 @@ RSpec.describe "UsersMutate", type: :request do
       sign_in current_user.identities.first
       post path, params:, headers:
     end
+  end
 
+  describe "GET /users/:id/edit" do
+    let(:target_user) { create(:user, email: "target.user@example.com") }
+    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let(:current_user_role) { UserRole::ORG_ADMIN }
+    let(:current_user_organization) { organization }
 
+    before { target_user_role }
+
+    context "when the current user is allowed to update the target user" do
+      it "renders the form" do
+        assert_success { act(path: edit_user_path(id: target_user.id)) }
+        expect(response.body).to include("Edit user")
+        assert_form_rendered(submit_text: "Update user")
+      end
+    end
+
+    context "when the current user is not allowed to update the target user" do
+      let(:current_user_role) { UserRole::DRIVER }
+      let(:current_user_organization) { nil }
+
+      it "returns not found" do
+        act(path: edit_user_path(id: target_user.id))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:)
+      sign_in current_user.identities.first
+      get path, headers: headers
+    end
+  end
+
+  describe "PATCH /users/:id" do
+    let(:target_user) { create(:user, email: "target.user@example.com") }
+    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let(:current_user_role) { UserRole::ORG_ADMIN }
+    let(:current_user_organization) { organization }
+    let(:update_params) do
+      {
+        user: {
+          global_role: "",
+          org_admin_user_roles: {
+            "1" => {
+              role: UserRole::RIDE_REQUESTER,
+              organization_id: organization.id,
+            },
+          },
+        },
+      }
+    end
+
+    before { target_user_role }
+
+    context "when the current user is allowed to update the target user" do
+      before do
+        allow_any_instance_of(UnitsOfWork::UpdateUser)
+          .to receive(:execute)
+          .and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)))
+      end
+
+      it "calls UpdateUser and redirects to users_path" do
+        assert_redirect(to: users_path) {
+          act(path: user_path(id: target_user.id), params: update_params)
+        }
+      end
+    end
+
+    context "when the current user is not allowed to update the target user" do
+      let(:current_user_role) { UserRole::DRIVER }
+      let(:current_user_organization) { nil }
+
+      it "returns not found" do
+        act(path: user_path(id: target_user.id), params: update_params)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:, params:)
+      sign_in current_user.identities.first
+      patch path, params:, headers:
+    end
   end
 
   # These tests cover behavior that is shared between multiple endpoints
-  describe "form rendering" do 
+  describe "form rendering" do
     let(:current_user_role) { UserRole::DEVELOPER }
 
     context "when there are validation errors" do
@@ -103,11 +182,12 @@ RSpec.describe "UsersMutate", type: :request do
         allow_any_instance_of(UnitsOfWork::CreateUser).to receive(:execute).and_return(UnitOfWork::Result.new(errors:))
       end
 
-      it "renders the form with errors" do
+      it "renders the filled in form with errors" do
         act(path: users_path, params: valid_create_params)
 
         expect(response).to have_http_status(:unprocessable_content)
         assert_form_rendered
+        assert_form_filled_in
         expect(response.body).to include("Please fix the following:")
         expect(response.body).to include("An error occurred")
       end
@@ -119,15 +199,21 @@ RSpec.describe "UsersMutate", type: :request do
           .and_raise(StandardError, "Sensitive details")
       end
 
-      it "renders the form with a generic error" do
+      it "renders the filled in form with a generic error" do
         act(path: users_path, params: valid_create_params)
 
         expect(response).to have_http_status(:unprocessable_content)
         assert_form_rendered
+        assert_form_filled_in
         expect(response.body).to include("Please fix the following:")
         expect(response.body).to include("An error occurred")
         expect(response.body).not_to include("Sensitive details")
       end
+    end
+
+    def assert_form_filled_in
+      # expect the value for email to be the one from the params
+      expect(response.body).to have_field("Email", with: valid_create_params[:user][:email])
     end
 
     def act(path:, params:)
@@ -136,10 +222,10 @@ RSpec.describe "UsersMutate", type: :request do
     end
   end
 
-  def assert_form_rendered
+  def assert_form_rendered(submit_text: "Create ride requester")
     expect(response.body).to include("form")
     expect(response.body).to have_css("input[name='user[email]'][type='email']")
     expect(response.body).to have_link("Cancel", href: users_path)
-    expect(response.body).to have_button("Create ride requester")
+    expect(response.body).to have_button(submit_text)
   end
 end
