@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workers="${PARALLEL_WORKERS:-3}"
+
+script/ensure_assets
+bundle exec rake parallel:prepare
+bundle exec parallel_rspec -n "$workers"
