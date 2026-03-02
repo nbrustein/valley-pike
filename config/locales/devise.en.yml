@@ -1,4 +1,5 @@
 en:
   devise:
     failure:
+      disabled: "Account is not active."
       magic_link_invalid: "Invalid or expired login link."
