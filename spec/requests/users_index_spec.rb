@@ -15,17 +15,19 @@ RSpec.describe "Users index", type: :request do
     let!(:user_1) do
       create(
         :user,
+        role: UserRole::RIDE_REQUESTER,
+        role_organization: user_1_role_organization,
         human: build(:human, full_name: "Andrew", preferred_name: "Yadawa")
       )
     end
     let!(:user_2) do
       create(
         :user,
+        role: UserRole::RIDE_REQUESTER,
+        role_organization: user_2_role_organization,
         human: build(:human, full_name: "Benita", preferred_name: "Xavier")
       )
     end
-    let!(:user_2_role) { create(:user_role, user: user_2, role: UserRole::RIDE_REQUESTER, organization: user_2_role_organization) }
-    let!(:user_1_role) { create(:user_role, user: user_1, role: UserRole::RIDE_REQUESTER, organization: user_1_role_organization) }
     let(:user_1_role_organization) { organization }
     let(:user_2_role_organization) { organization }
 
@@ -66,11 +68,10 @@ RSpec.describe "Users index", type: :request do
           create(
             :user,
             disabled: true,
+            role: UserRole::RIDE_REQUESTER,
+            role_organization: organization,
             human: build(:human, full_name: "Disabled User", preferred_name: "Disabled")
           )
-        end
-        let!(:disabled_user_role) do
-          create(:user_role, user: disabled_user, role: UserRole::RIDE_REQUESTER, organization: organization)
         end
 
         it "shows a disabled label next to their name" do
@@ -88,8 +89,7 @@ RSpec.describe "Users index", type: :request do
       end
 
       context "when a user is not editable" do
-        let!(:user_3) { create(:user, email: "vanita.admin@example.com") }
-        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_ADMIN, organization: nil) }
+        let!(:user_3) { create(:user, email: "vanita.admin@example.com", role: UserRole::VANITA_ADMIN) }
 
         it "does not link row" do
           act
@@ -102,8 +102,7 @@ RSpec.describe "Users index", type: :request do
         let(:another_organization) { create(:organization) }
         let(:user_1_role_organization) { organization }
         let(:user_2_role_organization) { another_organization }
-        let!(:user_3) { create(:user, email: "user_3@example.com") }
-        let!(:user_3_role) { create(:user_role, user: user_3, role: UserRole::VANITA_VIEWER, organization: nil) }
+        let!(:user_3) { create(:user, email: "user_3@example.com", role: UserRole::VANITA_VIEWER) }
 
         before { act }
         it 'shows a user whose role has an organization' do
@@ -115,8 +114,8 @@ RSpec.describe "Users index", type: :request do
       end
 
       context "when a user in the list has a single role" do
-        let!(:single_role_user) { create(:user, email: "driver@example.com") }
-        let!(:single_role) { create(:user_role, user: single_role_user, role: UserRole::DRIVER, organization: nil) }
+        let!(:single_role_user) { create(:user, email: "driver@example.com", role: UserRole::DRIVER) }
+        let!(:single_role) { single_role_user.user_roles.first }
         before { act }
 
         it "shows the role pill" do

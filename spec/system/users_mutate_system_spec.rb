@@ -12,8 +12,12 @@ RSpec.describe "User mutate form", type: :system do
   let(:phone) { "" }
   let!(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
   let(:identity) do
-    user = create(:user, email: "udo-admin@example.com")
-    create(:user_role, user:, role: current_user_role, organization: current_user_role_organization)
+    user = create(
+      :user,
+      email: "udo-admin@example.com",
+      role: current_user_role,
+      role_organization: current_user_role_organization
+    )
     create(:identity, :magic_link, user:, email: user.email)
   end
 
@@ -49,12 +53,16 @@ RSpec.describe "User mutate form", type: :system do
   context "when editing an existing user" do
     let(:current_user_role) { UserRole::DEVELOPER }
     let(:current_user_role_organization) { nil }
-    let(:target_user) { create(:user, email: "target.user@example.com") }
-    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let(:target_user) do
+      create(
+        :user,
+        email: "target.user@example.com",
+        role: UserRole::RIDE_REQUESTER,
+        role_organization: organization
+      )
+    end
     let(:updated_full_name) { "Updated Name" }
     let(:updated_preferred_name) { "Updated" }
-
-    before { target_user_role }
 
     it "allows for updating a basic field" do
       visit edit_user_path(id: target_user.id)
