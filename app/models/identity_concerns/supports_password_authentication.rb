@@ -3,13 +3,17 @@ module IdentityConcerns
     extend ActiveSupport::Concern
 
     included do
-      devise :database_authenticatable, :validatable
+      devise :database_authenticatable
 
       attr_accessor :skip_password_validation
       attr_accessor :skip_password_strength_validation
 
+      # We are not using Devise :validatable. See app/models/identity_concerns/has_email.rb for an
+      # explanation of why. validatable would give us some of the following validatoins if we were
+      # using it
+      validates_presence_of :password, if: :password_required?
+      validates_confirmation_of :password, if: :password_required?
       validate :password_strength, if: :password_strength_required?
-
       validate :password_length, if: :password_length_required?
     end
 

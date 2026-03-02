@@ -25,6 +25,22 @@ RSpec.describe UnitsOfWork::SendUserLoginLink do
       end
     end
 
+    context "when the user has a password identity" do
+      before do
+        create(:identity, user:, kind: "password", email: user.email)
+        allow_any_instance_of(Identity).to receive(:send_magic_link)
+      end
+
+      # see comment about validatable in app/models/identity_concerns/has_email.rb
+      it "creates a magic link identity without hitting a uniqueness violation" do
+        result = act
+
+        assert_success(result)
+        magic_link_identity = Identity.find_by(kind: "magic_link", email: user.email)
+        expect(magic_link_identity).to be_present
+      end
+    end
+
     context "when the user exists and the identity is disabled" do
       before do
         allow(Identity)
