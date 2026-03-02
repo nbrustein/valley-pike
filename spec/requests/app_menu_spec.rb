@@ -10,16 +10,26 @@ RSpec.describe "App menu", type: :request do
   before { configure_request_host! }
 
   let!(:target_user) do
-    target_user = create(:user)
-    create(:user_role, user: target_user, role: UserRole::DRIVER)
-    create(:identity, :magic_link, user: target_user, email: target_user.email)
+    target_user = create(
+      :user,
+      :with_identity,
+      email: "target.user@example.com",
+      identity_kind: "magic_link",
+      identity_email: "target.user@example.com",
+      role: UserRole::DRIVER
+    )
     target_user
   end
 
   let(:current_user) do
-    current_user = create(:user)
-    create(:user_role, user: current_user, role: current_user_role)
-    create(:identity, :magic_link, user: current_user, email: current_user.email)
+    current_user = create(
+      :user,
+      :with_identity,
+      email: "current.user@example.com",
+      identity_kind: "magic_link",
+      identity_email: "current.user@example.com",
+      role: current_user_role
+    )
     current_user
   end
 

@@ -6,8 +6,7 @@ RSpec.describe "UsersMutate", type: :request do
 
   let(:headers) { request_headers }
   let(:current_user) do
-    user = create(:user, email: "udo-admin@example.com")
-    create(:user_role, user: user, role: current_user_role, organization: nil)
+    user = create(:user, email: "udo-admin@example.com", role: current_user_role)
     create(:identity, :magic_link, user: user, email: user.email)
     user
   end
@@ -88,8 +87,13 @@ RSpec.describe "UsersMutate", type: :request do
 
   describe "GET /users/:id/edit" do
     let!(:target_user) do
-      target_user = create(:user, email: "target.user@example.com", disabled: target_user_disabled)
-      create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization: organization)
+      target_user = create(
+        :user,
+        email: "target.user@example.com",
+        disabled: target_user_disabled,
+        role: UserRole::RIDE_REQUESTER,
+        role_organization: organization
+      )
       if target_global_role.present?
         create(:user_role, user: target_user, role: target_global_role, organization: nil)
       end
@@ -219,8 +223,14 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "PATCH /users/:id" do
-    let(:target_user) { create(:user, email: "target.user@example.com") }
-    let(:target_user_role) { create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization:) }
+    let(:target_user) do
+      create(
+        :user,
+        email: "target.user@example.com",
+        role: UserRole::RIDE_REQUESTER,
+        role_organization: organization
+      )
+    end
     let(:current_user_role) { UserRole::DEVELOPER }
     let(:update_params) do
       {
@@ -235,8 +245,6 @@ RSpec.describe "UsersMutate", type: :request do
         },
       }
     end
-
-    before { target_user_role }
 
     context "when the current user is allowed to update the target user" do
       before do
@@ -268,11 +276,7 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "POST /users/:id/send_login_link" do
-    let!(:target_user) do
-      target_user = create(:user, email: "target.user@example.com")
-      create(:user_role, user: target_user, role: UserRole::DRIVER)
-      target_user
-    end
+    let!(:target_user) { create(:user, email: "target.user@example.com", role: UserRole::DRIVER) }
 
     context "when the current user is allowed to send login links" do
       before do
