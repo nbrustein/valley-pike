@@ -85,8 +85,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_120000) do
     t.uuid "user_id", null: false
     t.index ["organization_id"], name: "index_user_roles_on_organization_id"
     t.index ["user_id"], name: "index_user_roles_on_user_id"
-    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'driver'::character varying]::text[])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying, 'ride_requester'::character varying]::text[])) AND organization_id IS NOT NULL", name: "user_roles_organization_id_check"
-    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'org_admin'::character varying, 'ride_requester'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
+    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'vanita_viewer'::character varying::text, 'driver'::character varying::text])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying::text, 'ride_requester'::character varying::text])) AND organization_id IS NOT NULL", name: "user_roles_organization_id_check"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'vanita_viewer'::character varying::text, 'org_admin'::character varying::text, 'ride_requester'::character varying::text, 'driver'::character varying::text])", name: "user_roles_role_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
