@@ -112,6 +112,11 @@ RSpec.describe "UsersMutate", type: :request do
         assert_form_rendered(submit_text: "Update user")
       end
 
+      it "renders the send login link button" do
+        assert_success { act(path: edit_user_path(id: target_user.id)) }
+        expect(response.body).to have_button("Send Login Link")
+      end
+
       it "fills the human fields with defaults from the user" do
         assert_success { act(path: edit_user_path(id: target_user.id)) }
 
@@ -176,6 +181,15 @@ RSpec.describe "UsersMutate", type: :request do
             )
             assert_org_role_checked(organization:, role_value: UserRole::RIDE_REQUESTER)
           end
+        end
+      end
+
+      context "when the target user is disabled" do
+        before { target_user.update!(disabled: true) }
+
+        it "disables the send login link button" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+          expect(response.body).to have_button("Send Login Link", disabled: true)
         end
       end
     end
@@ -250,6 +264,43 @@ RSpec.describe "UsersMutate", type: :request do
     def act(path:, params:)
       sign_in current_user.identities.first
       patch path, params:, headers:
+    end
+  end
+
+  describe "POST /users/:id/send_login_link" do
+    let!(:target_user) do
+      target_user = create(:user, email: "target.user@example.com")
+      create(:user_role, user: target_user, role: UserRole::DRIVER)
+      target_user
+    end
+
+    context "when the current user is allowed to send login links" do
+      before do
+        allow_any_instance_of(UnitsOfWork::SendUserLoginLink)
+          .to receive(:execute)
+          .and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)))
+      end
+
+      it "calls SendUserLoginLink and redirects to users_path" do
+        assert_redirect(to: users_path) {
+          act(path: send_login_link_user_path(id: target_user.id))
+        }
+        expect(flash[:notice]).to be_present
+      end
+    end
+
+    context "when the current user is not allowed to send login links" do
+      let(:current_user_role) { UserRole::DRIVER }
+
+      it "returns not found" do
+        act(path: send_login_link_user_path(id: target_user.id))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:)
+      sign_in current_user.identities.first
+      post path, headers: headers
     end
   end
 

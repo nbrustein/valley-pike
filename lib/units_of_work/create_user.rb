@@ -2,7 +2,7 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
-    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name, :phone, :password
+    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name, :phone, :password, :send_login_link
 
     def initialize(executor_id:, params:)
       super
@@ -13,11 +13,12 @@ module UnitsOfWork
       @user_roles = params.fetch(:user_roles)
       @driver_qualifications = params.fetch(:driver_qualifications, [])
       @password = params[:password]
+      @send_login_link = params.fetch(:send_login_link, false)
     end
 
     private
 
-    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password, :driver_qualifications
+    attr_reader :email, :full_name, :preferred_name, :phone, :roles, :password, :driver_qualifications, :send_login_link
 
     def execute_unit_of_work(errors:)
       user = build_user(errors)
@@ -33,6 +34,9 @@ module UnitsOfWork
       return if errors.any?
 
       create_password_identity(user, errors) if password.present?
+      return if errors.any?
+
+      send_magic_link(user, errors) if send_login_link
     end
 
     def audit_params
@@ -93,6 +97,18 @@ module UnitsOfWork
         next if driver_qualification.save
 
         merge_errors(errors, driver_qualification)
+      end
+    end
+
+    def send_magic_link(user, errors)
+      result = UnitsOfWork::SendUserLoginLink.new(
+        executor_id: executor_id,
+        params: {user_id: user.id}
+      ).execute
+      return if result.success?
+
+      result.errors.each do |error|
+        errors.add(error.attribute, error.message)
       end
     end
 
