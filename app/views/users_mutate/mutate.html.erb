@@ -6,11 +6,16 @@
 
   <%= render "shared/form_errors", errors: @errors %>
 
-  <%= form_with scope: :user, url: @form_action, method: @form_method, local: true, class: "space-y-5" do |form| %>
+  <% form_id = "user-mutate-form" %>
+  <%= form_with scope: :user, url: @form_action, method: @form_method, local: true, class: "space-y-5", id: form_id do |form| %>
     <%= render "users_mutate/human_fields", form: form %>
+    <% if @show_send_login_link_checkbox %>
+      <%= render "users_mutate/send_login_link_checkbox", form: form %>
+    <% end %>
     <%= render "users_mutate/user_roles_inputs", form: form %>
-    <%= render "shared/action_buttons", form:, cancel_path: users_path, submit_text: @submit_text %>
   <% end %>
+
+  <%= render "shared/action_buttons", form_id: form_id %>
 </section>
 
 <script>

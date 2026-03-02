@@ -39,7 +39,6 @@ RSpec.describe "UsersMutate", type: :request do
         assert_success { act(path: new_user_path) }
         assert_form_rendered
       end
-
     end
 
     context "when the current user is not allowed to create users" do
@@ -242,7 +241,11 @@ RSpec.describe "UsersMutate", type: :request do
   end
 
   describe "POST /users/:id/send_login_link" do
-    let(:target_user) { create(:user, email: "target.user@example.com") }
+    let!(:target_user) do
+      target_user = create(:user, email: "target.user@example.com")
+      create(:user_role, user: target_user, role: UserRole::DRIVER)
+      target_user
+    end
 
     context "when the current user is allowed to send login links" do
       before do

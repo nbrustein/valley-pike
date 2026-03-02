@@ -57,6 +57,26 @@ class UsersMutateController < ApplicationController
     )
   end
 
+  def send_login_link
+    return render_not_found unless target_user.present?
+
+    authorize(target_user, :edit?, policy_class: UserMutatePolicy)
+    success, errors = execute_unit_of_work(
+    ) do
+      UnitsOfWork::SendUserLoginLink.new(
+        executor_id: current_user.id,
+        params: {user_id: target_user.id}
+      )
+    end
+
+    if success
+      redirect_to users_path, notice: "Login link sent."
+    else
+      error_message = errors.full_messages.presence&.to_sentence || "Unable to send login link."
+      redirect_to users_path, alert: error_message
+    end
+  end
+
   private
 
   memoize def user_mutate_policy
@@ -71,6 +91,7 @@ class UsersMutateController < ApplicationController
       :phone,
       :global_role,
       :driver_role,
+      :send_login_link,
       driver_qualifications: [],
       org_admin_user_roles: %i[role organization_id]
     )
@@ -101,7 +122,11 @@ class UsersMutateController < ApplicationController
       .to_h
       .except("global_role", "org_admin_user_roles", "driver_role")
       .deep_symbolize_keys
-      .merge(user_roles:, driver_qualifications: normalize_driver_qualifications(permitted[:driver_qualifications]))
+      .merge(
+        user_roles:,
+        driver_qualifications: normalize_driver_qualifications(permitted[:driver_qualifications]),
+        send_login_link: ActiveModel::Type::Boolean.new.cast(permitted[:send_login_link])
+      )
   end
 
   def normalize_user_roles(org_admin_user_roles:, global_role:, driver_role:)

@@ -55,14 +55,13 @@ RSpec.describe UnitsOfWork::CreateUser do
 
       context "when send_login_link is true" do
         let(:send_login_link) { true }
-        let(:identity) { build_stubbed(:identity, :magic_link) }
+        let(:send_login_link_uow) { instance_double(UnitsOfWork::SendUserLoginLink, execute: send_login_link_result) }
+        let(:send_login_link_result) { UnitOfWork::Result.new(errors: ActiveModel::Errors.new(User.new)) }
 
         before do
-          allow(Identity)
-            .to receive(:find_or_create_magic_link_identity_for_user!)
-            .and_return(identity)
-          allow(identity).to receive(:active_for_magic_link_authentication?).and_return(true)
-          allow(identity).to receive(:send_magic_link)
+          allow(UnitsOfWork::SendUserLoginLink)
+            .to receive(:new)
+            .and_return(send_login_link_uow)
         end
 
         it "sends a magic link" do
@@ -70,8 +69,10 @@ RSpec.describe UnitsOfWork::CreateUser do
 
           assert_success(result)
           user = User.find_by!(email:)
-          expect(Identity).to have_received(:find_or_create_magic_link_identity_for_user!).with(user)
-          expect(identity).to have_received(:send_magic_link)
+          expect(UnitsOfWork::SendUserLoginLink).to have_received(:new).with(
+            executor_id: executor.id,
+            params: {user_id: user.id}
+          )
         end
       end
     end

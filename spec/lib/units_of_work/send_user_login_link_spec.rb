@@ -25,10 +25,27 @@ RSpec.describe UnitsOfWork::SendUserLoginLink do
       end
     end
 
+    context "when the user exists and the identity is disabled" do
+      before do
+        allow(Identity)
+          .to receive(:find_or_create_magic_link_identity_for_user!)
+          .with(user)
+          .and_return(identity)
+        allow(identity).to receive(:active_for_magic_link_authentication?).and_return(false)
+      end
+
+      it "returns an errored result" do
+        result = act
+
+        expect(result.success?).to be(false)
+        expect(result.errors.full_messages).to include("User is disabled")
+      end
+    end
+
     context "when the user does not exist" do
       let(:user_id) { SecureRandom.uuid }
 
-      it "returns an error" do
+      it "returns an errored result" do
         result = act
 
         expect(result.success?).to be(false)
