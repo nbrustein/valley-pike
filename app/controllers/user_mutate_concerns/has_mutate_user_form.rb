@@ -12,6 +12,7 @@ module UserMutateConcerns
     end
 
     def setup_instance_vars(mode:, target_user:)
+      @target_user = target_user
       @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
       @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
       @organizations_for_org_role_inputs = Organization.all
@@ -22,16 +23,19 @@ module UserMutateConcerns
         @subheader_text ||= "Invite a new ride requester by email."
         @form_action ||= users_path
         @form_method ||= :post
+        @show_send_login_link_checkbox = true
+        @send_login_link = true
         @show_disable_input = false
-      elsif mode == :edit
+      else
         @submit_text ||= "Update user"
         @header_text ||= "Edit user"
         @subheader_text ||= "Update user details and roles."
         @form_action ||= user_path(id: target_user.id)
         @form_method ||= :patch
+        @show_send_login_link_checkbox = false
+        @show_send_login_link_button = true
+        @send_login_link_button_disabled = target_user.disabled?
         @show_disable_input = true
-      else
-        raise "invalid mode"
       end
     end
 
@@ -42,6 +46,7 @@ module UserMutateConcerns
       @phone = get_input_default(target_user:, submitted_params:, key: :phone)
       @disabled = cast_boolean(get_input_default(target_user:, submitted_params:, key: :disabled))
       setup_role_defaults(target_user:, submitted_params:)
+      setup_send_login_link_default(submitted_params:)
     end
 
     def get_input_default(target_user:, submitted_params:, key:)
@@ -95,6 +100,13 @@ module UserMutateConcerns
       end
       @selected_driver_role = user_roles.any? {|role| role_name(role) == UserRole::DRIVER }
       @selected_driver_qualifications = Array(driver_qualifications)
+    end
+
+    def setup_send_login_link_default(submitted_params:)
+      return unless submitted_params.present?
+      return unless submitted_params.key?(:send_login_link)
+
+      @send_login_link = ActiveModel::Type::Boolean.new.cast(submitted_params[:send_login_link])
     end
 
     def role_name(role)

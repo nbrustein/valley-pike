@@ -156,6 +156,7 @@ RSpec.describe "User mutate form", type: :system do
     fill_in "Preferred Name", with: preferred_name
     expect(page).to have_field("Phone", type: "tel")
     fill_in "Phone", with: phone if phone.present?
+    expect(page).to have_checked_field("Send Login Link to User Email")
   end
 
   def expect_user_to_have_roles(email, role_pairs)
