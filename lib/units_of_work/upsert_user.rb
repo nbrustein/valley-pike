@@ -25,11 +25,11 @@ module UnitsOfWork
       user = User.find_by(email: normalized_email)
 
       if user.nil?
-        merge_errors_from_result(errors, create_user_result)
+        delegate_work { execute_create_user_uow }
         return
       end
 
-      merge_errors_from_result(errors, update_user_result(user))
+      delegate_work { execute_update_user_uow(user) }
     end
 
     def audit_params
@@ -38,7 +38,7 @@ module UnitsOfWork
       filtered
     end
 
-    memoize def create_user_result
+    memoize def execute_create_user_uow
       UnitsOfWork::CreateUser.execute(
         executor_id:,
         params: {
@@ -53,7 +53,7 @@ module UnitsOfWork
       )
     end
 
-    def update_user_result(user)
+    def execute_update_user_uow(user)
       UnitsOfWork::UpdateUser.execute(
         executor_id:,
         params: {
@@ -66,12 +66,6 @@ module UnitsOfWork
           password:,
         }
       )
-    end
-
-    def merge_errors_from_result(errors, result)
-      result.errors.each do |error|
-        errors.add(error.attribute, error.message)
-      end
     end
   end
 end
