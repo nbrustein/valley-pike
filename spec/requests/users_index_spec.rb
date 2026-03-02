@@ -61,6 +61,25 @@ RSpec.describe "Users index", type: :request do
         end
       end
 
+      context "when a user is disabled" do
+        let!(:disabled_user) do
+          create(
+            :user,
+            disabled: true,
+            human: build(:human, full_name: "Disabled User", preferred_name: "Disabled")
+          )
+        end
+        let!(:disabled_user_role) do
+          create(:user_role, user: disabled_user, role: UserRole::RIDE_REQUESTER, organization: organization)
+        end
+
+        it "shows a disabled label next to their name" do
+          act
+          row = page.find("tr", text: disabled_user.human.full_name)
+          expect(row.find("td:first-child")).to have_text("#{disabled_user.human.full_name} [DISABLED]")
+        end
+      end
+
       context "when a user is editable" do
         it "links row to the edit page" do
           act
@@ -108,8 +127,8 @@ RSpec.describe "Users index", type: :request do
 
       context "when a user in the list has multiple roles" do
         let!(:multi_role_user) { create(:user, email: "multi-role@example.com") }
-        let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization:) }
-        let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization:) }
+        let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization: organization) }
+        let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization: organization) }
         before { act }
 
         it "shows all the role pills" do
@@ -164,10 +183,10 @@ RSpec.describe "Users index", type: :request do
 
   def create_current_user_with_role(role:)
     user = create(:user, email: "current-user@example.com")
-    role_attrs = {user:, role:}
+    role_attrs = {user: user, role: role}
     role_attrs[:organization] = organization if role.in?([ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ])
     create(:user_role, **role_attrs)
-    create(:identity, :magic_link, user:, email: user.email)
+    create(:identity, :magic_link, user: user, email: user.email)
     user
   end
 

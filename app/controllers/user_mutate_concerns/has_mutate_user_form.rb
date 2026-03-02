@@ -22,12 +22,16 @@ module UserMutateConcerns
         @subheader_text ||= "Invite a new ride requester by email."
         @form_action ||= users_path
         @form_method ||= :post
-      else
+        @show_disable_input = false
+      elsif mode == :edit
         @submit_text ||= "Update user"
         @header_text ||= "Edit user"
         @subheader_text ||= "Update user details and roles."
         @form_action ||= user_path(id: target_user.id)
         @form_method ||= :patch
+        @show_disable_input = true
+      else
+        raise "invalid mode"
       end
     end
 
@@ -36,6 +40,7 @@ module UserMutateConcerns
       @full_name = get_input_default(target_user:, submitted_params:, key: :full_name)
       @preferred_name = get_input_default(target_user:, submitted_params:, key: :preferred_name)
       @phone = get_input_default(target_user:, submitted_params:, key: :phone)
+      @disabled = cast_boolean(get_input_default(target_user:, submitted_params:, key: :disabled))
       setup_role_defaults(target_user:, submitted_params:)
     end
 

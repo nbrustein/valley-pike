@@ -83,6 +83,7 @@ class UsersMutateController < ApplicationController
       :full_name,
       :preferred_name,
       :phone,
+      :disabled,
       :global_role,
       :driver_role,
       driver_qualifications: [],
@@ -97,11 +98,16 @@ class UsersMutateController < ApplicationController
       global_role: permitted[:global_role],
       driver_role: permitted[:driver_role]
     )
+    extra_attrs = {
+      user_roles:,
+      driver_qualifications: normalize_driver_qualifications(permitted[:driver_qualifications]),
+    }
+    extra_attrs[:disabled] = cast_boolean(permitted[:disabled]) if permitted.key?(:disabled)
     permitted
       .to_h
       .except("global_role", "org_admin_user_roles", "driver_role")
       .deep_symbolize_keys
-      .merge(user_roles:, driver_qualifications: normalize_driver_qualifications(permitted[:driver_qualifications]))
+      .merge(extra_attrs)
   end
 
   def normalize_user_roles(org_admin_user_roles:, global_role:, driver_role:)

@@ -88,7 +88,7 @@ RSpec.describe "UsersMutate", type: :request do
 
   describe "GET /users/:id/edit" do
     let!(:target_user) do
-      target_user = create(:user, email: "target.user@example.com")
+      target_user = create(:user, email: "target.user@example.com", disabled: target_user_disabled)
       create(:user_role, user: target_user, role: UserRole::RIDE_REQUESTER, organization: organization)
       if target_global_role.present?
         create(:user_role, user: target_user, role: target_global_role, organization: nil)
@@ -101,6 +101,7 @@ RSpec.describe "UsersMutate", type: :request do
       target_user
     end
     let(:target_global_role) { nil }
+    let(:target_user_disabled) { false }
     let(:target_human) { target_user.human }
     let(:current_user_role) { UserRole::DEVELOPER }
 
@@ -119,6 +120,32 @@ RSpec.describe "UsersMutate", type: :request do
           expect(response.body).to have_field("Full Name", with: target_human.full_name)
           expect(response.body).to have_field("Preferred Name", with: target_human.preferred_name)
           expect(response.body).to have_field("Phone", with: target_human.phone)
+        end
+      end
+
+      context "when the target user is disabled" do
+        let(:target_user_disabled) { true }
+
+        it "checks the disable checkbox" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css("input[name='user[disabled]'][type='checkbox'][checked]", visible: :all)
+            expect(response.body).to have_css("label", text: "Disable user")
+          end
+        end
+      end
+
+      context "when the target user is active" do
+        let(:target_user_disabled) { false }
+
+        it "leaves the disable checkbox unchecked" do
+          assert_success { act(path: edit_user_path(id: target_user.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css("input[name='user[disabled]'][type='checkbox']", visible: :all)
+            expect(response.body).not_to have_css("input[name='user[disabled]'][type='checkbox'][checked]", visible: :all)
+          end
         end
       end
 
