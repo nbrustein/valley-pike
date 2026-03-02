@@ -101,14 +101,11 @@ module UnitsOfWork
     end
 
     def send_magic_link(user, errors)
-      result = UnitsOfWork::SendUserLoginLink.new(
-        executor_id: executor_id,
-        params: {user_id: user.id}
-      ).execute
-      return if result.success?
-
-      result.errors.each do |error|
-        errors.add(error.attribute, error.message)
+      delegate_work do
+        UnitsOfWork::SendUserLoginLink.execute(
+          executor_id: executor_id,
+          params: {user_id: user.id}
+        )
       end
     end
 

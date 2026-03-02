@@ -16,6 +16,7 @@ class UnitOfWork
     with_execution_context do
       execution = create_execution_record if should_audit_execution?
       errors = ActiveModel::Errors.new(executor_for_errors)
+      @errors = errors
 
       ActiveRecord::Base.transaction do
         begin
@@ -34,6 +35,8 @@ class UnitOfWork
       end
 
       UnitOfWork::Result.new(errors:)
+    ensure
+      @errors = nil
     end
   end
 
@@ -70,5 +73,29 @@ class UnitOfWork
   # another unit of work. Only the unit triggered at the top level is recorded.
   def should_audit_execution?
     execution_depth == 1
+  end
+
+  def delegate_work
+    unless block_given?
+      raise ArgumentError, "delegate_work requires a block"
+    end
+
+    result = yield
+    merge_errors_from_result(result)
+    result
+  end
+
+  def merge_errors_from_result(result)
+    unless result.is_a?(UnitOfWork::Result)
+      raise ArgumentError, "result must be an instance of UnitOfWork::Result"
+    end
+
+    result.errors.each do |error|
+      errors.add(error.attribute, error.message)
+    end
+  end
+
+  def errors
+    @errors || raise("errors not initialized")
   end
 end
