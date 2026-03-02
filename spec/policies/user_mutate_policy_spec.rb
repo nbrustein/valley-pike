@@ -12,11 +12,7 @@ RSpec.describe UserMutatePolicy do
     end
     executor
   }
-  let(:target_user) {
-    user = create(:user)
-    create(:user_role, user:, role: target_user_role)
-    user
-  }
+  let(:target_user) { create(:user, role: target_user_role) }
   let(:target_user_role) { UserRole::DRIVER }
 
   describe "#new?" do
