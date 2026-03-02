@@ -25,6 +25,7 @@ module UserMutateConcerns
         @form_method ||= :post
         @show_send_login_link_checkbox = true
         @send_login_link = true
+        @show_disable_input = false
       else
         @submit_text ||= "Update user"
         @header_text ||= "Edit user"
@@ -34,6 +35,7 @@ module UserMutateConcerns
         @show_send_login_link_checkbox = false
         @show_send_login_link_button = true
         @send_login_link_button_disabled = target_user.disabled?
+        @show_disable_input = true
       end
     end
 
@@ -42,6 +44,7 @@ module UserMutateConcerns
       @full_name = get_input_default(target_user:, submitted_params:, key: :full_name)
       @preferred_name = get_input_default(target_user:, submitted_params:, key: :preferred_name)
       @phone = get_input_default(target_user:, submitted_params:, key: :phone)
+      @disabled = cast_boolean(get_input_default(target_user:, submitted_params:, key: :disabled))
       setup_role_defaults(target_user:, submitted_params:)
       setup_send_login_link_default(submitted_params:)
     end

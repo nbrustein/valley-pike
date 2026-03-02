@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe IdentityConcerns::CanBeDisabled, type: :model do
   describe "#active_for_authentication?" do
     let(:identity) { build_stubbed(:identity, disabled_at:) }
-    let(:user) { build_stubbed(:user, disabled_at: user_disabled_at) }
-    let(:user_disabled_at) { nil }
+    let(:user) { build_stubbed(:user, disabled: user_disabled) }
+    let(:user_disabled) { false }
     let(:disabled_at) { nil }
 
     before do
@@ -26,7 +26,7 @@ RSpec.describe IdentityConcerns::CanBeDisabled, type: :model do
     end
 
     context "when the user is disabled" do
-      let(:user_disabled_at) { Time.current }
+      let(:user_disabled) { true }
 
       it "returns false" do
         expect(identity.active_for_authentication?).to be(false)
@@ -36,7 +36,7 @@ RSpec.describe IdentityConcerns::CanBeDisabled, type: :model do
 
   describe "#active_for_magic_link_authentication?" do
     context "when the identity is disabled" do
-      let(:user) { build_stubbed(:user, disabled_at: nil) }
+      let(:user) { build_stubbed(:user, disabled: false) }
       let(:identity) { build_stubbed(:identity, kind: "magic_link", email: "a@example.com", disabled_at: Time.current) }
 
       before do
@@ -49,7 +49,7 @@ RSpec.describe IdentityConcerns::CanBeDisabled, type: :model do
     end
 
     context "when the user is disabled" do
-      let(:user) { build_stubbed(:user, disabled_at: Time.current) }
+      let(:user) { build_stubbed(:user, disabled: true) }
       let(:identity) { build_stubbed(:identity, kind: "magic_link", email: "a@example.com") }
 
       before do

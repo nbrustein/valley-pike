@@ -4,10 +4,10 @@
   <td class="px-3 py-3 text-forest-900">
     <% if editable %>
       <%= link_to edit_user_path(id: user.id), class: "block" do %>
-        <span><%= user.human.full_name %></span>
+        <span><%= user_display_name(user) %></span>
       <% end %>
     <% else %>
-      <span><%= user.human.full_name %></span>
+      <span><%= user_display_name(user) %></span>
     <% end %>
   </td>
   <td class="px-3 py-3">

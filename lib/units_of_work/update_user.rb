@@ -2,9 +2,9 @@ module UnitsOfWork
   class UpdateUser < UnitOfWork
     include Memery
 
-    attr_reader :user_id, :user_roles, :driver_qualifications, :full_name, :preferred_name, :phone, :password
+    attr_reader :user_id, :user_roles, :driver_qualifications, :full_name, :preferred_name, :phone, :password, :disabled
     attr_reader :has_full_name_key, :has_preferred_name_key, :has_phone_key,
-                :has_user_roles_key, :has_driver_qualifications_key, :has_password_key
+                :has_user_roles_key, :has_driver_qualifications_key, :has_password_key, :has_disabled_key
 
     def initialize(executor_id:, params:)
       super
@@ -15,12 +15,14 @@ module UnitsOfWork
       @user_roles = params[:user_roles]
       @driver_qualifications = params[:driver_qualifications]
       @password = params[:password]
+      @disabled = params[:disabled]
       @has_full_name_key = params.key?(:full_name)
       @has_preferred_name_key = params.key?(:preferred_name)
       @has_phone_key = params.key?(:phone)
       @has_user_roles_key = params.key?(:user_roles)
       @has_driver_qualifications_key = params.key?(:driver_qualifications)
       @has_password_key = params.key?(:password)
+      @has_disabled_key = params.key?(:disabled)
     end
 
     memoize def user
@@ -29,9 +31,9 @@ module UnitsOfWork
 
     private
 
-    attr_reader :user_id, :driver_qualifications, :full_name, :preferred_name, :phone, :password
+    attr_reader :user_id, :driver_qualifications, :full_name, :preferred_name, :phone, :password, :disabled
     attr_reader :has_full_name_key, :has_preferred_name_key, :has_phone_key,
-                :has_user_roles_key, :has_driver_qualifications_key, :has_password_key
+                :has_user_roles_key, :has_driver_qualifications_key, :has_password_key, :has_disabled_key
 
     def execute_unit_of_work(errors:)
       user = self.user
@@ -41,6 +43,9 @@ module UnitsOfWork
       end
 
       update_human(user, errors)
+      return if errors.any?
+
+      update_user_record(user, errors)
       return if errors.any?
 
       sync_roles(user, errors)
@@ -68,6 +73,15 @@ module UnitsOfWork
       return if human.save
 
       merge_errors(errors, human)
+    end
+
+    def update_user_record(user, errors)
+      return unless has_disabled_key
+
+      user.disabled = disabled
+      return if user.save
+
+      merge_errors(errors, user)
     end
 
     def sync_roles(user, errors)

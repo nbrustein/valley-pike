@@ -12,6 +12,7 @@
     <% if @show_send_login_link_checkbox %>
       <%= render "users_mutate/send_login_link_checkbox", form: form %>
     <% end %>
+    <%= render "users_mutate/disabled_field", form: form if @show_disable_input %>
     <%= render "users_mutate/user_roles_inputs", form: form %>
   <% end %>
 

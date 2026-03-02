@@ -7,7 +7,7 @@ module IdentityConcerns
     end
 
     def inactive_message
-      :inactive
+      :disabled
     end
 
     def active_for_magic_link_authentication?
