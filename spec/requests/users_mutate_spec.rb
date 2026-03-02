@@ -185,7 +185,7 @@ RSpec.describe "UsersMutate", type: :request do
       end
 
       context "when the target user is disabled" do
-        before { target_user.update!(disabled_at: Time.current) }
+        before { target_user.update!(disabled: true) }
 
         it "disables the send login link button" do
           assert_success { act(path: edit_user_path(id: target_user.id)) }
