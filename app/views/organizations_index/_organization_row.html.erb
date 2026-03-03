@@ -1,0 +1,13 @@
+<% editable = organization_edit_allowed?(organization) %>
+<tr class="border-b border-forest-900/10 <%= "cursor-pointer transition hover:opacity-85 active:opacity-70" if editable %>"
+    data-organization-id="<%= organization.id %>">
+  <td class="px-3 py-3 text-forest-900">
+    <% if editable %>
+      <%= link_to edit_organization_path(id: organization.id), class: "block" do %>
+        <span><%= organization.name %></span>
+      <% end %>
+    <% else %>
+      <span><%= organization.name %></span>
+    <% end %>
+  </td>
+</tr>

@@ -46,6 +46,24 @@ RSpec.describe "Organizations index", type: :request do
           expect(organization_names.index(organization_a.name)).to be < organization_names.index(organization_b.name)
         end
       end
+
+      context "when an organization is editable" do
+        let(:role) { UserRole::DEVELOPER }
+
+        it "links the organization name to the edit page" do
+          act
+          expect(page).to have_link(organization_a.name, href: edit_organization_path(id: organization_a.id))
+        end
+      end
+
+      context "when an organization is not editable" do
+        let(:role) { UserRole::VANITA_VIEWER }
+
+        it "does not link the organization name" do
+          act
+          expect(page).not_to have_link(organization_a.name, href: edit_organization_path(id: organization_a.id))
+        end
+      end
     end
   end
 
