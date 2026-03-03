@@ -42,4 +42,30 @@ RSpec.describe "Organization mutate form", type: :system do
       expect(organization.required_qualifications).to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
     end
   end
+
+  context "when editing an organization" do
+    let!(:organization) do
+      create(
+        :organization,
+        name: "Old Organization",
+        abbreviation: "OLD",
+        required_qualifications: []
+      )
+    end
+
+    it "allows for updating fields and required qualifications" do
+      visit edit_organization_path(id: organization.id)
+      fill_in "Name", with: "Updated Organization"
+      fill_in "Abbreviation", with: "UPD"
+      check "CWS vetted"
+
+      click_button "Update organization"
+      expect(page).to have_current_path(organizations_path)
+
+      organization.reload
+      expect(organization.name).to eq("Updated Organization")
+      expect(organization.abbreviation).to eq("UPD")
+      expect(organization.required_qualifications).to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
+    end
+  end
 end

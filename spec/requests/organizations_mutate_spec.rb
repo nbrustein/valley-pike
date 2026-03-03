@@ -85,6 +85,124 @@ RSpec.describe "OrganizationsMutate", type: :request do
     end
   end
 
+  describe "GET /organizations/:id/edit" do
+    let!(:organization) do
+      create(
+        :organization,
+        name: "Target Organization",
+        abbreviation: "TGT",
+        required_qualifications: required_qualifications
+      )
+    end
+    let(:required_qualifications) { [] }
+    let(:current_user_role) { UserRole::DEVELOPER }
+
+    context "when the current user is allowed to update organizations" do
+      it "renders the form" do
+        assert_success { act(path: edit_organization_path(id: organization.id)) }
+        expect(response.body).to include("Edit organization")
+        assert_form_rendered(submit_text: "Update organization")
+      end
+
+      it "fills the fields with defaults from the organization" do
+        assert_success { act(path: edit_organization_path(id: organization.id)) }
+
+        aggregate_failures do
+          expect(response.body).to have_field("Name", with: organization.name)
+          expect(response.body).to have_field("Abbreviation", with: organization.abbreviation)
+        end
+      end
+
+      context "when the organization requires CWS vetted" do
+        let(:required_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
+
+        it "checks the required qualifications checkbox" do
+          assert_success { act(path: edit_organization_path(id: organization.id)) }
+
+          expect(response.body).to have_css(
+            "input[name='organization[required_qualifications][]'][type='checkbox'][checked]",
+            visible: :all
+          )
+        end
+      end
+
+      context "when the organization has no required qualifications" do
+        let(:required_qualifications) { [] }
+
+        it "leaves the required qualifications checkbox unchecked" do
+          assert_success { act(path: edit_organization_path(id: organization.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css(
+              "input[name='organization[required_qualifications][]'][type='checkbox']",
+              visible: :all
+            )
+            expect(response.body).not_to have_css(
+              "input[name='organization[required_qualifications][]'][type='checkbox'][checked]",
+              visible: :all
+            )
+          end
+        end
+      end
+    end
+
+    context "when the current user is not allowed to update organizations" do
+      let(:current_user_role) { UserRole::DRIVER }
+
+      it "returns not found" do
+        act(path: edit_organization_path(id: organization.id))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:)
+      sign_in current_user.identities.first
+      get path, headers: headers
+    end
+  end
+
+  describe "PATCH /organizations/:id" do
+    let!(:organization) { create(:organization, name: "Target Organization", abbreviation: "TGT") }
+    let(:current_user_role) { UserRole::DEVELOPER }
+    let(:update_params) do
+      {
+        organization: {
+          name: "Updated Organization",
+          abbreviation: "UPD",
+          required_qualifications: [],
+        },
+      }
+    end
+
+    context "when the current user is allowed to update organizations" do
+      before do
+        allow_any_instance_of(UnitsOfWork::UpdateOrganization)
+          .to receive(:execute)
+          .and_return(UnitOfWork::Result.new(errors: ActiveModel::Errors.new(Organization.new)))
+      end
+
+      it "calls UpdateOrganization and redirects to organizations_path" do
+        assert_redirect(to: organizations_path) {
+          act(path: organization_path(id: organization.id), params: update_params)
+        }
+      end
+    end
+
+    context "when the current user is not allowed to update organizations" do
+      let(:current_user_role) { UserRole::VANITA_VIEWER }
+
+      it "returns not found" do
+        act(path: organization_path(id: organization.id), params: update_params)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    def act(path:, params:)
+      sign_in current_user.identities.first
+      patch path, params:, headers:
+    end
+  end
+
   # These tests cover behavior that is shared between multiple endpoints
   describe "form rendering" do
     let(:current_user_role) { UserRole::DEVELOPER }
