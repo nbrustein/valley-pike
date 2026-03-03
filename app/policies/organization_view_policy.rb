@@ -1,0 +1,19 @@
+class OrganizationViewPolicy < ApplicationPolicy
+  memoize def index?
+    user&.has_role_permissions?(UserRole::VANITA_VIEWER) || false
+  end
+
+  class Scope < Scope
+    def resolve
+      return Organization.where("FALSE") unless policy.index?
+
+      Organization.all
+    end
+
+    private
+
+    memoize def policy
+      OrganizationViewPolicy.new(user, nil)
+    end
+  end
+end

@@ -1,0 +1,17 @@
+<section class="surface-card">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= @header_text %></h1>
+    <p class="mt-1 text-sm text-forest-900/70"><%= @subheader_text %></p>
+  </div>
+
+  <%= render "shared/form_errors", errors: @errors %>
+
+  <% form_id = "organization-mutate-form" %>
+  <%= form_with scope: :organization, url: @form_action, method: @form_method, local: true, class: "space-y-5", id: form_id do |form| %>
+    <%= render "organizations_mutate/name_field", form: form %>
+    <%= render "organizations_mutate/abbreviation_field", form: form %>
+    <%= render "organizations_mutate/required_qualifications_input" %>
+  <% end %>
+
+  <%= render "shared/action_buttons", form_id: form_id, cancel_path: organizations_path %>
+</section>

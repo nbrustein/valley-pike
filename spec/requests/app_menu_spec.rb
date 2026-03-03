@@ -33,7 +33,7 @@ RSpec.describe "App menu", type: :request do
     current_user
   end
 
-  describe "navigation links" do
+  describe "users link" do
     context "when the signed-in user has viewable users" do
       let(:current_user_role) { UserRole::DEVELOPER }
 
@@ -53,7 +53,32 @@ RSpec.describe "App menu", type: :request do
         expect(page).not_to have_link("Users", href: users_path)
       end
     end
+  end
 
+  describe "orgs link" do
+    context "when the signed-in user has viewable organizations" do
+      let(:current_user_role) { UserRole::VANITA_VIEWER }
+      before { organization }
+
+      it "shows the orgs link with the label" do
+        act_get_profile(current_user:)
+        page = Capybara.string(response.body)
+        expect(page).to have_link("Orgs", href: organizations_path)
+      end
+    end
+
+    context "when the signed-in user has no viewable organizations" do
+      let(:current_user_role) { UserRole::DRIVER }
+
+      it "does not show the orgs link" do
+        act_get_profile(current_user:)
+        page = Capybara.string(response.body)
+        expect(page).not_to have_link("Orgs", href: organizations_path)
+      end
+    end
+  end
+
+  describe "edit profile link" do
     context "when the user is signed out" do
       it "does not show the edit profile link" do
         get profile_path, headers: headers
@@ -62,10 +87,14 @@ RSpec.describe "App menu", type: :request do
     end
 
     context "when the user is signed in" do
-      let(:current_user) { create(:user, email: "signed-in@example.com") }
-
-      before do
-        create(:identity, :magic_link, user: current_user, email: current_user.email)
+      let(:current_user) do
+        create(
+          :user,
+          :with_identity,
+          email: "signed-in@example.com",
+          identity_kind: "magic_link",
+          identity_email: "signed-in@example.com"
+        )
       end
 
       it "shows the edit profile link" do

@@ -11,6 +11,8 @@ After changing code, run rubocop and eslint and fix issues
 ## Running commands
 
 Run bin commands using host-bin (see README.md)
+Run rubocop with `bin/rubocop`
+Run eslint with `yarn lint:js`
 
 ## Migrations
 
