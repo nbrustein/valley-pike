@@ -1,0 +1,22 @@
+<section class="surface-card">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Organizations</h1>
+  </div>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="min-w-full border-collapse text-left text-sm">
+      <thead>
+        <tr class="border-b border-forest-900/15 text-xs uppercase tracking-wide text-forest-900/70">
+          <th class="px-3 py-2 font-semibold">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @organizations.each do |organization| %>
+          <tr class="border-b border-forest-900/10" data-organization-id="<%= organization.id %>">
+            <td class="px-3 py-3 text-forest-900"><%= organization.name %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
