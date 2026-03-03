@@ -9,7 +9,7 @@ Rails.application.routes.draw do
     post :send_login_link, on: :member
   end
   resources :organizations, only: %i[index], controller: "organizations_index"
-  resources :organizations, only: %i[new create], controller: "organizations_mutate"
+  resources :organizations, only: %i[new create edit update], controller: "organizations_mutate"
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
