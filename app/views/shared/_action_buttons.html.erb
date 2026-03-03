@@ -1,5 +1,6 @@
+<% cancel_path = local_assigns.fetch(:cancel_path, users_path) %>
 <div class="flex items-center justify-end gap-3">
-  <%= link_to "Cancel", users_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
+  <%= link_to "Cancel", cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
   <% if @show_send_login_link_button %>
     <%= button_to "Send Login Link",
       send_login_link_user_path(id: @target_user.id),
