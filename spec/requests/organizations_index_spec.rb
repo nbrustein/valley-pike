@@ -57,8 +57,14 @@ RSpec.describe "Organizations index", type: :request do
   end
 
   def create_current_user_with_role(role:)
-    user = create(:user, email: "current-user@example.com", role:)
-    create(:identity, :magic_link, user: user, email: user.email)
+    user = create(
+      :user,
+      :with_identity,
+      email: "current-user@example.com",
+      role:,
+      identity_kind: "magic_link",
+      identity_email: "current-user@example.com"
+    )
     user
   end
 

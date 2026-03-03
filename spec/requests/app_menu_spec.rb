@@ -87,10 +87,14 @@ RSpec.describe "App menu", type: :request do
     end
 
     context "when the user is signed in" do
-      let(:current_user) { create(:user, email: "signed-in@example.com") }
-
-      before do
-        create(:identity, :magic_link, user: current_user, email: current_user.email)
+      let(:current_user) do
+        create(
+          :user,
+          :with_identity,
+          email: "signed-in@example.com",
+          identity_kind: "magic_link",
+          identity_email: "signed-in@example.com"
+        )
       end
 
       it "shows the edit profile link" do
