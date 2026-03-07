@@ -7,6 +7,8 @@ module RideRequestsHelper
 
   memoize def show_ride_request_org_column?
     policy = RideRequestViewPolicy.new(current_user, nil)
-    policy.permitted_organization_ids.compact.size > 1
+    organization_id_count = policy.all_organizations_permitted? ? Organization.count : policy.permitted_organization_ids.compact.size
+
+    organization_id_count > 1
   end
 end

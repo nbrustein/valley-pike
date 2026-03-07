@@ -6,8 +6,12 @@ module IsOrganizationAwarePolicy
   #        user&.roles_with_permissions(UserRole::RIDE_REQUESTER) || []
   #      end
 
-  def permitted_organization_ids
-    if roles_granting_org_permissions.any? {|role| role.organization_id.nil? }
+  memoize def all_organizations_permitted?
+    roles_granting_org_permissions.any? {|role| role.organization_id.nil? }
+  end
+
+  memoize def permitted_organization_ids
+    if all_organizations_permitted?
       return Organization.ids + [ nil ]
     end
 
