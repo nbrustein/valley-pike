@@ -10,10 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_01_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "city", null: false
+    t.string "country", null: false
+    t.datetime "created_at", null: false
+    t.decimal "latitude"
+    t.decimal "longitude"
+    t.string "name", null: false
+    t.string "place_id"
+    t.string "state", null: false
+    t.string "street_address", null: false
+    t.datetime "updated_at", null: false
+    t.string "zip", null: false
+  end
+
+  create_table "driver_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "canceled", default: false, null: false
+    t.datetime "created_at", null: false
+    t.uuid "driver_id", null: false
+    t.uuid "ride_request_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_driver_assignments_on_driver_id"
+    t.index ["ride_request_id", "driver_id"], name: "index_driver_assignments_on_ride_request_id_and_driver_id", unique: true
+    t.index ["ride_request_id"], name: "index_driver_assignments_on_ride_request_id"
+  end
 
   create_table "driver_qualifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -64,6 +89,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_180000) do
     t.check_constraint "required_qualifications <@ ARRAY['cws_vetted'::text]", name: "organizations_required_qualifications_check"
   end
 
+  create_table "ride_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "appointment_time"
+    t.boolean "cancelled", default: false, null: false
+    t.boolean "completed", default: false, null: false
+    t.string "contact_email"
+    t.string "contact_full_name"
+    t.string "contact_phone"
+    t.datetime "created_at", null: false
+    t.date "date"
+    t.string "desired_driver_gender", default: "none", null: false
+    t.uuid "destination_address_id"
+    t.boolean "draft", null: false
+    t.text "driver_notes"
+    t.boolean "has_enough_drivers", default: false, null: false
+    t.uuid "organization_id", null: false
+    t.text "other_notes"
+    t.uuid "pick_up_address_id"
+    t.uuid "requester_id", null: false
+    t.text "requester_notes"
+    t.boolean "requires_multiple_drivers", default: false, null: false
+    t.text "ride_description_private"
+    t.text "ride_description_public"
+    t.string "short_description"
+    t.string "type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["destination_address_id"], name: "index_ride_requests_on_destination_address_id"
+    t.index ["organization_id"], name: "index_ride_requests_on_organization_id"
+    t.index ["pick_up_address_id"], name: "index_ride_requests_on_pick_up_address_id"
+    t.index ["requester_id"], name: "index_ride_requests_on_requester_id"
+    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying::text, 'female_accompaniment'::character varying::text, 'none'::character varying::text])", name: "ride_requests_desired_driver_gender_check"
+    t.check_constraint "draft = true OR contact_full_name IS NOT NULL", name: "ride_requests_contact_full_name_check"
+    t.check_constraint "draft = true OR date IS NOT NULL", name: "ride_requests_date_check"
+    t.check_constraint "draft = true OR pick_up_address_id IS NOT NULL", name: "ride_requests_pick_up_address_check"
+    t.check_constraint "draft = true OR ride_description_public IS NOT NULL", name: "ride_requests_ride_description_public_check"
+    t.check_constraint "draft = true OR short_description IS NOT NULL", name: "ride_requests_short_description_check"
+    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying::text, 'RideRequest::Published'::character varying::text])", name: "ride_requests_type_check"
+  end
+
   create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "completed_at", precision: nil
     t.datetime "created_at", null: false
@@ -97,9 +160,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_180000) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "driver_assignments", "ride_requests"
+  add_foreign_key "driver_assignments", "users", column: "driver_id"
   add_foreign_key "driver_qualifications", "users"
   add_foreign_key "humans", "users"
   add_foreign_key "identities", "users"
+  add_foreign_key "ride_requests", "addresses", column: "destination_address_id"
+  add_foreign_key "ride_requests", "addresses", column: "pick_up_address_id"
+  add_foreign_key "ride_requests", "organizations"
+  add_foreign_key "ride_requests", "users", column: "requester_id"
   add_foreign_key "unit_of_work_executions", "users", column: "executor_id"
   add_foreign_key "user_roles", "organizations"
   add_foreign_key "user_roles", "users"
