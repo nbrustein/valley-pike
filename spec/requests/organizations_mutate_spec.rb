@@ -203,6 +203,83 @@ RSpec.describe "OrganizationsMutate", type: :request do
     end
   end
 
+  describe "GET /organizations/:id" do
+    let!(:organization) do
+      create(
+        :organization,
+        name: "Target Organization",
+        abbreviation: "TGT",
+        required_qualifications: required_qualifications
+      )
+    end
+    let(:required_qualifications) { [] }
+    let(:current_user_role) { UserRole::VANITA_VIEWER }
+
+    context "when signed out" do
+      it "returns not found" do
+        get organization_path(id: organization.id), headers: headers
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the current user cannot view organizations" do
+      let(:current_user_role) { UserRole::DRIVER }
+
+      it "returns not found" do
+        act(path: organization_path(id: organization.id))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the organization does not exist" do
+      it "returns not found" do
+        act(path: organization_path(id: 0))
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the current user can view organizations" do
+      it "renders the organization name and abbreviation" do
+        assert_success { act(path: organization_path(id: organization.id)) }
+
+        aggregate_failures do
+          expect(response.body).to include(organization.name)
+          expect(response.body).to include(organization.abbreviation)
+        end
+      end
+
+      it "links back to the organizations index" do
+        assert_success { act(path: organization_path(id: organization.id)) }
+        expect(response.body).to have_link("Back to organizations", href: organizations_path)
+      end
+
+      context "when the organization requires CWS vetted" do
+        let(:required_qualifications) { [ DriverQualification::QUALIFICATION_CWS_VETTED ] }
+
+        it "shows the CWS vetted qualification as checked" do
+          assert_success { act(path: organization_path(id: organization.id)) }
+          expect(response.body).to have_css("i.fa-square-check")
+        end
+      end
+
+      context "when the organization has no required qualifications" do
+        it "shows the CWS vetted qualification as unchecked" do
+          assert_success { act(path: organization_path(id: organization.id)) }
+
+          aggregate_failures do
+            expect(response.body).to have_css("i.fa-square")
+            expect(response.body).not_to have_css("i.fa-square-check")
+          end
+        end
+      end
+    end
+
+    def act(path:)
+      sign_in current_user.identities.first
+      get path, headers: headers
+    end
+  end
+
   # These tests cover behavior that is shared between multiple endpoints
   describe "form rendering" do
     let(:current_user_role) { UserRole::DEVELOPER }

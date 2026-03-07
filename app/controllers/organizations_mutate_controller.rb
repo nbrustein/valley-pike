@@ -3,6 +3,13 @@ class OrganizationsMutateController < ApplicationController
   include ExecutesUnitsOfWork
   include OrganizationMutateConcerns::HasMutateOrganizationForm
 
+  def show
+    return render_not_found unless target_organization.present?
+
+    authorize(target_organization, :show?, policy_class: OrganizationViewPolicy)
+    render_form mode: :show, target_organization:, submitted_params: nil
+  end
+
   def new
     authorize(nil, :new?, policy_class: OrganizationMutatePolicy)
     render_form mode: :create, target_organization: nil, submitted_params: nil

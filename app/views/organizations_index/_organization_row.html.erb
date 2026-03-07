@@ -1,5 +1,5 @@
 <% editable = organization_edit_allowed?(organization) %>
-<tr class="border-b border-forest-900/10 <%= "cursor-pointer transition hover:opacity-85 active:opacity-70" if editable %>"
+<tr class="border-b border-forest-900/10 cursor-pointer transition hover:opacity-85 active:opacity-70"
     data-organization-id="<%= organization.id %>">
   <td class="px-3 py-3 text-forest-900">
     <% if editable %>
@@ -7,7 +7,20 @@
         <span><%= organization.name %></span>
       <% end %>
     <% else %>
-      <span><%= organization.name %></span>
+      <%= link_to organization_path(id: organization.id), class: "block" do %>
+        <span><%= organization.name %></span>
+      <% end %>
+    <% end %>
+  </td>
+  <td class="px-3 py-3 text-right text-forest-900">
+    <% if editable %>
+      <%= link_to edit_organization_path(id: organization.id), class: "inline-flex items-center" do %>
+        <i class="fa-solid fa-pen-to-square text-forest-900/70"></i>
+      <% end %>
+    <% else %>
+      <%= link_to organization_path(id: organization.id), class: "inline-flex items-center" do %>
+        <i class="fa-solid fa-eye text-forest-900/50"></i>
+      <% end %>
     <% end %>
   </td>
 </tr>

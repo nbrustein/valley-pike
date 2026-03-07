@@ -74,6 +74,12 @@ user_definitions = [
     user_roles: [ {role: UserRole::VANITA_ADMIN, organization_id: nil} ],
   },
   {
+    email: "vanita.viewer@#{EMAIL_DOMAIN}",
+    full_name: "vanita viewer",
+    phone: "555-0112",
+    user_roles: [ {role: UserRole::VANITA_VIEWER, organization_id: nil} ],
+  },
+  {
     email: "udo.admin@#{EMAIL_DOMAIN}",
     full_name: "udo admin",
     phone: "555-0104",
