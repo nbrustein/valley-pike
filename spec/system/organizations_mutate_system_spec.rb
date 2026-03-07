@@ -37,7 +37,7 @@ RSpec.describe "Organization mutate form", type: :system do
       click_button "Create organization"
       expect(page).to have_current_path(organizations_path)
 
-      organization = Organization.find_by!(abbreviation: abbreviation)
+      organization = Organization.find_by!(abbreviation:)
       expect(organization.name).to eq(name)
       expect(organization.required_qualifications).to contain_exactly(DriverQualification::QUALIFICATION_CWS_VETTED)
     end

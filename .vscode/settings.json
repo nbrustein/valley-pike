@@ -5,6 +5,7 @@
   },
   "rubocop.autocorrect": true,
   "rubocop.autocorrectOnSave": true,
+  "rubocop.additionalLanguages": ["erb"],
   "rubocop.commandPath": "${userHome}/.asdf/shims/rubocop",
   "rubocop.bundleCommandPath": "${userHome}/.asdf/shims/bundle",
   "ruby.rubyPath": "${userHome}/.asdf/shims/ruby",

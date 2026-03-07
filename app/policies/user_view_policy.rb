@@ -4,6 +4,10 @@ class UserViewPolicy < ApplicationPolicy
       false
   end
 
+  memoize def show?
+    index?
+  end
+
   class Scope < Scope
     def resolve
       return User.where("FALSE") unless policy.index?

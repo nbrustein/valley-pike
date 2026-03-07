@@ -81,7 +81,7 @@ RSpec.describe "App menu", type: :request do
   describe "edit profile link" do
     context "when the user is signed out" do
       it "does not show the edit profile link" do
-        get profile_path, headers: headers
+        get(profile_path, headers:)
         expect(response.body).not_to include("Edit profile")
       end
     end
@@ -108,6 +108,6 @@ RSpec.describe "App menu", type: :request do
 
   def act_get_profile(current_user:)
     sign_in current_user.identities.find_by!(kind: "magic_link")
-    get root_path, headers: headers
+    get root_path, headers:
   end
 end

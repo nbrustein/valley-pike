@@ -1,8 +1,9 @@
 <% cancel_path = local_assigns.fetch(:cancel_path, users_path) %>
 <% readonly = local_assigns.fetch(:readonly, false) %>
+<% back_text = local_assigns.fetch(:back_text, "Back") %>
 <div class="flex items-center justify-end gap-3">
   <% if readonly %>
-    <%= link_to "Back to organizations", cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
+    <%= link_to back_text, cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
   <% else %>
     <%= link_to "Cancel", cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
     <% if @show_send_login_link_button %>

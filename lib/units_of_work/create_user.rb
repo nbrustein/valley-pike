@@ -103,7 +103,7 @@ module UnitsOfWork
     def send_magic_link(user, errors)
       delegate_work do
         UnitsOfWork::SendUserLoginLink.execute(
-          executor_id: executor_id,
+          executor_id:,
           params: {user_id: user.id}
         )
       end
