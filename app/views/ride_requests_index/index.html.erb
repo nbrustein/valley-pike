@@ -1,0 +1,24 @@
+<section class="surface-card">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Ride Requests</h1>
+  </div>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="min-w-full border-collapse text-left text-sm">
+      <thead>
+        <tr class="border-b border-forest-900/15 text-xs uppercase tracking-wide text-forest-900/70">
+          <th class="px-3 py-2 font-semibold">Date</th>
+          <th class="px-3 py-2 font-semibold">Description</th>
+          <% if show_ride_request_org_column? %>
+            <th class="px-3 py-2 font-semibold">Org</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @ride_requests.each do |ride_request| %>
+          <%= render "ride_requests_index/ride_request_row", ride_request: ride_request %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

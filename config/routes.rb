@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     post :send_login_link, on: :member
   end
   resources :organizations, only: %i[index], controller: "organizations_index"
+  resources :ride_requests, only: %i[index], controller: "ride_requests_index"
   resources :organizations, only: %i[show new create edit update], controller: "organizations_mutate"
 
   root "home#index"
