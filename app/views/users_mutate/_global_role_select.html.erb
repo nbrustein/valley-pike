@@ -1,29 +1,34 @@
+<% readonly = local_assigns.fetch(:readonly, false) %>
   <div class="space-y-2">
     <p class="text-sm font-semibold text-forest-900">Admin Role</p>
-    <div class="space-y-2">
-      <label class="flex items-center gap-2 text-sm text-forest-900" for="user_global_role_none">
-        <input type="radio"
-               name="user[global_role]"
-               id="user_global_role_none"
-               value=""
-               <%= "checked" if @selected_global_role.blank? %>
-               required
-               data-global-role>
-        None
-      </label>
-
-      <% @roles_for_global_role_input.each do |role| %>
-        <% input_id = "user_global_role_#{role}" %>
-        <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= input_id %>">
+    <% if readonly %>
+      <p class="text-sm text-forest-900"><%= @selected_global_role.present? ? @selected_global_role.humanize : "None" %></p>
+    <% else %>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm text-forest-900" for="user_global_role_none">
           <input type="radio"
                  name="user[global_role]"
-                 id="<%= input_id %>"
-                 value="<%= role %>"
-                 <%= "checked" if @selected_global_role == role %>
+                 id="user_global_role_none"
+                 value=""
+                 <%= "checked" if @selected_global_role.blank? %>
                  required
                  data-global-role>
-          <%= role.humanize %>
+          None
         </label>
-      <% end %>
-    </div>
+
+        <% @roles_for_global_role_input.each do |role| %>
+          <% input_id = "user_global_role_#{role}" %>
+          <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= input_id %>">
+            <input type="radio"
+                   name="user[global_role]"
+                   id="<%= input_id %>"
+                   value="<%= role %>"
+                   <%= "checked" if @selected_global_role == role %>
+                   required
+                   data-global-role>
+            <%= role.humanize %>
+          </label>
+        <% end %>
+      </div>
+    <% end %>
   </div>

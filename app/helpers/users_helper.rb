@@ -13,6 +13,10 @@ module UsersHelper
     UserMutatePolicy.new(current_user, target_user).edit?
   end
 
+  def user_show_allowed?(target_user)
+    UserViewPolicy.new(current_user, target_user).show?
+  end
+
   def user_display_name(user)
     suffix = user.disabled? ? " [DISABLED]" : ""
     "#{user.human.full_name}#{suffix}"

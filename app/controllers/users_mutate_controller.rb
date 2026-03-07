@@ -4,6 +4,13 @@ class UsersMutateController < ApplicationController
   include UserMutateConcerns::HasMutateUserForm
   helper UsersHelper
 
+  def show
+    return render_not_found unless target_user.present?
+
+    authorize(target_user, :show?, policy_class: UserViewPolicy)
+    render_form mode: :show, target_user:, submitted_params: nil
+  end
+
   def new
     authorize(nil, :new?, policy_class: UserMutatePolicy)
     render_form mode: :create, target_user: nil, submitted_params: nil

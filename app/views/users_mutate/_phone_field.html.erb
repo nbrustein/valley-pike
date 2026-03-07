@@ -1,4 +1,10 @@
+<% readonly = local_assigns.fetch(:readonly, false) %>
 <div>
-  <%= form.label :phone, "Phone", class: "block text-sm font-semibold text-forest-900" %>
-  <%= form.telephone_field :phone, value: @phone, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+  <% if readonly %>
+    <p class="block text-sm font-semibold text-forest-900">Phone</p>
+    <p class="mt-2 text-sm text-forest-900"><%= @phone %></p>
+  <% else %>
+    <%= form.label :phone, "Phone", class: "block text-sm font-semibold text-forest-900" %>
+    <%= form.telephone_field :phone, value: @phone, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+  <% end %>
 </div>

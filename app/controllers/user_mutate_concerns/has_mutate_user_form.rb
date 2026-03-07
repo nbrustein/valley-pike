@@ -5,7 +5,8 @@ module UserMutateConcerns
 
     # FIXME: continue moving stuff over here
     def render_form(status: :ok, target_user:, submitted_params:, mode:)
-      raise ArgumentError, "invalid mode" unless %i[ create edit ].include?(mode)
+      raise ArgumentError, "invalid mode" unless %i[ create edit show ].include?(mode)
+      @readonly = mode == :show
       setup_instance_vars(mode:, target_user:)
       setup_input_defaults(target_user:, submitted_params:)
       render :mutate, status:
@@ -13,30 +14,58 @@ module UserMutateConcerns
 
     def setup_instance_vars(mode:, target_user:)
       @target_user = target_user
-      @roles_for_global_role_input = [ UserRole::DEVELOPER, UserRole::VANITA_ADMIN, UserRole::VANITA_VIEWER ] & user_mutate_policy.manageable_roles
-      @roles_for_org_role_inputs = [ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ] & user_mutate_policy.manageable_roles
       @organizations_for_org_role_inputs = Organization.all
-      @show_driver_role_input = user_mutate_policy.manage_drivers?
-      if mode == :create
-        @submit_text ||= "Create ride requester"
-        @header_text ||= "Create ride requester"
-        @subheader_text ||= "Invite a new ride requester by email."
-        @form_action ||= users_path
-        @form_method ||= :post
-        @show_send_login_link_checkbox = true
-        @send_login_link = true
-        @show_disable_input = false
-      else
-        @submit_text ||= "Update user"
-        @header_text ||= "Edit user"
-        @subheader_text ||= "Update user details and roles."
-        @form_action ||= user_path(id: target_user.id)
-        @form_method ||= :patch
-        @show_send_login_link_checkbox = false
-        @show_send_login_link_button = true
-        @send_login_link_button_disabled = target_user.disabled?
-        @show_disable_input = true
+      if mode == :show
+        return setup_show_instance_vars(target_user:)
       end
+
+      setup_shared_create_edit_instance_vars
+
+      if mode == :create
+        setup_create_instance_vars
+      elsif mode == :edit
+        setup_edit_instance_vars(target_user:)
+      else
+        raise "invalid mode"
+      end
+    end
+
+    def setup_show_instance_vars(target_user:)
+      @header_text ||= target_user.human.full_name
+
+      # It may seem strange that a user with view priveleges has more roles listed here than one
+      # with edit priveleges, but the input is disabled in this case. So here it just means they
+      # can see that a user has these roles.
+      @roles_for_global_role_input = UserRole::GLOBAL_ADMIN_ROLES.to_a
+      @roles_for_org_role_inputs = UserRole::ORG_SPECIFIC_ROLES.to_a
+    end
+
+    def setup_shared_create_edit_instance_vars
+      @roles_for_global_role_input = UserRole::GLOBAL_ADMIN_ROLES & user_mutate_policy.manageable_roles
+      @roles_for_org_role_inputs = UserRole::ORG_SPECIFIC_ROLES & user_mutate_policy.manageable_roles
+    end
+
+    def setup_create_instance_vars
+      @show_driver_role_input = user_mutate_policy.manage_drivers?
+      @submit_text ||= "Create ride requester"
+      @header_text ||= "Create ride requester"
+      @form_action ||= users_path
+      @form_method ||= :post
+      @show_send_login_link_checkbox = true
+      @send_login_link = true
+      @show_disable_input = false
+    end
+
+    def setup_edit_instance_vars(target_user:)
+      @show_driver_role_input = user_mutate_policy.manage_drivers?
+      @submit_text ||= "Update user"
+      @header_text ||= "Edit user"
+      @form_action ||= user_path(id: target_user.id)
+      @form_method ||= :patch
+      @show_send_login_link_checkbox = false
+      @show_send_login_link_button = true
+      @send_login_link_button_disabled = target_user.disabled?
+      @show_disable_input = true
     end
 
     def setup_input_defaults(target_user:, submitted_params:)

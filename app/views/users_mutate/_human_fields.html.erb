@@ -1,4 +1,5 @@
-<%= render "users_mutate/email_field", form: form %>
-<%= render "users_mutate/full_name_field", form: form %>
-<%= render "users_mutate/preferred_name_field", form: form %>
-<%= render "users_mutate/phone_field", form: form %>
+<% readonly = local_assigns.fetch(:readonly, false) %>
+<%= render "users_mutate/email_field", form: form, readonly: %>
+<%= render "users_mutate/full_name_field", form: form, readonly: %>
+<%= render "users_mutate/preferred_name_field", form: form, readonly: %>
+<%= render "users_mutate/phone_field", form: form, readonly: %>

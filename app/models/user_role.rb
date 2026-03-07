@@ -29,12 +29,16 @@ class UserRole < ApplicationRecord
 
   ROLES = [ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER, ORG_ADMIN, RIDE_REQUESTER, DRIVER ].to_set.freeze
 
+  ORG_SPECIFIC_ROLES = [ ORG_ADMIN, RIDE_REQUESTER ].to_set.freeze
+  GLOBAL_ADMIN_ROLES = [ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER ].to_set.freeze
+  GLOBAL_ROLES = [ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER, DRIVER ].to_set.freeze
+
   belongs_to :user
   belongs_to :organization, optional: true
 
   validates :role, inclusion: {in: ROLES}
-  validates :organization, presence: true, if: -> { role.in?([ ORG_ADMIN, RIDE_REQUESTER ]) }
-  validates :organization, absence: true, if: -> { role.in?([ DEVELOPER, VANITA_ADMIN, VANITA_VIEWER, DRIVER ]) }
+  validates :organization, presence: true, if: -> { role.in?(ORG_SPECIFIC_ROLES) }
+  validates :organization, absence: true, if: -> { role.in?(GLOBAL_ROLES) }
 
   # This method sets up a hierarchy of role permissions, allowing a role to automatically
   # inherit all the permissions of other roles. This makes it unnecessary, for example, to
