@@ -24,7 +24,9 @@
       </table>
     </div>
   <% end %>
-<% elsif roles.present? && organizations.present? %>
+<% elsif !readonly %>
+<div style="display: none;" data-organization-roles data-org-admin-user-role-inputs>
+<% if roles.present? && organizations.present? %>
   <% if roles.size == 1 && organizations.size == 1 %>
     <%= hidden_field_tag "user[org_admin_user_roles][1][role]", roles.first %>
     <%= hidden_field_tag "user[org_admin_user_roles][1][organization_id]", organizations.first.id %>
@@ -74,4 +76,6 @@
       </table>
     </div>
   <% end %>
+<% end %>
+</div>
 <% end %>

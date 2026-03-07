@@ -1,14 +1,12 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
-<% if readonly %>
-  <%= render "users_mutate/global_role_select", readonly: %>
-  <%= render "users_mutate/org_admin_user_role_inputs", form:, readonly: %>
-  <%= render "users_mutate/driver_role_input", readonly: %>
-<% else %>
-  <% if @roles_for_global_role_input.present? %>
-    <%= render "users_mutate/global_role_select" %>
-  <% end %>
-  <div style="display: none;" data-organization-roles data-org-admin-user-role-inputs>
-    <%= render "users_mutate/org_admin_user_role_inputs", form: %>
-  </div>
-  <%= render "users_mutate/driver_role_input" if @show_driver_role_input %>
+<% if @roles_for_global_role_input.present? %>
+  <%= render "shared/radio_group",
+    label: "Admin Role",
+    name: "user[global_role]",
+    options: @roles_for_global_role_input,
+    selected: @selected_global_role,
+    readonly:,
+    input_data_attr: "data-global-role" %>
 <% end %>
+<%= render "users_mutate/org_admin_user_role_inputs", form:, readonly: %>
+<%= render "users_mutate/driver_role_input", readonly: %>

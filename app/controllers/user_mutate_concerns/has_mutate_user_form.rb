@@ -46,7 +46,6 @@ module UserMutateConcerns
     end
 
     def setup_create_instance_vars
-      @show_driver_role_input = user_mutate_policy.manage_drivers?
       @submit_text ||= "Create ride requester"
       @header_text ||= "Create ride requester"
       @form_action ||= users_path
@@ -57,7 +56,6 @@ module UserMutateConcerns
     end
 
     def setup_edit_instance_vars(target_user:)
-      @show_driver_role_input = user_mutate_policy.manage_drivers?
       @submit_text ||= "Update user"
       @header_text ||= "Edit user"
       @form_action ||= user_path(id: target_user.id)
