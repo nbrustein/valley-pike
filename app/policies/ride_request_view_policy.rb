@@ -2,13 +2,14 @@ class RideRequestViewPolicy < ApplicationPolicy
   include IsOrganizationAwarePolicy
 
   memoize def index?
-    user&.has_role_permissions?(UserRole::VANITA_VIEWER) ||
-      roles_granting_org_permissions.any? ||
+      roles_granting_permissions.any? ||
       false
   end
 
-  memoize def roles_granting_org_permissions
-    user&.roles_with_permissions(UserRole::RIDE_REQUESTER) || []
+  memoize def roles_granting_permissions
+    return [] if user.nil?
+
+    user&.roles_with_permissions(UserRole::RIDE_REQUESTER) + user&.roles_with_permissions(UserRole::VANITA_VIEWER)
   end
 
   class Scope < Scope

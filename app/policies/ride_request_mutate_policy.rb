@@ -16,7 +16,7 @@ class RideRequestMutatePolicy < ApplicationPolicy
     record.is_a?(UnitOfWork) ? record : nil
   end
 
-  memoize def roles_granting_org_permissions
+  memoize def roles_granting_permissions
     user&.roles_with_permissions(UserRole::RIDE_REQUESTER) || []
   end
 end

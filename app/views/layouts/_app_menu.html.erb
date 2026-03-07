@@ -1,3 +1,6 @@
+<% if show_ride_requests_index_link? %>
+  <%= link_to "Ride Requests", ride_requests_path, class: "menu-link" %>
+<% end %>
 <% if show_users_index_link? %>
   <%= link_to "Users", users_path, class: "menu-link" %>
 <% end %>

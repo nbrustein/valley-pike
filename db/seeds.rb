@@ -159,6 +159,48 @@ begin
 
     raise "Failed to seed user #{user_definition.fetch(:email)}: #{result.errors.full_messages.join(', ')}"
   end
+  udo_requester = User.find_by!(email: "udo.ride.requester@#{EMAIL_DOMAIN}")
+  vdo_requester = User.find_by!(email: "vdo.ride.requester@#{EMAIL_DOMAIN}")
+
+  [
+    {
+      organization: organizations.fetch("udo"),
+      requester: udo_requester,
+      date: Date.new(2026, 3, 15),
+      short_description: "Doctor appointment - UDO client",
+      contact_full_name: "udo ride requester",
+    },
+    {
+      organization: organizations.fetch("vdo"),
+      requester: vdo_requester,
+      date: Date.new(2026, 3, 10),
+      short_description: "Physical therapy - VDO client",
+      contact_full_name: "vdo ride requester",
+    },
+  ].each do |attrs|
+    next if RideRequest.exists?(organization: attrs[:organization], short_description: attrs[:short_description])
+
+    address = Address.find_or_create_by!(
+      name: "#{attrs[:organization].abbreviation} Pickup Location",
+      street_address: "123 Main St",
+      city: "Harrisonburg",
+      state: "VA",
+      zip: "22801",
+      country: "US"
+    )
+
+    RideRequest::Published.create!(
+      organization: attrs[:organization],
+      requester: attrs[:requester],
+      date: attrs[:date],
+      short_description: attrs[:short_description],
+      contact_full_name: attrs[:contact_full_name],
+      pick_up_address: address,
+      ride_description_public: "Ride to appointment",
+      desired_driver_gender: "none",
+      draft: false
+    )
+  end
 rescue StandardError => error
   warn "SEED FAILURE: #{error.message}"
   warn(error.backtrace.first(10).join("\n")) if error.backtrace.present?
