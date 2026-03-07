@@ -1,6 +1,6 @@
 <% columns = [ "Date", "Description" ] %>
 <% columns << "Org" if show_ride_request_org_column? %>
-<%= render(ResourceListPageComponent.new(title: "Ride Requests")) do %>
+<%= render(ResourceListPageComponent.new(title: "Ride Requests", create_path: ride_request_create_allowed? ? new_ride_request_path : nil)) do %>
   <%= render(ResourceListComponent.new(columns:)) do %>
     <% @ride_requests.each do |ride_request| %>
       <%= render "ride_requests_index/ride_request_row", ride_request: %>

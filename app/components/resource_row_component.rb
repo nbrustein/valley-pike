@@ -1,3 +1,4 @@
+# FIXME: refactor so that callers don't have to wrap each cell in the row_path
 class ResourceRowComponent < ViewComponent::Base
   def initialize(edit_path: nil, show_path: nil, data: {})
     @edit_path = edit_path
