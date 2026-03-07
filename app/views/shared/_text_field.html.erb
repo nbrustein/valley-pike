@@ -1,6 +1,7 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <% required = local_assigns.fetch(:required, false) %>
 <% type = local_assigns.fetch(:type, :text) %>
+<% data = local_assigns.fetch(:data, {}) %>
 <% meth = {text: :text_field, email: :email_field, phone: :phone_field}.fetch(type) { raise ArgumentError, "Unknown field type: #{type.inspect}" } %>
 <div>
   <% if readonly %>
@@ -8,6 +9,6 @@
     <p class="mt-2 text-sm text-forest-900"><%= value %></p>
   <% else %>
     <%= form.label field, label, class: "block text-sm font-semibold text-forest-900" %>
-    <%= form.public_send(meth, field, value:, required:, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900") %>
+    <%= form.public_send(meth, field, value:, required:, data:, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900") %>
   <% end %>
 </div>
