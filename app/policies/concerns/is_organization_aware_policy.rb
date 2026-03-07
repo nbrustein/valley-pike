@@ -7,8 +7,8 @@ module IsOrganizationAwarePolicy
   #      end
 
   def permitted_organization_ids
-    if roles_granting_org_permissions.any? { |role| role.organization_id.nil? }
-      return Organization.ids + [nil]
+    if roles_granting_org_permissions.any? {|role| role.organization_id.nil? }
+      return Organization.ids + [ nil ]
     end
 
     roles_granting_org_permissions.filter_map(&:organization_id).compact.uniq
