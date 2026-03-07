@@ -1,7 +1,10 @@
 <% editable = user_edit_allowed?(user) %>
 <% row_path = editable ? edit_user_path(id: user.id) : user_path(id: user.id) %>
-<tr class="border-b border-forest-900/10 align-top cursor-pointer transition hover:opacity-85 active:opacity-70"
-    data-user-id="<%= user.id %>">
+<%= render(ResourceRowComponent.new(
+  edit_path: editable ? edit_user_path(id: user.id) : nil,
+  show_path: editable ? nil : user_path(id: user.id),
+  data: {user_id: user.id}
+)) do %>
   <td class="px-3 py-3 text-forest-900">
     <%= link_to row_path, class: "block" do %>
       <span><%= user_display_name(user) %></span>
@@ -16,9 +19,4 @@
       </div>
     <% end %>
   </td>
-  <td class="px-3 py-3 text-right text-forest-900">
-    <%= link_to row_path, class: "inline-flex items-center" do %>
-      <i class="fa-solid <%= editable ? "fa-pen-to-square text-forest-900/70" : "fa-eye text-forest-900/50" %>"></i>
-    <% end %>
-  </td>
-</tr>
+<% end %>
