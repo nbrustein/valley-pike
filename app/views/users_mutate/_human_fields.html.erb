@@ -1,5 +1,5 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <%= render "shared/text_field", field: :email, label: "Email", value: @email, form:, readonly:, type: :email, required: true %>
-<%= render "users_mutate/full_name_field", form, readonly: %>
+<%= render "users_mutate/full_name_field", form:, readonly: %>
 <%= render "users_mutate/preferred_name_field", form:, readonly: %>
 <%= render "shared/text_field", field: :phone, label: "Phone", value: @phone, form:, readonly:, type: :phone %>

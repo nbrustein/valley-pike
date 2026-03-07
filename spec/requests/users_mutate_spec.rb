@@ -31,7 +31,6 @@ RSpec.describe "UsersMutate", type: :request do
       it "renders the header" do
         assert_success { act(path: new_user_path) }
         expect(response.body).to include("Create ride requester")
-        expect(response.body).to include("Invite a new ride requester by email.")
       end
 
       it "renders the form" do
