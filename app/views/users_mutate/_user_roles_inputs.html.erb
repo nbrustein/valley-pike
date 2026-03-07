@@ -1,7 +1,7 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <% if readonly %>
   <%= render "users_mutate/global_role_select", readonly: %>
-  <%= render "users_mutate/org_admin_user_role_inputs", form: form, readonly: %>
+  <%= render "users_mutate/org_admin_user_role_inputs", form:, readonly: %>
   <%= render "users_mutate/driver_role_input", readonly: %>
 <% else %>
   <% if @roles_for_global_role_input.present? %>

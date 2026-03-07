@@ -8,12 +8,14 @@
   <% form_id = "user-mutate-form" %>
   <% readonly = @readonly %>
   <%= form_with scope: :user, url: @form_action, method: @form_method, local: true, class: "space-y-5", id: form_id do |form| %>
-    <%= render "users_mutate/human_fields", form: form, readonly: %>
+    <%= render "users_mutate/human_fields", form:, readonly: %>
     <% if @show_send_login_link_checkbox %>
-      <%= render "users_mutate/send_login_link_checkbox", form: form %>
+      <%= render "users_mutate/send_login_link_checkbox", form: %>
     <% end %>
-    <%= render "users_mutate/disabled_field", form: form if @show_disable_input %>
-    <%= render "users_mutate/user_roles_inputs", form: form, readonly: %>
+    <% if @show_disable_input %>
+      <%= render "users_mutate/disabled_field", form: %>
+    <% end %>
+    <%= render "users_mutate/user_roles_inputs", form:, readonly: %>
   <% end %>
 
   <%= render "shared/action_buttons", form_id:, cancel_path: users_path, readonly:, back_text: "Back to users" %>
