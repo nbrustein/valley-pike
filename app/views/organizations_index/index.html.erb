@@ -1,24 +1,7 @@
-<section class="surface-card">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Organizations</h1>
-    <% if organization_create_allowed? %>
-      <%= link_to "Create", new_organization_path, class: "rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800" %>
+<%= render(ResourceListPageComponent.new(title: "Organizations", create_path: organization_create_allowed? ? new_organization_path : nil)) do %>
+  <%= render(ResourceListComponent.new(columns: [ "Name" ])) do %>
+    <% @organizations.each do |organization| %>
+      <%= render "organizations_index/organization_row", organization: %>
     <% end %>
-  </div>
-
-  <div class="mt-6 overflow-x-auto">
-    <table class="min-w-full border-collapse text-left text-sm">
-      <thead>
-        <tr class="border-b border-forest-900/15 text-xs uppercase tracking-wide text-forest-900/70">
-          <th class="px-3 py-2 font-semibold">Name</th>
-          <th class="px-3 py-2"></th> <!-- edit/view icon column -->
-        </tr>
-      </thead>
-      <tbody>
-        <% @organizations.each do |organization| %>
-          <%= render "organizations_index/organization_row", organization: %>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-</section>
+  <% end %>
+<% end %>

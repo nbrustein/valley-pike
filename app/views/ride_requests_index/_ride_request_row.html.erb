@@ -1,8 +1,7 @@
-<tr class="border-b border-forest-900/10 align-top"
-    data-ride-request-id="<%= ride_request.id %>">
+<%= render(ResourceRowComponent.new(data: {ride_request_id: ride_request.id})) do %>
   <td class="px-3 py-3 text-forest-900"><%= ride_request.date&.strftime("%-m/%-d/%Y") %></td>
   <td class="px-3 py-3 text-forest-900"><%= ride_request.short_description %></td>
   <% if show_ride_request_org_column? %>
     <td class="px-3 py-3 text-forest-900"><%= ride_request.organization.abbreviation %></td>
   <% end %>
-</tr>
+<% end %>

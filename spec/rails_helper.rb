@@ -11,4 +11,6 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
 end

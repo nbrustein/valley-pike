@@ -73,3 +73,4 @@ group :development do
 end
 
 gem "pundit", "~> 2.5"
+gem "view_component"
