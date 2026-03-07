@@ -11,7 +11,7 @@ Capybara.register_driver :selenium_chrome_headless do |app|
   chrome_bin = ENV["CHROME_BIN"]
   options.binary = chrome_bin if chrome_bin.present?
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options:)
 end
 
 RSpec.configure do |config|

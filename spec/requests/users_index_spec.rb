@@ -126,8 +126,8 @@ RSpec.describe "Users index", type: :request do
 
       context "when a user in the list has multiple roles" do
         let!(:multi_role_user) { create(:user, email: "multi-role@example.com") }
-        let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization: organization) }
-        let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization: organization) }
+        let!(:multi_role_one) { create(:user_role, user: multi_role_user, role: UserRole::ORG_ADMIN, organization:) }
+        let!(:multi_role_two) { create(:user_role, user: multi_role_user, role: UserRole::RIDE_REQUESTER, organization:) }
         before { act }
 
         it "shows all the role pills" do
@@ -177,15 +177,15 @@ RSpec.describe "Users index", type: :request do
 
   def act
     sign_in current_user.identities.find_by!(kind: "magic_link") if current_user.present?
-    get users_path, headers: headers
+    get users_path, headers:
   end
 
   def create_current_user_with_role(role:)
     user = create(:user, email: "current-user@example.com")
-    role_attrs = {user: user, role: role}
+    role_attrs = {user:, role:}
     role_attrs[:organization] = organization if role.in?([ UserRole::ORG_ADMIN, UserRole::RIDE_REQUESTER ])
     create(:user_role, **role_attrs)
-    create(:identity, :magic_link, user: user, email: user.email)
+    create(:identity, :magic_link, user:, email: user.email)
     user
   end
 

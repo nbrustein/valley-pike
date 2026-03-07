@@ -2,7 +2,7 @@
 <% roles = @roles_for_org_role_inputs %>
 <% organizations = @organizations_for_org_role_inputs %>
 <% if readonly %>
-  <% orgs_with_roles = organizations.select { |org| @selected_org_admin_roles[org.id].present? } %>
+  <% orgs_with_roles = organizations.select {|org| @selected_org_admin_roles[org.id].present? } %>
   <% if orgs_with_roles.present? %>
     <p class="text-sm font-semibold text-forest-900">Organization Roles</p>
     <div class="mt-3 overflow-x-auto">

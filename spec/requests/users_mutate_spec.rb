@@ -7,7 +7,7 @@ RSpec.describe "UsersMutate", type: :request do
   let(:headers) { request_headers }
   let(:current_user) do
     user = create(:user, email: "udo-admin@example.com", role: current_user_role)
-    create(:identity, :magic_link, user: user, email: user.email)
+    create(:identity, :magic_link, user:, email: user.email)
     user
   end
   let(:organization) { create(:organization, name: "UDO Org", abbreviation: "UDO") }
@@ -51,7 +51,7 @@ RSpec.describe "UsersMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      get path, headers: headers
+      get path, headers:
     end
   end
 
@@ -209,7 +209,7 @@ RSpec.describe "UsersMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      get path, headers: headers
+      get path, headers:
     end
 
     def assert_org_role_checked(organization:, role_value:)
@@ -304,7 +304,7 @@ RSpec.describe "UsersMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      post path, headers: headers
+      post path, headers:
     end
   end
 
