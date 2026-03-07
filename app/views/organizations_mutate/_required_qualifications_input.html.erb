@@ -1,11 +1,10 @@
 <div class="space-y-2">
   <p class="text-sm font-semibold text-forest-900">Required Qualifications</p>
-  <label class="flex items-center gap-2 text-sm text-forest-900" for="organization_required_qualifications_cws_vetted">
-    <input type="checkbox"
-           name="organization[required_qualifications][]"
-           id="organization_required_qualifications_cws_vetted"
-           value="<%= DriverQualification::QUALIFICATION_CWS_VETTED %>"
-           <%= "checked" if @required_qualifications.include?(DriverQualification::QUALIFICATION_CWS_VETTED) %>>
-    CWS vetted
-  </label>
+  <%= render "shared/checkbox",
+    label: "CWS vetted",
+    name: "organization[required_qualifications][]",
+    input_id: "organization_required_qualifications_cws_vetted",
+    value: DriverQualification::QUALIFICATION_CWS_VETTED,
+    checked: @required_qualifications.include?(DriverQualification::QUALIFICATION_CWS_VETTED),
+    readonly: local_assigns.fetch(:readonly, false) %>
 </div>

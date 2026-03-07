@@ -52,16 +52,19 @@ RSpec.describe "Organizations index", type: :request do
 
         it "links the organization name to the edit page" do
           act
-          expect(page).to have_link(organization_a.name, href: edit_organization_path(id: organization_a.id))
+          row = page.find("tr[data-organization-id='#{organization_a.id}']")
+          expect(row).to have_link(organization_a.name, href: edit_organization_path(id: organization_a.id))
         end
       end
 
       context "when an organization is not editable" do
         let(:role) { UserRole::VANITA_VIEWER }
 
-        it "does not link the organization name" do
+        it "links to the show page with an eyeball icon" do
           act
-          expect(page).not_to have_link(organization_a.name, href: edit_organization_path(id: organization_a.id))
+          row = page.find("tr[data-organization-id='#{organization_a.id}']")
+          expect(row).to have_link(href: organization_path(id: organization_a.id))
+          expect(row).to have_css("i.fa-eye")
         end
       end
     end

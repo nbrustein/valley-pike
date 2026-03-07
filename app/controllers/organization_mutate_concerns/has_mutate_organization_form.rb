@@ -4,7 +4,8 @@ module OrganizationMutateConcerns
     include Memery
 
     def render_form(status: :ok, target_organization:, submitted_params:, mode:)
-      raise ArgumentError, "invalid mode" unless %i[ create edit ].include?(mode)
+      raise ArgumentError, "invalid mode" unless %i[ create edit show ].include?(mode)
+      @readonly = mode == :show
       setup_instance_vars(mode:, target_organization:)
       setup_input_defaults(target_organization:, submitted_params:)
       render :mutate, status:
@@ -17,12 +18,19 @@ module OrganizationMutateConcerns
         @subheader_text ||= "Add a new organization."
         @form_action ||= organizations_path
         @form_method ||= :post
-      else
+      elsif mode == :show
+        @header_text ||= target_organization.name
+        @subheader_text ||= "Organization details."
+        @form_action ||= organization_path(id: target_organization.id)
+        @form_method ||= :patch
+      elsif mode == :edit
         @submit_text ||= "Update organization"
         @header_text ||= "Edit organization"
         @subheader_text ||= "Update organization details."
         @form_action ||= organization_path(id: target_organization.id)
         @form_method ||= :patch
+      else
+        raise "invalid mode"
       end
     end
 
