@@ -1,4 +1,5 @@
-<%= render "users_mutate/email_field", form: form %>
-<%= render "users_mutate/full_name_field", form: form %>
-<%= render "users_mutate/preferred_name_field", form: form %>
-<%= render "users_mutate/phone_field", form: form %>
+<% readonly = local_assigns.fetch(:readonly, false) %>
+<%= render "shared/text_field", field: :email, label: "Email", value: @email, form:, readonly:, type: :email, required: true %>
+<%= render "shared/text_field", field: :full_name, label: "Full Name", value: @full_name, form:, readonly:, required: true, data: {full_name_input: true} %>
+<%= render "shared/text_field", field: :preferred_name, label: "Preferred Name", value: @preferred_name, form:, readonly:, required: true, data: {preferred_name_input: true} %>
+<%= render "shared/text_field", field: :phone, label: "Phone", value: @phone, form:, readonly:, type: :phone %>

@@ -74,7 +74,7 @@ RSpec.describe "Organizations index", type: :request do
 
   def act
     sign_in current_user.identities.find_by!(kind: "magic_link") if current_user.present?
-    get organizations_path, headers: headers
+    get organizations_path, headers:
   end
 
   def create_current_user_with_role(role:)

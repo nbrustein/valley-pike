@@ -49,7 +49,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      get path, headers: headers
+      get path, headers:
     end
   end
 
@@ -91,7 +91,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
         :organization,
         name: "Target Organization",
         abbreviation: "TGT",
-        required_qualifications: required_qualifications
+        required_qualifications:
       )
     end
     let(:required_qualifications) { [] }
@@ -157,7 +157,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      get path, headers: headers
+      get path, headers:
     end
   end
 
@@ -209,7 +209,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
         :organization,
         name: "Target Organization",
         abbreviation: "TGT",
-        required_qualifications: required_qualifications
+        required_qualifications:
       )
     end
     let(:required_qualifications) { [] }
@@ -217,7 +217,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
 
     context "when signed out" do
       it "returns not found" do
-        get organization_path(id: organization.id), headers: headers
+        get(organization_path(id: organization.id), headers:)
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -276,7 +276,7 @@ RSpec.describe "OrganizationsMutate", type: :request do
 
     def act(path:)
       sign_in current_user.identities.first
-      get path, headers: headers
+      get path, headers:
     end
   end
 

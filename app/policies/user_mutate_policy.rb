@@ -36,10 +36,6 @@ class UserMutatePolicy < ApplicationPolicy
     edit? && create?
   end
 
-  def manage_drivers?
-    user&.has_role_permissions?(UserRole::VANITA_ADMIN) || false
-  end
-
   def manageable_roles
     return UserRole::ROLES.to_a if user&.has_role_permissions?(UserRole::DEVELOPER)
     return [
