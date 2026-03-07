@@ -8,5 +8,7 @@ class RideRequest < ApplicationRecord
   has_many :driver_assignments
   has_many :drivers, through: :driver_assignments, source: :driver
 
+  scope :published, -> { where(draft: false) }
+
   validates :desired_driver_gender, inclusion: {in: DESIRED_DRIVER_GENDERS}
 end
