@@ -1,34 +1,17 @@
 class OrganizationMutatePolicy < ApplicationPolicy
-  def uow
-    record.is_a?(UnitOfWork) ? record : nil
-  end
-
-  def target_organization
-    return record if record.is_a?(Organization)
-    return uow.organization if uow&.respond_to?(:organization)
-
-    nil
-  end
+  include CrudsRecordsWithUnitsOfWork
 
   def new?
     user&.has_role_permissions?(UserRole::VANITA_ADMIN) || false
   end
 
-  def create?
-    return false unless new?
-    return false unless uow
-
+  # users who are allowed to mutate organizations are allowed to
+  # mutate any organization
+  def can_mutate?(uow_or_target_record)
     true
   end
 
-  def edit?
-    return false unless new?
-    return false unless target_organization
-
-    true
-  end
-
-  def update?
-    edit? && create?
+  def target_record_from_uow
+    uow&.organization
   end
 end

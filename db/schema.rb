@@ -118,13 +118,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.index ["organization_id"], name: "index_ride_requests_on_organization_id"
     t.index ["pick_up_address_id"], name: "index_ride_requests_on_pick_up_address_id"
     t.index ["requester_id"], name: "index_ride_requests_on_requester_id"
-    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying, 'female_accompaniment'::character varying, 'none'::character varying]::text[])", name: "ride_requests_desired_driver_gender_check"
+    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying::text, 'female_accompaniment'::character varying::text, 'none'::character varying::text])", name: "ride_requests_desired_driver_gender_check"
     t.check_constraint "draft = true OR contact_full_name IS NOT NULL", name: "ride_requests_contact_full_name_check"
     t.check_constraint "draft = true OR date IS NOT NULL", name: "ride_requests_date_check"
     t.check_constraint "draft = true OR pick_up_address_id IS NOT NULL", name: "ride_requests_pick_up_address_check"
     t.check_constraint "draft = true OR ride_description_public IS NOT NULL", name: "ride_requests_ride_description_public_check"
     t.check_constraint "draft = true OR short_description IS NOT NULL", name: "ride_requests_short_description_check"
-    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying, 'RideRequest::Published'::character varying]::text[])", name: "ride_requests_type_check"
+    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying::text, 'RideRequest::Published'::character varying::text])", name: "ride_requests_type_check"
   end
 
   create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
