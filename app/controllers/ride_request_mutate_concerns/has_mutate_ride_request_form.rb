@@ -31,7 +31,11 @@ module RideRequestMutateConcerns
           last_page_label: "Publish"
         )
         @form_step_class = FORM_STEP_COMPONENTS.fetch(page)
-        @form_step_attrs = page == 1 ? {organizations: permitted_organizations, ride_request:} : {}
+        @form_step_attrs = case page
+        when 1 then {organizations: permitted_organizations, ride_request:}
+        when 2 then {ride_request:}
+        else {}
+        end
       end
     end
 
