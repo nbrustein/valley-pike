@@ -11,4 +11,11 @@ class RideRequest < ApplicationRecord
   scope :published, -> { where(draft: false) }
 
   validates :desired_driver_gender, inclusion: {in: DESIRED_DRIVER_GENDERS}
+  validate :date_not_changed_to_past, if: -> { date.present? && (new_record? || date_changed?) }
+
+  private
+
+  def date_not_changed_to_past
+    errors.add(:date, "must not be in the past") if date < Date.today
+  end
 end

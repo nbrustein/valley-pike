@@ -7,6 +7,6 @@
     <% if @description %>
       <p class="mt-0.5 text-xs text-forest-900/70"><%= @description %></p>
     <% end %>
-    <%= @form.public_send(field_method, @field, value: @value, required: @required, data: @data, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900") %>
+    <%= @form.public_send(field_method, @field, value: @value, required: @required, data: @data, placeholder: @placeholder, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900") %>
   <% end %>
 </div>

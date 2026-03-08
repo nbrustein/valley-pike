@@ -29,7 +29,8 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
         field: :organization_id,
         label: "Organization",
         options: [ [ organization.name, organization.id ], [ other_organization.name, other_organization.id ] ],
-        selected: nil
+        selected: nil,
+        required: true
       )
     end
 
@@ -55,7 +56,9 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
       expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(
         field: :short_description,
         label: "Short Description",
-        description: start_with("Used as the email subject line")
+        description: "Used in the subject line for the email that goes to drivers.",
+        placeholder: "Richmond Doctor Appt",
+        required: true
       ))
     end
 
@@ -82,7 +85,8 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
         form: anything,
         field: :date,
         label: "Ride Date",
-        value: nil
+        value: nil,
+        required: true
       )
     end
 
@@ -107,7 +111,7 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
       render_component
       expect(Shared::RadioGroupComponent).to have_received(:new).with(hash_including(
         name: "ride_request[requires_multiple_drivers]",
-        label: "Number of Drivers",
+        label: "How many drivers do you need?",
         options: [ [ "false", "1 Driver" ], [ "true", "Multiple Drivers" ] ],
         include_none_option: false
       ))
@@ -173,8 +177,10 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
       render_component
       expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(
         field: :appointment_time,
-        label: "Appointment / Timing",
-        description: start_with("Enter a specific time")
+        label: "Appointment Time",
+        description: start_with("If there is an appointment"),
+        placeholder: "9:00am",
+        required: true
       ))
     end
 

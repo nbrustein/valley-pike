@@ -30,11 +30,22 @@ RSpec.describe "Ride request create form", type: :system do
     def act
       visit new_ride_request_path
       fill_in "Short Description", with: short_description
-      execute_script("document.getElementById('ride_request_date').value = '#{date}'")
+      fill_in_date "Ride Date", with: date
       choose "Multiple Drivers"
       choose "Female Driver"
-      fill_in "Appointment / Timing", with: appointment_time
+      fill_in "Appointment Time", with: appointment_time
       click_button "Save and Continue"
+    end
+
+    context "when submitted values are invalid" do
+      it "shows errors" do
+        visit new_ride_request_path
+        fill_in "Short Description", with: "Hospital appointment"
+        fill_in_date "Ride Date", with: Date.today - 1
+        fill_in "Appointment Time", with: "10:00 AM"
+        click_button "Save and Continue"
+        expect(page).to have_text("Date must not be in the past")
+      end
     end
 
     it "creates a draft and moves to page 2", :aggregate_failures do

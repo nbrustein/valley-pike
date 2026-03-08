@@ -5,6 +5,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 require "spec_helper"
 require "support/system_driver"
+require "support/form_helpers"
 require "view_component/test_helpers"
 
 RSpec.configure do |config|
@@ -12,6 +13,7 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
+  config.include FormHelpers, type: :system
   config.include ViewComponent::TestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
 end

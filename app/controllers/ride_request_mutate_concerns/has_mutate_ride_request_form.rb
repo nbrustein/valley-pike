@@ -12,11 +12,11 @@ module RideRequestMutateConcerns
       5 => RideRequestMutate::FormStep5Component,
     }.freeze
 
-    def render_form(mode:, page:, ride_request:, submitted_params:)
+    def render_form(mode:, page:, ride_request:, submitted_params:, status: :ok)
       raise ArgumentError, "invalid mode" unless %i[create].include?(mode)
 
       setup_instance_vars(mode:, ride_request:, page:)
-      render :form
+      render :form, status:
     end
 
     private

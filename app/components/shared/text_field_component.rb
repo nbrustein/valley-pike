@@ -2,7 +2,7 @@ module Shared
   class TextFieldComponent < ViewComponent::Base
     FIELD_METHODS = {text: :text_field, email: :email_field, phone: :phone_field}.freeze
 
-    def initialize(form:, field:, label:, value:, readonly: false, required: false, type: :text, data: {}, description: nil)
+    def initialize(form:, field:, label:, value:, readonly: false, required: false, type: :text, data: {}, description: nil, placeholder: nil)
       @form = form
       @field = field
       @label = label
@@ -12,6 +12,7 @@ module Shared
       @type = type
       @data = data
       @description = description
+      @placeholder = placeholder
     end
 
     private

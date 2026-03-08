@@ -16,7 +16,9 @@ module RideRequestMutate
         field: :short_description,
         label: "Short Description",
         value: @ride_request&.short_description,
-        description: "Used as the email subject line: 'Ride Requested: {your description}'",
+        description: "Used in the subject line for the email that goes to drivers.",
+        placeholder: "Richmond Doctor Appt",
+        required: true,
       )
     end
 
@@ -24,18 +26,19 @@ module RideRequestMutate
       Shared::TextFieldComponent.new(
         form: @form,
         field: :appointment_time,
-        label: "Appointment / Timing",
+        label: "Appointment Time",
         value: @ride_request&.appointment_time,
-        description: "Enter a specific time if there is an appointment, or describe " \
-          "timing requirements for potential drivers " \
-          "(e.g. 'The rider can arrive any time between 9am and 12pm')",
+        description: "If there is an appointment, enter a specific time. If not, tell potential drivers what the " \
+          "requirements are. (e.g. 'The rider can arrive any time between 9am and 12pm')",
+        placeholder: "9:00am",
+        required: true,
       )
     end
 
     memoize def driver_count_field
       Shared::RadioGroupComponent.new(
         name: "ride_request[requires_multiple_drivers]",
-        label: "Number of Drivers",
+        label: "How many drivers do you need?",
         options: driver_count_options,
         selected: (@ride_request&.requires_multiple_drivers || false).to_s,
         include_none_option: false,
@@ -58,6 +61,7 @@ module RideRequestMutate
         field: :date,
         label: "Ride Date",
         value: @ride_request&.date&.iso8601,
+        required: true,
       )
     end
 
@@ -68,6 +72,7 @@ module RideRequestMutate
         label: "Organization",
         options: organization_options,
         selected: @ride_request&.organization_id,
+        required: true,
       )
     end
 

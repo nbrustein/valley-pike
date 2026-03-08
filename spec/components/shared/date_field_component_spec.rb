@@ -20,6 +20,16 @@ RSpec.describe Shared::DateFieldComponent, type: :component do
       render_component
       expect(page).to have_css("input[value='2026-06-15']")
     end
+
+    it "marks the input as required" do
+      render_component(required: true)
+      expect(page).to have_css("input[required]")
+    end
+
+    it "does not mark the input as required by default" do
+      render_component
+      expect(page).not_to have_css("input[required]")
+    end
   end
 
   context "when readonly" do

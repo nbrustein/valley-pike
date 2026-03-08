@@ -1,4 +1,11 @@
 <section class="surface-card">
+  <% if @errors&.any? %>
+    <ul class="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <% @errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
   <%= form_with scope: :ride_request, url: @form_action, method: @form_method, local: true do |f| %>
     <%= render(@multi_page_form) do %>
       <%= render(@form_step_class.new(form: f, **@form_step_attrs)) %>

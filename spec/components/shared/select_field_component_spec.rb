@@ -43,6 +43,16 @@ RSpec.describe Shared::SelectFieldComponent, type: :component do
       render_component(selected: 2)
       expect(page).to have_css("option[selected]", text: "Org B")
     end
+
+    it "marks the select as required" do
+      render_component(required: true)
+      expect(page).to have_css("select[required]")
+    end
+
+    it "does not mark the select as required by default" do
+      render_component
+      expect(page).not_to have_css("select[required]")
+    end
   end
 
   context "when readonly" do

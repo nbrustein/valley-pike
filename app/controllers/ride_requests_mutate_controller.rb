@@ -25,7 +25,7 @@ class RideRequestsMutateController < ApplicationController
     end
     return redirect_to edit_ride_request_path(id: uow.draft.id, page: 2) if success
 
-    render_form(status: :unprocessable_entity, mode: :create, page: 1, ride_request: nil, submitted_params: create_ride_request_params)
+    render_form(status: :unprocessable_entity, mode: :create, page: 1, ride_request: uow&.draft, submitted_params: create_ride_request_params)
   end
 
   # GET /ride_requests/:id/edit(/:page)

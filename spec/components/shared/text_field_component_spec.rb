@@ -49,6 +49,16 @@ RSpec.describe Shared::TextFieldComponent, type: :component do
       render_component(data: {my_target: true})
       expect(page).to have_css("input[data-my-target]")
     end
+
+    it "sets the placeholder on the input" do
+      render_component(placeholder: "Enter a name")
+      expect(page).to have_css("input[placeholder='Enter a name']")
+    end
+
+    it "does not set a placeholder attribute when none provided" do
+      render_component
+      expect(page).not_to have_css("input[placeholder]")
+    end
   end
 
   context "when readonly" do

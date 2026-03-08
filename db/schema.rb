@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_222316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -97,7 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.string "contact_full_name"
     t.string "contact_phone"
     t.datetime "created_at", null: false
-    t.date "date"
+    t.date "date", null: false
     t.string "desired_driver_gender", default: "none", null: false
     t.uuid "destination_address_id"
     t.boolean "draft", null: false
@@ -111,7 +111,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.boolean "requires_multiple_drivers", default: false, null: false
     t.text "ride_description_private"
     t.text "ride_description_public"
-    t.string "short_description"
+    t.string "short_description", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
     t.index ["destination_address_id"], name: "index_ride_requests_on_destination_address_id"

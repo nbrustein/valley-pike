@@ -1,12 +1,13 @@
 module Shared
   class SelectFieldComponent < ViewComponent::Base
-    def initialize(form:, field:, label:, options:, selected: nil, readonly: false)
+    def initialize(form:, field:, label:, options:, selected: nil, readonly: false, required: false)
       @form = form
       @field = field
       @label = label
       @options = options
       @selected = selected
       @readonly = readonly
+      @required = required
     end
 
     private
