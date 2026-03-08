@@ -19,11 +19,10 @@ RSpec.describe RideRequestMutate::FormStep2Component, type: :component do
       expect(Shared::TextareaFieldComponent).to have_received(:new).with(
         form: anything,
         field: :ride_description_public,
-        label: start_with("Provide information that a potential driver"),
         value: nil,
-        description: start_with("Consider including information"),
         placeholder: start_with("We are looking for a ride"),
         required: true,
+        rows: 6,
       )
     end
 

@@ -50,6 +50,16 @@ RSpec.describe Shared::TextareaFieldComponent, type: :component do
       render_component
       expect(page).not_to have_css("textarea[placeholder]")
     end
+
+    it "sets the rows attribute on the textarea" do
+      render_component(rows: 6)
+      expect(page).to have_css("textarea[rows='6']")
+    end
+
+    it "does not render a label element when label is nil" do
+      render_inline(described_class.new(form:, field: :description, value: "test"))
+      expect(page).not_to have_css("label")
+    end
   end
 
   context "when readonly" do

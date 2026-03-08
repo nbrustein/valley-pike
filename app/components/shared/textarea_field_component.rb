@@ -1,6 +1,6 @@
 module Shared
   class TextareaFieldComponent < ViewComponent::Base
-    def initialize(form:, field:, label:, value:, readonly: false, required: false, description: nil, placeholder: nil)
+    def initialize(form:, field:, label: nil, value: nil, readonly: false, required: false, description: nil, placeholder: nil, rows: nil)
       @form = form
       @field = field
       @label = label
@@ -9,6 +9,7 @@ module Shared
       @required = required
       @description = description
       @placeholder = placeholder
+      @rows = rows
     end
   end
 end
