@@ -30,6 +30,7 @@ module RideRequestMutateConcerns
           current_page: page,
           last_page_label: "Publish"
         )
+        @header_text = ride_request&.short_description.presence || "New Ride Request"
         @form_step_class = FORM_STEP_COMPONENTS.fetch(page)
         @form_step_attrs = case page
         when 1 then {organizations: permitted_organizations, ride_request:}

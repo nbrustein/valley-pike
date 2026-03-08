@@ -1,4 +1,8 @@
 <section class="surface-card">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold tracking-tight text-forest-900"><%= @header_text %></h1>
+  </div>
+
   <% if @errors&.any? %>
     <ul class="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
       <% @errors.full_messages.each do |message| %>

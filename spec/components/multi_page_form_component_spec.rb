@@ -49,6 +49,18 @@ RSpec.describe MultiPageFormComponent, type: :component do
     end
   end
 
+  describe "page indicator" do
+    it "shows the current page number and total" do
+      render_inline(build(current_page: 2))
+      expect(page).to have_text("Page 2 of 3")
+    end
+
+    it "reflects the correct total for the given page_paths" do
+      render_inline(build(current_page: 1))
+      expect(page).to have_text("Page 1 of 3")
+    end
+  end
+
   describe "Next/Submit button" do
     context "when not on the last page" do
       it "renders a submit button labelled 'Save and Continue'" do
