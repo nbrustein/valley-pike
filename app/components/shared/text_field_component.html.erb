@@ -1,0 +1,12 @@
+<div>
+  <% if @readonly %>
+    <p class="block text-sm font-semibold text-forest-900"><%= @label %></p>
+    <p class="mt-2 text-sm text-forest-900"><%= @value %></p>
+  <% else %>
+    <%= @form.label @field, @label, class: "block text-sm font-semibold text-forest-900" %>
+    <% if @description %>
+      <p class="mt-0.5 text-xs text-forest-900/70"><%= @description %></p>
+    <% end %>
+    <%= @form.public_send(field_method, @field, value: @value, required: @required, data: @data, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900") %>
+  <% end %>
+</div>

@@ -1,0 +1,9 @@
+<div>
+  <% if @readonly %>
+    <p class="block text-sm font-semibold text-forest-900"><%= @label %></p>
+    <p class="mt-2 text-sm text-forest-900"><%= @value %></p>
+  <% else %>
+    <%= @form.label @field, @label, class: "block text-sm font-semibold text-forest-900" %>
+    <%= @form.date_field @field, value: @value, class: "mt-2 rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+  <% end %>
+</div>

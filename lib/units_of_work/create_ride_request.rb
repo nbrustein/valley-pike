@@ -1,10 +1,16 @@
 module UnitsOfWork
   class CreateRideRequest < UnitOfWork
-    attr_reader :organization_id, :draft
+    attr_reader :organization_id, :draft,
+      :short_description, :date, :requires_multiple_drivers, :desired_driver_gender, :appointment_time
 
     def initialize(executor_id:, params:)
       super
       @organization_id = params.fetch(:organization_id)
+      @short_description = params[:short_description]
+      @date = params[:date]
+      @requires_multiple_drivers = params[:requires_multiple_drivers] || false
+      @desired_driver_gender = params[:desired_driver_gender].presence || "none"
+      @appointment_time = params[:appointment_time]
     end
 
     private
@@ -13,7 +19,12 @@ module UnitsOfWork
       @draft = RideRequest::Draft.new(
         organization_id:,
         requester_id: executor_id,
-        draft: true
+        draft: true,
+        short_description:,
+        date:,
+        requires_multiple_drivers:,
+        desired_driver_gender:,
+        appointment_time:
       )
       return if @draft.save
 

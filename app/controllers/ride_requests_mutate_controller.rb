@@ -2,6 +2,7 @@ class RideRequestsMutateController < ApplicationController
   include Memery
   include ExecutesUnitsOfWork
   include RideRequestMutateConcerns::HasMutateRideRequestForm
+  include CastsParams
 
   # GET /ride_requests/new
   def new
@@ -43,14 +44,23 @@ class RideRequestsMutateController < ApplicationController
 
     # FIXME: implement a UOW
     current_page = params[:page].to_i
-    next_path = current_page >= PAGE_COUNT ? ride_requests_path : edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
+    next_path = current_page >= FORM_STEP_COUNT ? ride_requests_path : edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
     redirect_to next_path
   end
 
   private
 
   def create_ride_request_params
-    {organization_id: RideRequestMutatePolicy.new(current_user, nil).permitted_organization_ids.first}
+    params.require(:ride_request).permit(
+      :organization_id,
+      :short_description,
+      :date,
+      :requires_multiple_drivers,
+      :desired_driver_gender,
+      :appointment_time
+    ).to_h.symbolize_keys.merge(
+      requires_multiple_drivers: cast_boolean(params.dig(:ride_request, :requires_multiple_drivers))
+    )
   end
 
   memoize def target_ride_request

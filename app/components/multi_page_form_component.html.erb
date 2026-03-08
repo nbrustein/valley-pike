@@ -1,18 +1,16 @@
-<%= form_with url: @form_action, method: @form_method, local: true do %>
-  <div class="space-y-6">
-    <div>
-      <%= content %>
-    </div>
-
-    <div class="flex items-center <%= previous_path ? "justify-between" : "justify-end" %>">
-      <% if previous_path %>
-        <%= link_to "Previous", previous_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
-      <% end %>
-
-      <button type="submit"
-              class="rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800 active:bg-forest-900/90">
-        <%= next_button_label %>
-      </button>
-    </div>
+<div class="space-y-6">
+  <div>
+    <%= content %>
   </div>
-<% end %>
+
+  <div class="flex items-center <%= previous_path ? "justify-between" : "justify-end" %>">
+    <% if previous_path %>
+      <%= link_to "Previous", previous_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
+    <% end %>
+
+    <button type="submit"
+            class="rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800 active:bg-forest-900/90">
+      <%= next_button_label %>
+    </button>
+  </div>
+</div>

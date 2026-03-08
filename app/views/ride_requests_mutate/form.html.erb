@@ -1,5 +1,7 @@
 <section class="surface-card">
-  <%= render(@multi_page_form) do %>
-    <%= render(@page_component) %>
+  <%= form_with scope: :ride_request, url: @form_action, method: @form_method, local: true do |f| %>
+    <%= render(@multi_page_form) do %>
+      <%= render(@form_step_class.new(form: f, **@form_step_attrs)) %>
+    <% end %>
   <% end %>
 </section>

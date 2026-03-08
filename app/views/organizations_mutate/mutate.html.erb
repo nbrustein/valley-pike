@@ -9,8 +9,8 @@
   <% form_id = "organization-mutate-form" %>
   <% readonly = @readonly %>
   <%= form_with scope: :organization, url: @form_action, method: @form_method, local: true, class: "space-y-5", id: form_id do |form| %>
-    <%= render "shared/text_field", field: :name, label: "Name", value: @name, form:, readonly:, required: true %>
-    <%= render "shared/text_field", field: :abbreviation, label: "Abbreviation", value: @abbreviation, form:, readonly:, required: true %>
+    <%= render Shared::TextFieldComponent.new(field: :name, label: "Name", value: @name, form:, readonly:, required: true) %>
+    <%= render Shared::TextFieldComponent.new(field: :abbreviation, label: "Abbreviation", value: @abbreviation, form:, readonly:, required: true) %>
     <%= render "organizations_mutate/required_qualifications_input", readonly: %>
   <% end %>
 

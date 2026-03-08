@@ -1,36 +1,32 @@
-<% readonly = local_assigns.fetch(:readonly, false) %>
-<% input_data_attr = local_assigns.fetch(:input_data_attr, nil) %>
-<% include_none_option = local_assigns.fetch(:include_none_option, true) %>
-<% id_prefix = name.gsub(/[\[\]]+/, "_").delete_suffix("_") %>
 <div class="space-y-2">
-  <p class="text-sm font-semibold text-forest-900"><%= label %></p>
-  <% if readonly %>
-    <p class="text-sm text-forest-900"><%= selected.present? ? selected.humanize : "None" %></p>
+  <p class="text-sm font-semibold text-forest-900"><%= @label %></p>
+  <% if @readonly %>
+    <p class="text-sm text-forest-900"><%= @selected.present? ? @selected.humanize : "None" %></p>
   <% else %>
     <div class="space-y-2">
-      <% if include_none_option %>
+      <% if @include_none_option %>
         <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= id_prefix %>_none">
           <input type="radio"
-                 name="<%= name %>"
+                 name="<%= @name %>"
                  id="<%= id_prefix %>_none"
                  value=""
-                 <%= "checked" if selected.blank? %>
+                 <%= "checked" if @selected.blank? %>
                  required
-                 <%= input_data_attr %>>
+                 <%= @input_data_attr %>>
           None
         </label>
       <% end %>
-      <% options.each do |option| %>
+      <% @options.each do |option| %>
         <% value, option_label = Array(option) %>
         <% option_label ||= value.humanize %>
         <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= "#{id_prefix}_#{value}" %>">
           <input type="radio"
-                 name="<%= name %>"
+                 name="<%= @name %>"
                  id="<%= "#{id_prefix}_#{value}" %>"
                  value="<%= value %>"
-                 <%= "checked" if selected == value %>
+                 <%= "checked" if @selected == value %>
                  required
-                 <%= input_data_attr %>>
+                 <%= @input_data_attr %>>
           <%= option_label %>
         </label>
       <% end %>

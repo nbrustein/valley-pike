@@ -1,5 +1,5 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
-<%= render "shared/text_field", field: :email, label: "Email", value: @email, form:, readonly:, type: :email, required: true %>
-<%= render "shared/text_field", field: :full_name, label: "Full Name", value: @full_name, form:, readonly:, required: true, data: {full_name_input: true} %>
-<%= render "shared/text_field", field: :preferred_name, label: "Preferred Name", value: @preferred_name, form:, readonly:, required: true, data: {preferred_name_input: true} %>
-<%= render "shared/text_field", field: :phone, label: "Phone", value: @phone, form:, readonly:, type: :phone %>
+<%= render Shared::TextFieldComponent.new(field: :email, label: "Email", value: @email, form:, readonly:, type: :email, required: true) %>
+<%= render Shared::TextFieldComponent.new(field: :full_name, label: "Full Name", value: @full_name, form:, readonly:, required: true, data: {full_name_input: true}) %>
+<%= render Shared::TextFieldComponent.new(field: :preferred_name, label: "Preferred Name", value: @preferred_name, form:, readonly:, required: true, data: {preferred_name_input: true}) %>
+<%= render Shared::TextFieldComponent.new(field: :phone, label: "Phone", value: @phone, form:, readonly:, type: :phone) %>

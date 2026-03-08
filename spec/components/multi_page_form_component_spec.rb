@@ -3,25 +3,14 @@ require "rails_helper"
 RSpec.describe MultiPageFormComponent, type: :component do
   let(:page_paths) { [ "/step/1", "/step/2", "/step/3" ] }
 
-  def build(current_page:, last_page_label: "Submit", form_method: :post)
-    described_class.new(
-      form_action: "/ride_requests",
-      form_method:,
-      page_paths:,
-      current_page:,
-      last_page_label:
-    )
+  def build(current_page:, last_page_label: "Submit")
+    described_class.new(page_paths:, current_page:, last_page_label:)
   end
 
-  describe "form" do
-    it "renders a form pointing to form_action" do
-      render_inline(build(current_page: 1))
-      expect(page).to have_css("form[action='/ride_requests']")
-    end
-
-    it "yields content inside the form" do
+  describe "content" do
+    it "yields content" do
       render_inline(build(current_page: 1)) { "<p>Page content</p>".html_safe }
-      expect(page).to have_css("form p", text: "Page content")
+      expect(page).to have_css("p", text: "Page content")
     end
   end
 
