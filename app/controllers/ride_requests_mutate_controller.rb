@@ -42,13 +42,38 @@ class RideRequestsMutateController < ApplicationController
 
     authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
 
-    # FIXME: implement a UOW
     current_page = params[:page].to_i
+    uow = nil
+    success, _errors = execute_unit_of_work do
+      uow = UnitsOfWork::UpdateRideRequest.new(
+        executor_id: current_user.id,
+        params: update_ride_request_params.merge(id: params[:id])
+      )
+    end
+
     next_path = current_page >= FORM_STEP_COUNT ? ride_requests_path : edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
-    redirect_to next_path
+    return redirect_to next_path if success
+
+    render_form(status: :unprocessable_entity, mode: :create, page: current_page, ride_request: uow&.ride_request, submitted_params: update_ride_request_params)
   end
 
   private
+
+  def update_ride_request_params
+    permitted = params.require(:ride_request).permit(
+      :organization_id,
+      :short_description,
+      :date,
+      :requires_multiple_drivers,
+      :desired_driver_gender,
+      :appointment_time,
+      :ride_description_public
+    ).to_h.symbolize_keys
+    if permitted.key?(:requires_multiple_drivers)
+      permitted[:requires_multiple_drivers] = cast_boolean(params.dig(:ride_request, :requires_multiple_drivers))
+    end
+    permitted
+  end
 
   def create_ride_request_params
     params.require(:ride_request).permit(

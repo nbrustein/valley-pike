@@ -64,4 +64,21 @@ RSpec.describe "Ride request create form", type: :system do
       expect(draft.organization_id).to eq(organization.id)
     end
   end
+
+  context "when filling in page 2" do
+    let(:draft) { create(:draft_ride_request, requester: identity.user, organization:) }
+    let(:description) { "We are looking for a ride for a woman to a medical appointment." }
+
+    def act
+      visit edit_ride_request_path(id: draft.id, page: 2)
+      find("textarea[name='ride_request[ride_description_public]']").fill_in with: description
+      click_button "Save and Continue"
+    end
+
+    it "saves the description and moves to page 3", :aggregate_failures do
+      act
+      expect(page).to have_current_path(%r{/ride_requests/[^/]+/edit/3})
+      expect(draft.reload.ride_description_public).to eq(description)
+    end
+  end
 end
