@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   devise_for :identities, controllers: {sessions: "identities/sessions"}
 
-  post "identity/magic_link_identity", to: "create_magic_link_identity#create_magic_link_identity", as: :identity_magic_link_identity
+  post "identity/magic_link_identity",
+    to: "create_magic_link_identity#create_magic_link_identity",
+    as: :identity_magic_link_identity
   post "auth/password_session", to: "auth#create_password_session", as: :password_session
   resource :profile, only: %i[show update]
   resources :users, only: %i[index], controller: "users_index"

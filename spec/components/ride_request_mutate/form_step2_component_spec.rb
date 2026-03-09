@@ -30,7 +30,9 @@ RSpec.describe RideRequestMutate::FormStep2Component, type: :component do
       it "passes ride_description_public as value" do
         rr = build_stubbed(:draft_ride_request, ride_description_public: "A ride to the doctor.")
         render_component(ride_request: rr)
-        expect(Shared::TextareaFieldComponent).to have_received(:new).with(hash_including(value: "A ride to the doctor."))
+        expect(Shared::TextareaFieldComponent).to have_received(:new).with(
+          hash_including(value: "A ride to the doctor.")
+        )
       end
     end
 

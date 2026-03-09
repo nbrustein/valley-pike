@@ -14,7 +14,9 @@ module RideRequestMutate
         form: @form,
         field: :ride_description_public,
         value: @ride_request&.ride_description_public,
-        placeholder: "We are looking for a ride for a single woman to a court appointment. The appointment is expected to take up to 3 hours. The driver can leave during the appointment, but will need to be accessible by phone so they can come back and pick up the rider whenever the appointment is complete.",
+        placeholder: "We are looking for a ride for a single woman to a court appointment. The appointment is " \
+          "expected to take up to 3 hours. The driver can leave during the appointment, but will need to be " \
+          "accessible by phone so they can come back and pick up the rider whenever the appointment is complete.",
         required: true,
         rows: 6,
       )

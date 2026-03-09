@@ -25,7 +25,10 @@ class RideRequestsMutateController < ApplicationController
     end
     return redirect_to edit_ride_request_path(id: uow.draft.id, page: 2) if success
 
-    render_form(status: :unprocessable_entity, mode: :create, page: 1, ride_request: uow&.draft, submitted_params: create_ride_request_params)
+    render_form(
+      status: :unprocessable_entity, mode: :create, page: 1,
+      ride_request: uow&.draft, submitted_params: create_ride_request_params
+    )
   end
 
   # GET /ride_requests/:id/edit(/:page)
@@ -33,7 +36,8 @@ class RideRequestsMutateController < ApplicationController
     return render_not_found unless target_ride_request.present?
 
     authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
-    render_form(mode: :create, page: params.fetch(:page, 1).to_i, ride_request: target_ride_request, submitted_params: nil)
+    render_form(mode: :create, page: params.fetch(:page, 1).to_i, ride_request: target_ride_request,
+      submitted_params: nil)
   end
 
   # PATCH /ride_requests/:id/edit(/:page)
@@ -51,10 +55,17 @@ class RideRequestsMutateController < ApplicationController
       )
     end
 
-    next_path = current_page >= FORM_STEP_COUNT ? ride_requests_path : edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
+    next_path = if current_page >= FORM_STEP_COUNT
+      ride_requests_path
+    else
+      edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
+    end
     return redirect_to next_path if success
 
-    render_form(status: :unprocessable_entity, mode: :create, page: current_page, ride_request: uow&.ride_request, submitted_params: update_ride_request_params)
+    render_form(
+      status: :unprocessable_entity, mode: :create, page: current_page,
+      ride_request: uow&.ride_request, submitted_params: update_ride_request_params
+    )
   end
 
   private

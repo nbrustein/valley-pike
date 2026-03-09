@@ -152,7 +152,9 @@ RSpec.describe "UsersMutate", type: :request do
 
           aggregate_failures do
             expect(response.body).to have_css("input[name='user[disabled]'][type='checkbox']", visible: :all)
-            expect(response.body).not_to have_css("input[name='user[disabled]'][type='checkbox'][checked]", visible: :all)
+            expect(response.body).not_to have_css(
+              "input[name='user[disabled]'][type='checkbox'][checked]", visible: :all
+            )
           end
         end
       end

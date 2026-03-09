@@ -37,8 +37,9 @@ module OrganizationMutateConcerns
     def setup_input_defaults(target_organization:, submitted_params:)
       @name = get_input_default(target_organization:, submitted_params:, key: :name)
       @abbreviation = get_input_default(target_organization:, submitted_params:, key: :abbreviation)
-      @required_qualifications = Array(get_input_default(target_organization:, submitted_params:, key: :required_qualifications))
-        .compact_blank
+      @required_qualifications = Array(
+        get_input_default(target_organization:, submitted_params:, key: :required_qualifications)
+      ).compact_blank
     end
 
     def get_input_default(target_organization:, submitted_params:, key:)

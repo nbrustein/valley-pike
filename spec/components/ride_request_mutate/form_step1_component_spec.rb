@@ -66,14 +66,18 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
       it "passes short_description as value" do
         rr = build_stubbed(:draft_ride_request, short_description: "Hospital run")
         render_component(ride_request: rr)
-        expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(field: :short_description, value: "Hospital run"))
+        expect(Shared::TextFieldComponent).to have_received(:new).with(
+          hash_including(field: :short_description, value: "Hospital run")
+        )
       end
     end
 
     context "when there is no ride request" do
       it "passes nil as value" do
         render_component
-        expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(field: :short_description, value: nil))
+        expect(Shared::TextFieldComponent).to have_received(:new).with(
+          hash_including(field: :short_description, value: nil)
+        )
       end
     end
   end
@@ -188,14 +192,18 @@ RSpec.describe RideRequestMutate::FormStep1Component, type: :component do
       it "passes appointment_time as value" do
         rr = build_stubbed(:draft_ride_request, appointment_time: "10:00 AM")
         render_component(ride_request: rr)
-        expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(field: :appointment_time, value: "10:00 AM"))
+        expect(Shared::TextFieldComponent).to have_received(:new).with(
+          hash_including(field: :appointment_time, value: "10:00 AM")
+        )
       end
     end
 
     context "when there is no ride request" do
       it "passes nil as value" do
         render_component
-        expect(Shared::TextFieldComponent).to have_received(:new).with(hash_including(field: :appointment_time, value: nil))
+        expect(Shared::TextFieldComponent).to have_received(:new).with(
+          hash_including(field: :appointment_time, value: nil)
+        )
       end
     end
   end
