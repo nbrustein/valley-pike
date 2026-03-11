@@ -33,8 +33,10 @@ module UnitsOfWork
     end
 
     def upsert_address(errors)
-      attrs = @pick_up_address_attrs.slice(:name, :street_address, :city, :state, :zip, :country)
+      attrs = @pick_up_address_attrs.slice(:name, :street_address, :city, :state)
       return nil if attrs.values.all?(&:blank?)
+
+      attrs[:country] = "US"
 
       address = @ride_request.pick_up_address || Address.new
       address.assign_attributes(attrs)

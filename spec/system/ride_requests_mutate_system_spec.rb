@@ -91,8 +91,6 @@ RSpec.describe "Ride request create form", type: :system do
       fill_in "Street Address", with: "100 Main St"
       fill_in "City", with: "Richmond"
       fill_in "State", with: "VA"
-      fill_in "ZIP Code", with: "23220"
-      fill_in "Country", with: "US"
       find("textarea[name='ride_request[ride_description_private]']").fill_in with: "Ring the doorbell twice."
       click_button "Save and Continue"
     end
@@ -104,6 +102,7 @@ RSpec.describe "Ride request create form", type: :system do
       expect(draft.pick_up_address).to be_present
       expect(draft.pick_up_address.street_address).to eq("100 Main St")
       expect(draft.pick_up_address.city).to eq("Richmond")
+      expect(draft.pick_up_address.country).to eq("US")
       expect(draft.ride_description_private).to eq("Ring the doorbell twice.")
     end
   end

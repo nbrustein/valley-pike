@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_222316) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_11_033020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_222316) do
     t.string "state", null: false
     t.string "street_address", null: false
     t.datetime "updated_at", null: false
-    t.string "zip", null: false
+    t.string "zip"
   end
 
   create_table "driver_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

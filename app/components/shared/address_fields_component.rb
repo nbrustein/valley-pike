@@ -43,19 +43,5 @@ module Shared
         value: @value&.state, required: true,
       )
     end
-
-    memoize def zip_field
-      Shared::TextFieldComponent.new(
-        form: @addr_form, field: :zip, label: "ZIP Code",
-        value: @value&.zip, required: true,
-      )
-    end
-
-    memoize def country_field
-      Shared::TextFieldComponent.new(
-        form: @addr_form, field: :country, label: "Country",
-        value: @value&.country || "US", required: true,
-      )
-    end
   end
 end
