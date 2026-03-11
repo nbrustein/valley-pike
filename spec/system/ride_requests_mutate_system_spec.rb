@@ -71,6 +71,12 @@ RSpec.describe "Ride request create form", type: :system do
 
     def act
       visit edit_ride_request_path(id: draft.id, page: 2)
+      within_fieldset("Destination Address") do
+        fill_in "Name", with: "City Hospital"
+        fill_in "Street Address", with: "200 Broad St"
+        fill_in "City", with: "Richmond"
+        fill_in "State", with: "VA"
+      end
       find("textarea[name='ride_request[ride_description_public]']").fill_in with: description
       click_button "Save and Continue"
     end
@@ -78,7 +84,10 @@ RSpec.describe "Ride request create form", type: :system do
     it "saves the description and moves to page 3", :aggregate_failures do
       act
       expect(page).to have_current_path(%r{/ride_requests/[^/]+/edit/3})
-      expect(draft.reload.ride_description_public).to eq(description)
+      draft.reload
+      expect(draft.ride_description_public).to eq(description)
+      expect(draft.destination_address).to be_present
+      expect(draft.destination_address.street_address).to eq("200 Broad St")
     end
   end
 

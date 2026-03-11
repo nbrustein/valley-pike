@@ -9,6 +9,15 @@ module RideRequestMutate
 
     private
 
+    memoize def destination_address_field
+      Shared::AddressFieldsComponent.new(
+        form: @form,
+        field: :destination_address,
+        label: "Destination Address",
+        value: @ride_request&.destination_address,
+      )
+    end
+
     memoize def ride_description_public_field
       Shared::TextareaFieldComponent.new(
         form: @form,

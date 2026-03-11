@@ -6,6 +6,7 @@ module UnitsOfWork
       super
       @ride_request_id = params.fetch(:id)
       @pick_up_address_attrs = params.delete(:pick_up_address)
+      @destination_address_attrs = params.delete(:destination_address)
       @attributes = params.except(:id)
     end
 
@@ -21,10 +22,17 @@ module UnitsOfWork
       @ride_request.assign_attributes(@attributes)
 
       if @pick_up_address_attrs
-        address = upsert_address(errors)
+        address = upsert_address(:pick_up_address, @pick_up_address_attrs, errors)
         return if errors.any?
 
         @ride_request.pick_up_address = address
+      end
+
+      if @destination_address_attrs
+        address = upsert_address(:destination_address, @destination_address_attrs, errors)
+        return if errors.any?
+
+        @ride_request.destination_address = address
       end
 
       return if @ride_request.save
@@ -32,13 +40,13 @@ module UnitsOfWork
       merge_errors(errors, @ride_request)
     end
 
-    def upsert_address(errors)
-      attrs = @pick_up_address_attrs.slice(:name, :street_address, :city, :state)
+    def upsert_address(association, address_attrs, errors)
+      attrs = address_attrs.slice(:name, :street_address, :city, :state)
       return nil if attrs.values.all?(&:blank?)
 
       attrs[:country] = "US"
 
-      address = @ride_request.pick_up_address || Address.new
+      address = @ride_request.public_send(association) || Address.new
       address.assign_attributes(attrs)
       return address if address.save
 

@@ -10,7 +10,31 @@ RSpec.describe RideRequestMutate::FormStep2Component, type: :component do
   end
 
   before do
+    allow(Shared::AddressFieldsComponent).to receive(:new).and_call_original
     allow(Shared::TextareaFieldComponent).to receive(:new).and_call_original
+  end
+
+  describe "destination_address_field" do
+    it "passes the correct arguments to AddressFieldsComponent" do
+      render_component
+      expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+        form: anything,
+        field: :destination_address,
+        label: "Destination Address",
+        value: nil,
+      )
+    end
+
+    context "when a ride request with a destination_address is provided" do
+      it "passes the address as value" do
+        address = build_stubbed(:address)
+        rr = build_stubbed(:draft_ride_request, destination_address: address)
+        render_component(ride_request: rr)
+        expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+          hash_including(value: address)
+        )
+      end
+    end
   end
 
   describe "ride_description_public_field" do
