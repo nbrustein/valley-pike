@@ -5,12 +5,14 @@
     <% end %>
     <p class="mt-2 text-sm text-forest-900"><%= @value %></p>
   <% else %>
-    <% if @label %>
-      <%= @form.label @field, @label, class: "block text-sm font-semibold text-forest-900" %>
-    <% end %>
+    <fieldset class="mui-fieldset">
+      <% if @label %>
+        <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <% end %>
+      <%= @form.text_area @field, value: @value, required: @required, placeholder: @placeholder, rows: @rows, class: "mui-fieldset-input" %>
+    </fieldset>
     <% if @description %>
-      <p class="mt-0.5 text-xs text-forest-900/70"><%= @description %></p>
+      <p class="mt-1 text-xs text-forest-900/60"><%= @description %></p>
     <% end %>
-    <%= @form.text_area @field, value: @value, required: @required, placeholder: @placeholder, rows: @rows, class: "mt-2 w-full rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
   <% end %>
 </div>

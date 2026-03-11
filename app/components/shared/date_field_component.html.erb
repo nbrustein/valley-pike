@@ -3,7 +3,9 @@
     <p class="block text-sm font-semibold text-forest-900"><%= @label %></p>
     <p class="mt-2 text-sm text-forest-900"><%= @value %></p>
   <% else %>
-    <%= @form.label @field, @label, class: "block text-sm font-semibold text-forest-900" %>
-    <%= @form.date_field @field, value: @value, required: @required, class: "mt-2 rounded-lg border border-forest-900/20 bg-white px-3 py-2 text-sm text-forest-900" %>
+    <fieldset class="mui-fieldset">
+      <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.date_field @field, value: @value, required: @required, class: "mui-fieldset-input" %>
+    </fieldset>
   <% end %>
 </div>
