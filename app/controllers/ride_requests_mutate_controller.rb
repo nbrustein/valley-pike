@@ -78,8 +78,10 @@ class RideRequestsMutateController < ApplicationController
       :requires_multiple_drivers,
       :desired_driver_gender,
       :appointment_time,
-      :ride_description_public
-    ).to_h.symbolize_keys
+      :ride_description_public,
+      :ride_description_private,
+      pick_up_address: %i[name street_address city state zip country]
+    ).to_h.deep_symbolize_keys
     if permitted.key?(:requires_multiple_drivers)
       permitted[:requires_multiple_drivers] = cast_boolean(params.dig(:ride_request, :requires_multiple_drivers))
     end

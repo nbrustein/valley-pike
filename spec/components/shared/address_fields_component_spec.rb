@@ -1,0 +1,63 @@
+require "rails_helper"
+
+RSpec.describe Shared::AddressFieldsComponent, type: :component do
+  let(:form) { ActionView::Helpers::FormBuilder.new("ride_request", nil, vc_test_controller.view_context, {}) }
+
+  def render_component(value: nil)
+    render_inline(described_class.new(form:, field: :pick_up_address, value:))
+  end
+
+  it "renders inputs for all address fields" do
+    render_component
+    aggregate_failures do
+      expect(page).to have_css("input[name='ride_request[pick_up_address][name]']")
+      expect(page).to have_css("input[name='ride_request[pick_up_address][street_address]']")
+      expect(page).to have_css("input[name='ride_request[pick_up_address][city]']")
+      expect(page).to have_css("input[name='ride_request[pick_up_address][state]']")
+      expect(page).to have_css("input[name='ride_request[pick_up_address][zip]']")
+      expect(page).to have_css("input[name='ride_request[pick_up_address][country]']")
+    end
+  end
+
+  it "renders labels for all fields" do
+    render_component
+    aggregate_failures do
+      expect(page).to have_css("label", text: "Name")
+      expect(page).to have_css("label", text: "Street Address")
+      expect(page).to have_css("label", text: "City")
+      expect(page).to have_css("label", text: "State")
+      expect(page).to have_css("label", text: "ZIP Code")
+      expect(page).to have_css("label", text: "Country")
+    end
+  end
+
+  context "when an existing address is provided" do
+    let(:address) {
+      build_stubbed(:address,
+        name: "City Hospital",
+        street_address: "100 Main St",
+        city: "Richmond",
+        state: "VA",
+        zip: "23220",
+        country: "US")
+    }
+
+    it "pre-fills the field values" do
+      render_component(value: address)
+      aggregate_failures do
+        expect(page).to have_css("input[value='City Hospital']")
+        expect(page).to have_css("input[value='100 Main St']")
+        expect(page).to have_css("input[value='Richmond']")
+        expect(page).to have_css("input[value='VA']")
+        expect(page).to have_css("input[value='23220']")
+      end
+    end
+  end
+
+  context "when no address is provided" do
+    it "defaults country to US" do
+      render_component
+      expect(page).to have_css("input[name='ride_request[pick_up_address][country]'][value='US']")
+    end
+  end
+end

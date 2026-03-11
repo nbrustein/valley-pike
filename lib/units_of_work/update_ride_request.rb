@@ -5,6 +5,7 @@ module UnitsOfWork
     def initialize(executor_id:, params:)
       super
       @ride_request_id = params.fetch(:id)
+      @pick_up_address_attrs = params.delete(:pick_up_address)
       @attributes = params.except(:id)
     end
 
@@ -18,9 +19,29 @@ module UnitsOfWork
       end
 
       @ride_request.assign_attributes(@attributes)
+
+      if @pick_up_address_attrs
+        address = upsert_address(errors)
+        return if errors.any?
+
+        @ride_request.pick_up_address = address
+      end
+
       return if @ride_request.save
 
       merge_errors(errors, @ride_request)
+    end
+
+    def upsert_address(errors)
+      attrs = @pick_up_address_attrs.slice(:name, :street_address, :city, :state, :zip, :country)
+      return nil if attrs.values.all?(&:blank?)
+
+      address = @ride_request.pick_up_address || Address.new
+      address.assign_attributes(attrs)
+      return address if address.save
+
+      merge_errors(errors, address)
+      nil
     end
 
     def merge_errors(errors, record)

@@ -81,4 +81,30 @@ RSpec.describe "Ride request create form", type: :system do
       expect(draft.reload.ride_description_public).to eq(description)
     end
   end
+
+  context "when filling in page 3" do
+    let(:draft) { create(:draft_ride_request, requester: identity.user, organization:) }
+
+    def act
+      visit edit_ride_request_path(id: draft.id, page: 3)
+      fill_in "Name", with: "City Hospital"
+      fill_in "Street Address", with: "100 Main St"
+      fill_in "City", with: "Richmond"
+      fill_in "State", with: "VA"
+      fill_in "ZIP Code", with: "23220"
+      fill_in "Country", with: "US"
+      find("textarea[name='ride_request[ride_description_private]']").fill_in with: "Ring the doorbell twice."
+      click_button "Save and Continue"
+    end
+
+    it "saves the address and private notes and moves to page 4", :aggregate_failures do
+      act
+      expect(page).to have_current_path(%r{/ride_requests/[^/]+/edit/4})
+      draft.reload
+      expect(draft.pick_up_address).to be_present
+      expect(draft.pick_up_address.street_address).to eq("100 Main St")
+      expect(draft.pick_up_address.city).to eq("Richmond")
+      expect(draft.ride_description_private).to eq("Ring the doorbell twice.")
+    end
+  end
 end
