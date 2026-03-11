@@ -13,6 +13,7 @@ module RideRequestMutate
       Shared::AddressFieldsComponent.new(
         form: @form,
         field: :pick_up_address,
+        label: "Pick Up Address",
         value: @ride_request&.pick_up_address,
       )
     end

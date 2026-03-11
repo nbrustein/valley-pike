@@ -2,9 +2,10 @@ module Shared
   class AddressFieldsComponent < ViewComponent::Base
     include Memery
 
-    def initialize(form:, field:, value: nil)
+    def initialize(form:, field:, label:, value: nil)
       @form = form
       @field = field
+      @label = label
       @value = value
     end
 
