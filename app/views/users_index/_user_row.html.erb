@@ -5,7 +5,7 @@
   show_path: editable ? nil : user_path(id: user.id),
   data: {user_id: user.id}
 )) do %>
-  <td class="px-3 py-3 text-forest-900">
+  <td class="px-3 py-3 text-primary">
     <%= link_to row_path, class: "block" do %>
       <span><%= user_display_name(user) %></span>
     <% end %>
@@ -14,7 +14,7 @@
     <%= link_to row_path, class: "block" do %>
       <div class="flex flex-wrap gap-2">
         <% user.user_roles.each do |user_role| %>
-          <span class="rounded-full bg-moss-200/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-900" data-role-pill><%= user_role.pill_label %></span>
+          <span class="rounded-full bg-muted/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary" data-role-pill><%= user_role.pill_label %></span>
         <% end %>
       </div>
     <% end %>

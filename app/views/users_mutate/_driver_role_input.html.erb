@@ -1,21 +1,21 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <div class="mt-4 space-y-2" data-driver-roles>
-  <p class="text-sm font-semibold text-forest-900">Driver Role</p>
+  <p class="text-sm font-semibold text-primary">Driver Role</p>
   <% if readonly %>
     <% if @selected_driver_role %>
-      <p class="text-sm text-forest-900">Driver</p>
+      <p class="text-sm text-primary">Driver</p>
       <% if @selected_driver_qualifications.present? %>
-        <div class="ml-6 border-l border-forest-900/20 pl-4">
+        <div class="ml-6 border-l border-primary/20 pl-4">
           <% @selected_driver_qualifications.each do |qualification| %>
-            <p class="text-sm text-forest-900"><%= qualification.humanize %></p>
+            <p class="text-sm text-primary"><%= qualification.humanize %></p>
           <% end %>
         </div>
       <% end %>
     <% else %>
-      <p class="text-sm text-forest-900">None</p>
+      <p class="text-sm text-primary">None</p>
     <% end %>
   <% else %>
-    <label class="flex items-center gap-2 text-sm text-forest-900" for="user_driver_role_driver">
+    <label class="flex items-center gap-2 text-sm text-primary" for="user_driver_role_driver">
       <input type="checkbox"
              name="user[driver_role]"
              id="user_driver_role_driver"
@@ -24,8 +24,8 @@
              data-driver-role-input>
       Driver
     </label>
-    <div class="ml-6 border-l border-forest-900/20 pl-4">
-      <label class="flex items-center gap-2 text-sm text-forest-900" for="user_driver_qualifications_cws_vetted">
+    <div class="ml-6 border-l border-primary/20 pl-4">
+      <label class="flex items-center gap-2 text-sm text-primary" for="user_driver_qualifications_cws_vetted">
         <input type="checkbox"
                name="user[driver_qualifications][]"
                id="user_driver_qualifications_cws_vetted"

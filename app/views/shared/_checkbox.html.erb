@@ -1,15 +1,15 @@
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <% if readonly %>
-  <div class="flex items-center gap-2 text-sm text-forest-900">
+  <div class="flex items-center gap-2 text-sm text-primary">
     <% if checked %>
-      <i class="fa-solid fa-square-check text-forest-900/70"></i>
+      <i class="fa-solid fa-square-check text-primary/70"></i>
     <% else %>
-      <i class="fa-regular fa-square text-forest-900/50"></i>
+      <i class="fa-regular fa-square text-primary/50"></i>
     <% end %>
     <%= label %>
   </div>
 <% else %>
-  <label class="flex items-center gap-2 text-sm text-forest-900" for="<%= input_id %>">
+  <label class="flex items-center gap-2 text-sm text-primary" for="<%= input_id %>">
     <input type="checkbox" name="<%= name %>" id="<%= input_id %>" value="<%= value %>" <%= "checked" if checked %>>
     <%= label %>
   </label>

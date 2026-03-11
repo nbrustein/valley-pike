@@ -3,19 +3,19 @@
 <% back_text = local_assigns.fetch(:back_text, "Back") %>
 <div class="flex items-center justify-end gap-3">
   <% if readonly %>
-    <%= link_to back_text, cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
+    <%= link_to back_text, cancel_path, class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
   <% else %>
-    <%= link_to "Cancel", cancel_path, class: "text-sm font-semibold text-forest-900/70 transition hover:text-forest-900 active:text-forest-900/80" %>
+    <%= link_to "Cancel", cancel_path, class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
     <% if @show_send_login_link_button %>
       <%= button_to "Send Login Link",
         send_login_link_user_path(id: @target_user.id),
         method: :post,
         disabled: @send_login_link_button_disabled,
-        class: "rounded-full border border-forest-900/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-forest-900 transition hover:border-forest-900 hover:text-forest-900/80" %>
+        class: "rounded-full border border-primary/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:border-primary hover:text-primary/80" %>
     <% end %>
     <button type="submit"
             form="<%= form_id %>"
-            class="rounded-full bg-forest-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-fog-100 transition hover:bg-forest-800 active:bg-forest-900/90">
+            class="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90">
       <%= @submit_text %>
     </button>
   <% end %>
