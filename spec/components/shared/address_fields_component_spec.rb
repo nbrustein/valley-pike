@@ -4,7 +4,7 @@ RSpec.describe Shared::AddressFieldsComponent, type: :component do
   let(:form) { ActionView::Helpers::FormBuilder.new("ride_request", nil, vc_test_controller.view_context, {}) }
 
   def render_component(value: nil)
-    render_inline(described_class.new(form:, field: :pick_up_address, value:))
+    render_inline(described_class.new(form:, field: :pick_up_address, label: "Pick Up Address", value:))
   end
 
   it "renders inputs for all address fields" do
@@ -20,10 +20,10 @@ RSpec.describe Shared::AddressFieldsComponent, type: :component do
   it "renders labels for all fields" do
     render_component
     aggregate_failures do
-      expect(page).to have_css("label", text: "Name")
-      expect(page).to have_css("label", text: "Street Address")
-      expect(page).to have_css("label", text: "City")
-      expect(page).to have_css("label", text: "State")
+      expect(page).to have_css("legend", text: "Name")
+      expect(page).to have_css("legend", text: "Street Address")
+      expect(page).to have_css("legend", text: "City")
+      expect(page).to have_css("legend", text: "State")
     end
   end
 

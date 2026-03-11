@@ -7,6 +7,7 @@
   <% else %>
     <fieldset class="mui-fieldset">
       <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.label @field, @label, class: "sr-only" %>
       <%= @form.select @field, options_for_select(@options, @selected), {}, {required: @required, class: "mui-fieldset-input"} %>
     </fieldset>
   <% end %>

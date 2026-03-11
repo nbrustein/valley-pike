@@ -5,6 +5,7 @@
   <% else %>
     <fieldset class="mui-fieldset">
       <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.label @field, @label, class: "sr-only" %>
       <%= @form.public_send(field_method, @field, value: @value, required: @required, data: @data, placeholder: @placeholder, class: "mui-fieldset-input") %>
     </fieldset>
     <% if @description %>

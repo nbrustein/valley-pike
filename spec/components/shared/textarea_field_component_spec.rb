@@ -11,7 +11,7 @@ RSpec.describe Shared::TextareaFieldComponent, type: :component do
     it "renders a label and textarea" do
       render_component
       aggregate_failures do
-        expect(page).to have_css("label", text: "Description")
+        expect(page).to have_css("legend", text: "Description")
         expect(page).to have_css("textarea[name='model[description]']")
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe Shared::TextareaFieldComponent, type: :component do
 
     it "does not render a label element when label is nil" do
       render_inline(described_class.new(form:, field: :description, value: "test"))
-      expect(page).not_to have_css("label")
+      expect(page).not_to have_css("legend")
     end
   end
 

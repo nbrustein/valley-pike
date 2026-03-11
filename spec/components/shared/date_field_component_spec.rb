@@ -11,7 +11,7 @@ RSpec.describe Shared::DateFieldComponent, type: :component do
     it "renders a label and date input" do
       render_component
       aggregate_failures do
-        expect(page).to have_css("label", text: "Ride Date")
+        expect(page).to have_css("legend", text: "Ride Date")
         expect(page).to have_css("input[type='date']")
       end
     end

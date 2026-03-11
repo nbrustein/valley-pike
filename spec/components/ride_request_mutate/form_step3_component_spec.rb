@@ -20,6 +20,7 @@ RSpec.describe RideRequestMutate::FormStep3Component, type: :component do
       expect(Shared::AddressFieldsComponent).to have_received(:new).with(
         form: anything,
         field: :pick_up_address,
+        label: "Pick Up Address",
         value: nil,
       )
     end

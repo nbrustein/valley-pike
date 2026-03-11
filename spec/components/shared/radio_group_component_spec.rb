@@ -9,7 +9,7 @@ RSpec.describe Shared::RadioGroupComponent, type: :component do
 
   it "renders the label" do
     render_component
-    expect(page).to have_css("p", text: "Color")
+    expect(page).to have_css("legend", text: "Color")
   end
 
   it "renders each option" do

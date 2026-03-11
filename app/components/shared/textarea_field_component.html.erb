@@ -8,6 +8,7 @@
     <fieldset class="mui-fieldset">
       <% if @label %>
         <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+        <%= @form.label @field, @label, class: "sr-only" %>
       <% end %>
       <%= @form.text_area @field, value: @value, required: @required, placeholder: @placeholder, rows: @rows, class: "mui-fieldset-input" %>
     </fieldset>

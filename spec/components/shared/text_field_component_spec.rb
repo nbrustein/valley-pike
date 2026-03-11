@@ -11,7 +11,7 @@ RSpec.describe Shared::TextFieldComponent, type: :component do
     it "renders a label and text input" do
       render_component
       aggregate_failures do
-        expect(page).to have_css("label", text: "Name")
+        expect(page).to have_css("legend", text: "Name")
         expect(page).to have_field("Name", type: "text", with: "test value")
       end
     end
