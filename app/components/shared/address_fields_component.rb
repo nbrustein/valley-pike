@@ -41,7 +41,7 @@ module Shared
     memoize def state_field
       Shared::TextFieldComponent.new(
         form: @addr_form, field: :state, label: "State",
-        value: @value&.state, required: true,
+        value: @value&.state || "VA", required: true,
       )
     end
   end
