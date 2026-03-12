@@ -17,6 +17,7 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
     allow(Shared::DateFieldComponent).to receive(:new).and_call_original
     allow(Shared::RadioGroupComponent).to receive(:new).and_call_original
     allow(Shared::AddressFieldsComponent).to receive(:new).and_call_original
+    allow(Shared::ContactFieldsComponent).to receive(:new).and_call_original
   end
 
   describe "address fields" do
@@ -90,24 +91,10 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
       )
     end
 
-    it "renders contact_full_name_field as readonly" do
+    it "renders contact_fields as readonly" do
       render_component
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_full_name, label: "Contact Name", readonly: true)
-      )
-    end
-
-    it "renders contact_phone_field as readonly" do
-      render_component
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_phone, label: "Contact Phone", readonly: true)
-      )
-    end
-
-    it "renders contact_email_field as readonly" do
-      render_component
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_email, label: "Contact Email", readonly: true)
+      expect(Shared::ContactFieldsComponent).to have_received(:new).with(
+        hash_including(label: "Contact", readonly: true)
       )
     end
   end
@@ -145,14 +132,8 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
       expect(Shared::TextareaFieldComponent).to have_received(:new).with(
         hash_including(field: :ride_description_private, value: "Ring doorbell")
       )
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_full_name, value: "Jane Doe")
-      )
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_phone, value: "555-1234")
-      )
-      expect(Shared::TextFieldComponent).to have_received(:new).with(
-        hash_including(field: :contact_email, value: "jane@example.com")
+      expect(Shared::ContactFieldsComponent).to have_received(:new).with(
+        hash_including(full_name: "Jane Doe", phone: "555-1234", email: "jane@example.com")
       )
     end
   end

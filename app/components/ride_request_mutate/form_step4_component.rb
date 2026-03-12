@@ -10,33 +10,14 @@ module RideRequestMutate
 
     private
 
-    memoize def contact_full_name_field
-      Shared::TextFieldComponent.new(
+    memoize def contact_fields
+      Shared::ContactFieldsComponent.new(
         form: @form,
-        field: :contact_full_name,
-        label: "Contact Name",
-        value: @ride_request&.contact_full_name || @requester&.human&.full_name,
-        required: true,
-      )
-    end
-
-    memoize def contact_phone_field
-      Shared::TextFieldComponent.new(
-        form: @form,
-        field: :contact_phone,
-        label: "Contact Phone",
-        value: @ride_request&.contact_phone || @requester&.human&.phone,
-        type: :phone,
-      )
-    end
-
-    memoize def contact_email_field
-      Shared::TextFieldComponent.new(
-        form: @form,
-        field: :contact_email,
-        label: "Contact Email",
-        value: @ride_request&.contact_email || @requester&.email,
-        type: :email,
+        label: "Contact",
+        full_name: @ride_request&.contact_full_name || @requester&.human&.full_name,
+        phone: @ride_request&.contact_phone || @requester&.human&.phone,
+        email: @ride_request&.contact_email || @requester&.email,
+        required_name: true,
       )
     end
   end
