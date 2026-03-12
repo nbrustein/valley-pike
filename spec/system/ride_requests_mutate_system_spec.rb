@@ -115,4 +115,36 @@ RSpec.describe "Ride request create form", type: :system do
       expect(draft.ride_description_private).to eq("Ring the doorbell twice.")
     end
   end
+
+  context "when filling in page 4" do
+    let(:draft) { create(:draft_ride_request, requester: identity.user, organization:) }
+
+    def act
+      visit edit_ride_request_path(id: draft.id, page: 4)
+      fill_in "Contact Name", with: "Jane Doe"
+      fill_in "Contact Phone", with: "555-9999"
+      fill_in "Contact Email", with: "jane@example.com"
+      click_button "Save and Continue"
+    end
+
+    it "saves the contact info and moves to page 5", :aggregate_failures do
+      act
+      expect(page).to have_current_path(%r{/ride_requests/[^/]+/edit/5})
+      draft.reload
+      expect(draft.contact_full_name).to eq("Jane Doe")
+      expect(draft.contact_phone).to eq("555-9999")
+      expect(draft.contact_email).to eq("jane@example.com")
+    end
+
+    it "defaults fields from the requester", :aggregate_failures do
+      no_contact_draft = create(:draft_ride_request,
+        requester: identity.user, organization:,
+        contact_full_name: nil, contact_phone: nil, contact_email: nil)
+      visit edit_ride_request_path(id: no_contact_draft.id, page: 4)
+      requester = identity.user
+      expect(find_field("Contact Name").value).to eq(requester.human.full_name)
+      expect(find_field("Contact Phone").value).to eq(requester.human.phone)
+      expect(find_field("Contact Email").value).to eq(requester.email)
+    end
+  end
 end

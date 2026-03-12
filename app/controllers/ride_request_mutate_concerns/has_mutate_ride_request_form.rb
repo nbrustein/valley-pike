@@ -36,6 +36,7 @@ module RideRequestMutateConcerns
         when 1 then {organizations: permitted_organizations, ride_request:}
         when 2 then {ride_request:}
         when 3 then {ride_request:}
+        when 4 then {ride_request:, requester: ride_request&.requester}
         else {}
         end
       end

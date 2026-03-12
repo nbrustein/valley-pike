@@ -80,6 +80,9 @@ class RideRequestsMutateController < ApplicationController
       :appointment_time,
       :ride_description_public,
       :ride_description_private,
+      :contact_full_name,
+      :contact_phone,
+      :contact_email,
       pick_up_address: %i[name street_address city state],
       destination_address: %i[name street_address city state]
     ).to_h.deep_symbolize_keys
