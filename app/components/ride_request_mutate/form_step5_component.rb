@@ -1,29 +1,16 @@
 module RideRequestMutate
   class FormStep5Component < FormStepComponent
     include Memery
-    include Concerns::HasOrganizationOptions
     include Concerns::HasDriverOptions
 
-    def initialize(form:, total_steps:, ride_request: nil, organizations: [])
+    def initialize(form:, total_steps:, ride_request: nil)
       super(form:, total_steps:)
       @ride_request = ride_request
-      @organizations = organizations
     end
 
     private
 
     # Public fields
-
-    memoize def organization_field
-      Shared::SelectFieldComponent.new(
-        form: @form,
-        field: :organization_id,
-        label: "Organization",
-        options: organization_options,
-        selected: @ride_request&.organization_id,
-        readonly: true,
-      )
-    end
 
     memoize def short_description_field
       Shared::TextFieldComponent.new(

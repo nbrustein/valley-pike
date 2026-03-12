@@ -7,26 +7,18 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
     ActionView::Helpers::FormBuilder.new("ride_request", ride_request, vc_test_controller.view_context, {})
   end
 
-  def render_component(ride_request: nil, organizations: [ organization ])
-    render_inline(described_class.new(form: build_form(ride_request), total_steps: 5, ride_request:, organizations:))
+  def render_component(ride_request: nil)
+    render_inline(described_class.new(form: build_form(ride_request), total_steps: 5, ride_request:))
   end
 
   before do
     allow(Shared::TextFieldComponent).to receive(:new).and_call_original
     allow(Shared::TextareaFieldComponent).to receive(:new).and_call_original
     allow(Shared::DateFieldComponent).to receive(:new).and_call_original
-    allow(Shared::SelectFieldComponent).to receive(:new).and_call_original
     allow(Shared::RadioGroupComponent).to receive(:new).and_call_original
   end
 
   describe "public fields" do
-    it "renders organization_field as readonly" do
-      render_component
-      expect(Shared::SelectFieldComponent).to have_received(:new).with(
-        hash_including(field: :organization_id, label: "Organization", readonly: true)
-      )
-    end
-
     it "renders short_description_field as readonly" do
       render_component
       expect(Shared::TextFieldComponent).to have_received(:new).with(
@@ -110,7 +102,7 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
         contact_full_name: "Jane Doe",
         contact_phone: "555-1234",
         contact_email: "jane@example.com")
-      render_component(ride_request: rr, organizations: [ organization ])
+      render_component(ride_request: rr)
 
       expect(Shared::TextFieldComponent).to have_received(:new).with(
         hash_including(field: :short_description, value: "Hospital visit")
@@ -132,9 +124,6 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
       )
       expect(Shared::TextFieldComponent).to have_received(:new).with(
         hash_including(field: :contact_email, value: "jane@example.com")
-      )
-      expect(Shared::SelectFieldComponent).to have_received(:new).with(
-        hash_including(field: :organization_id, selected: organization.id)
       )
     end
   end
