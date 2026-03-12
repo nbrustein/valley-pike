@@ -1,7 +1,7 @@
 <div>
   <% if @readonly %>
     <p class="text-sm font-semibold text-primary"><%= @label %></p>
-    <p class="mt-2 text-sm text-primary"><%= @selected.present? ? @selected.humanize : "None" %></p>
+    <p class="mt-2 text-sm text-primary"><%= selected_label %></p>
   <% else %>
     <fieldset class="mui-fieldset pb-3 pt-2">
       <legend class="mui-legend"><%= @label %></legend>

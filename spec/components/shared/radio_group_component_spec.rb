@@ -45,9 +45,25 @@ RSpec.describe Shared::RadioGroupComponent, type: :component do
   end
 
   context "when readonly" do
-    it "renders the selected value as humanized text" do
+    it "renders the selected option label" do
       render_component(readonly: true)
       expect(page).to have_css("p", text: "Red")
+    end
+
+    it "renders the label from options, not the raw value" do
+      component = described_class.new(
+        name: "item[size]", label: "Size",
+        options: [ [ "false", "Small" ], [ "true", "Large" ] ],
+        selected: "false", readonly: true
+      )
+      render_inline(component)
+      expect(page).to have_css("p", text: "Small")
+      expect(page).not_to have_css("p", text: "False")
+    end
+
+    it "renders None when nothing is selected" do
+      render_component(readonly: true, selected: "")
+      expect(page).to have_css("p", text: "None")
     end
 
     it "does not render radio inputs" do
