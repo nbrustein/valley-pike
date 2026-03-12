@@ -2,16 +2,30 @@ module Shared
   class AddressFieldsComponent < ViewComponent::Base
     include Memery
 
-    def initialize(form:, field:, label:, value: nil)
+    def initialize(form:, field:, label:, value: nil, readonly: false)
       @form = form
       @field = field
       @label = label
       @value = value
+      @readonly = readonly
     end
 
     def before_render
+      return if @readonly
+
       @addr_form = nil
       @form.fields_for(@field, @value) {|f| @addr_form = f }
+    end
+
+    def formatted_address_lines
+      return [] if @value.nil?
+
+      lines = []
+      lines << @value.name if @value.name.present?
+      lines << @value.street_address if @value.street_address.present?
+      city_state = [ @value.city, @value.state ].select(&:present?).join(", ")
+      lines << city_state if city_state.present?
+      lines
     end
 
     private

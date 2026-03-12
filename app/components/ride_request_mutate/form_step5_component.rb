@@ -62,6 +62,16 @@ module RideRequestMutate
       )
     end
 
+    memoize def destination_address_field
+      Shared::AddressFieldsComponent.new(
+        form: @form,
+        field: :destination_address,
+        label: "Destination Address",
+        value: @ride_request&.destination_address,
+        readonly: true,
+      )
+    end
+
     memoize def ride_description_public_field
       Shared::TextareaFieldComponent.new(
         form: @form,
@@ -103,6 +113,16 @@ module RideRequestMutate
     end
 
     # Private fields
+
+    memoize def pick_up_address_field
+      Shared::AddressFieldsComponent.new(
+        form: @form,
+        field: :pick_up_address,
+        label: "Pick-Up Address",
+        value: @ride_request&.pick_up_address,
+        readonly: true,
+      )
+    end
 
     memoize def ride_description_private_field
       Shared::TextareaFieldComponent.new(

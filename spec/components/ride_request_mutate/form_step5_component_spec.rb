@@ -16,6 +16,35 @@ RSpec.describe RideRequestMutate::FormStep5Component, type: :component do
     allow(Shared::TextareaFieldComponent).to receive(:new).and_call_original
     allow(Shared::DateFieldComponent).to receive(:new).and_call_original
     allow(Shared::RadioGroupComponent).to receive(:new).and_call_original
+    allow(Shared::AddressFieldsComponent).to receive(:new).and_call_original
+  end
+
+  describe "address fields" do
+    it "renders destination_address_field as readonly" do
+      render_component
+      expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+        hash_including(field: :destination_address, label: "Destination Address", readonly: true)
+      )
+    end
+
+    it "renders pick_up_address_field as readonly" do
+      render_component
+      expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+        hash_including(field: :pick_up_address, label: "Pick-Up Address", readonly: true)
+      )
+    end
+
+    it "passes address values from ride request" do
+      address = build_stubbed(:address)
+      rr = build_stubbed(:ride_request, organization:, pick_up_address: address, destination_address: address)
+      render_component(ride_request: rr)
+      expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+        hash_including(field: :pick_up_address, value: address)
+      )
+      expect(Shared::AddressFieldsComponent).to have_received(:new).with(
+        hash_including(field: :destination_address, value: address)
+      )
+    end
   end
 
   describe "public fields" do
