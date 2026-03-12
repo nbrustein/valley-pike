@@ -1,8 +1,9 @@
 <div class="space-y-5">
-  <div>
-    <p class="text-base font-semibold text-primary">3 of 5: Private Information</p>
-    <p class="mt-1 text-sm text-primary/70">This information will only be sent to the driver who accepts the ride</p>
-  </div>
+  <%= render RideRequestMutate::StepHeaderComponent.new(
+    step: 3, total_steps: @total_steps,
+    title: "Private Information",
+    description: "This information will only be sent to the driver who accepts the ride",
+  ) %>
 
   <%= render pick_up_address_field %>
 

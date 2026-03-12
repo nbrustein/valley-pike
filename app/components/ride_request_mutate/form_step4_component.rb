@@ -2,8 +2,8 @@ module RideRequestMutate
   class FormStep4Component < FormStepComponent
     include Memery
 
-    def initialize(form:, ride_request: nil, requester: nil)
-      super(form:)
+    def initialize(form:, total_steps:, ride_request: nil, requester: nil)
+      super(form:, total_steps:)
       @ride_request = ride_request
       @requester = requester
     end

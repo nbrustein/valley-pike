@@ -1,8 +1,9 @@
 <div class="space-y-5">
-  <div>
-    <p class="text-base font-semibold text-primary">4 of 5: Contact Information</p>
-    <p class="mt-1 text-sm text-primary/70">This information will only be sent to the driver who accepts the ride</p>
-  </div>
+  <%= render RideRequestMutate::StepHeaderComponent.new(
+    step: 4, total_steps: @total_steps,
+    title: "Contact Information",
+    description: "This information will only be sent to the driver who accepts the ride",
+  ) %>
 
   <%= render contact_full_name_field %>
 

@@ -1,8 +1,9 @@
 <div class="space-y-5">
-  <div>
-    <p class="text-base font-semibold text-primary">1 of 5: Public Information</p>
-    <p class="mt-1 text-sm text-primary/70">This information will be sent to all eligible drivers</p>
-  </div>
+  <%= render RideRequestMutate::StepHeaderComponent.new(
+    step: 1, total_steps: @total_steps,
+    title: "Public Information",
+    description: "This information will be sent to all eligible drivers",
+  ) %>
 
   <%= render organization_field %>
 

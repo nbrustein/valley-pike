@@ -3,7 +3,6 @@ module RideRequestMutateConcerns
     extend ActiveSupport::Concern
     include Memery
 
-    FORM_STEP_COUNT = 5
     FORM_STEP_COMPONENTS = {
       1 => RideRequestMutate::FormStep1Component,
       2 => RideRequestMutate::FormStep2Component,
@@ -11,6 +10,7 @@ module RideRequestMutateConcerns
       4 => RideRequestMutate::FormStep4Component,
       5 => RideRequestMutate::FormStep5Component,
     }.freeze
+    FORM_STEP_COUNT = FORM_STEP_COMPONENTS.size
 
     def render_form(mode:, page:, ride_request:, submitted_params:, status: :ok)
       raise ArgumentError, "invalid mode" unless %i[create].include?(mode)
@@ -32,13 +32,15 @@ module RideRequestMutateConcerns
         )
         @header_text = ride_request&.short_description.presence || "New Ride Request"
         @form_step_class = FORM_STEP_COMPONENTS.fetch(page)
-        @form_step_attrs = case page
-        when 1 then {organizations: permitted_organizations, ride_request:}
-        when 2 then {ride_request:}
-        when 3 then {ride_request:}
-        when 4 then {ride_request:, requester: ride_request&.requester}
-        else {}
-        end
+        @form_step_attrs = {total_steps: FORM_STEP_COUNT}.merge(
+          case page
+          when 1 then {organizations: permitted_organizations, ride_request:}
+          when 2 then {ride_request:}
+          when 3 then {ride_request:}
+          when 4 then {ride_request:, requester: ride_request&.requester}
+          else {}
+          end
+        )
       end
     end
 

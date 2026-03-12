@@ -6,7 +6,7 @@ RSpec.describe RideRequestMutate::FormStep4Component, type: :component do
   end
 
   def render_component(ride_request: nil, requester: nil)
-    render_inline(described_class.new(form: build_form(ride_request), ride_request:, requester:))
+    render_inline(described_class.new(form: build_form(ride_request), total_steps: 5, ride_request:, requester:))
   end
 
   before do
