@@ -1,6 +1,8 @@
 module RideRequestMutate
   class FormStep1Component < FormStepComponent
     include Memery
+    include Concerns::HasOrganizationOptions
+    include Concerns::HasDriverOptions
 
     def initialize(form:, total_steps:, organizations:, ride_request: nil)
       super(form:, total_steps:)
@@ -74,22 +76,6 @@ module RideRequestMutate
         selected: @ride_request&.organization_id,
         required: true,
       )
-    end
-
-    memoize def organization_options
-      @organizations.map {|org| [ org.name, org.id ] }.freeze
-    end
-
-    memoize def driver_count_options
-      [ [ "false", "1 Driver" ], [ "true", "Multiple Drivers" ] ].freeze
-    end
-
-    memoize def driver_gender_options
-      [
-        [ "none", "None" ],
-        [ "female", "Female Driver" ],
-        [ "female_accompaniment", "Female Accompaniment if Driver is Male" ],
-  ].freeze
     end
   end
 end

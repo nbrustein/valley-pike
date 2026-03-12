@@ -1,1 +1,35 @@
-<p>Page 5</p>
+<div class="space-y-5">
+  <%= render RideRequestMutate::StepHeaderComponent.new(
+    step: 5, total_steps: @total_steps,
+    title: "Review and Publish",
+    description: "Review the information below before publishing",
+  ) %>
+
+  <div>
+    <p class="text-sm font-semibold text-primary">Public Information</p>
+    <p class="mt-1 text-sm text-primary/70"><%= RideRequestMutate::StepHeaderComponent::PUBLIC_DESCRIPTION %></p>
+  </div>
+
+  <%= render organization_field %>
+  <%= render short_description_field %>
+  <%= render ride_date_field %>
+  <%= render driver_count_field %>
+  <%= render driver_gender_field %>
+  <%= render appointment_time_field %>
+
+  <p class="text-sm text-primary/70">FIXME Destination Address</p>
+
+  <%= render ride_description_public_field %>
+  <%= render contact_full_name_field %>
+  <%= render contact_phone_field %>
+  <%= render contact_email_field %>
+
+  <div>
+    <p class="text-sm font-semibold text-primary">Private Information</p>
+    <p class="mt-1 text-sm text-primary/70"><%= RideRequestMutate::StepHeaderComponent::PRIVATE_DESCRIPTION %></p>
+  </div>
+
+  <p class="text-sm text-primary/70">FIXME Pick-Up Address</p>
+
+  <%= render ride_description_private_field %>
+</div>

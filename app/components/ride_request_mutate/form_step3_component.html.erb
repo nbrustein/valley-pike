@@ -2,7 +2,7 @@
   <%= render RideRequestMutate::StepHeaderComponent.new(
     step: 3, total_steps: @total_steps,
     title: "Private Information",
-    description: "This information will only be sent to the driver who accepts the ride",
+    description: RideRequestMutate::StepHeaderComponent::PRIVATE_DESCRIPTION,
   ) %>
 
   <%= render pick_up_address_field %>

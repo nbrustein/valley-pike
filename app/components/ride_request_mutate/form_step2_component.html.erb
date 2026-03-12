@@ -2,7 +2,7 @@
   <%= render RideRequestMutate::StepHeaderComponent.new(
     step: 2, total_steps: @total_steps,
     title: "Public Information Continued",
-    description: "This information will be sent to all eligible drivers",
+    description: RideRequestMutate::StepHeaderComponent::PUBLIC_DESCRIPTION,
   ) %>
 
   <%= render destination_address_field %>
