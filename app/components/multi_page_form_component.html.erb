@@ -8,10 +8,12 @@
       <%= link_to "Previous", previous_path, class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
     <% end %>
 
-    <button type="submit"
-            class="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90">
-      <%= next_button_label %>
-    </button>
+    <% if next_button_label %>
+      <button type="submit"
+              class="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90">
+        <%= next_button_label %>
+      </button>
+    <% end %>
   </div>
 
   <p class="text-center text-xs text-primary/50">Page <%= @current_page %> of <%= @page_paths.length %></p>
