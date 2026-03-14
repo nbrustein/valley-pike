@@ -10,4 +10,6 @@
     ride_request: @ride_request,
     show_step_header: false
   ) %>
+
+  <%= render "shared/action_buttons", cancel_path: ride_requests_path, readonly: true, back_text: "Back to ride requests" %>
 </section>
