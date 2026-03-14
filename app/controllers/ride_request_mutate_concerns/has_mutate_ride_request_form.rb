@@ -23,8 +23,14 @@ module RideRequestMutateConcerns
 
     def setup_instance_vars(mode:, ride_request:, page:)
       if mode == :create
-        @form_action = ride_request&.id ? edit_ride_request_path(id: ride_request.id, page:) : ride_requests_path
-        @form_method = ride_request&.id ? :patch : :post
+        @form_action = if page == FORM_STEP_COUNT && ride_request&.id
+          publish_ride_request_path(id: ride_request.id)
+        elsif ride_request&.id
+          edit_ride_request_path(id: ride_request.id, page:)
+        else
+          ride_requests_path
+        end
+        @form_method = page == FORM_STEP_COUNT ? :post : (ride_request&.id ? :patch : :post)
         @multi_page_form = MultiPageFormComponent.new(
           page_paths: create_page_paths(ride_request),
           current_page: page,

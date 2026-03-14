@@ -55,16 +55,33 @@ class RideRequestsMutateController < ApplicationController
       )
     end
 
-    next_path = if current_page >= FORM_STEP_COUNT
-      ride_requests_path
-    else
-      edit_ride_request_path(id: target_ride_request.id, page: current_page + 1)
-    end
-    return redirect_to next_path if success
+    return redirect_to edit_ride_request_path(id: target_ride_request.id, page: current_page + 1) if success
 
     render_form(
       status: :unprocessable_entity, mode: :create, page: current_page,
       ride_request: uow&.ride_request, submitted_params: update_ride_request_params
+    )
+  end
+
+  # POST /ride_requests/:id/publish
+  def publish
+    return render_not_found unless target_ride_request.present?
+
+    authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
+
+    uow = nil
+    success, _errors = execute_unit_of_work do
+      uow = UnitsOfWork::PublishRideRequest.new(
+        executor_id: current_user.id,
+        params: {ride_request_id: params[:id]}
+      )
+    end
+
+    return redirect_to ride_requests_path if success
+
+    render_form(
+      status: :unprocessable_entity, mode: :create, page: FORM_STEP_COUNT,
+      ride_request: target_ride_request, submitted_params: nil
     )
   end
 

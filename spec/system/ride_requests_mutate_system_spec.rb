@@ -147,4 +147,24 @@ RSpec.describe "Ride request create form", type: :system do
       expect(find_field("Contact Email").value).to eq(requester.email)
     end
   end
+
+  context "when publishing from page 5" do
+    let(:draft) { create(:draft_ride_request, requester: identity.user, organization:) }
+
+    it "publishes the ride request and redirects to index", :aggregate_failures do
+      visit edit_ride_request_path(id: draft.id, page: 5)
+      click_button "Publish"
+      expect(page).to have_current_path(ride_requests_path)
+      expect(RideRequest.find(draft.id)).to be_a(RideRequest::Published)
+    end
+
+    it "shows errors when publishing fails" do
+      unpublishable = create(:draft_ride_request,
+        requester: identity.user, organization:,
+        contact_full_name: nil, ride_description_public: nil)
+      visit edit_ride_request_path(id: unpublishable.id, page: 5)
+      click_button "Publish"
+      expect(page).to have_text("can't be blank")
+    end
+  end
 end

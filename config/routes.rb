@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   resources :ride_requests, only: %i[new create], controller: "ride_requests_mutate"
   get   "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#edit",   as: :edit_ride_request
   patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :ride_request
+  post  "ride_requests/:id/publish",      to: "ride_requests_mutate#publish", as: :publish_ride_request
   resources :organizations, only: %i[show new create edit update], controller: "organizations_mutate"
 
   root "home#index"
