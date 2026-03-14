@@ -11,22 +11,8 @@ module RideRequestMutate
 
     private
 
-    STATUS_DISPLAY = {
-      draft: {label: "Draft", icon: "fa-file-pen"},
-      request_sent: {label: "Request Sent", icon: "fa-paper-plane"},
-      driver_assigned: {label: "Driver Assigned", icon: "fa-car"},
-      complete: {label: "Complete", icon: "fa-circle-check"},
-      canceled: {label: "Canceled", icon: "fa-ban"},
-    }.freeze
-
     def status_display
-      STATUS_DISPLAY.fetch(status_key)
-    end
-
-    def status_key
-      return :draft if @ride_request.nil? || @ride_request.draft?
-
-      :request_sent
+      @ride_request&.status_display || RideRequest::STATUS_DISPLAY[:draft]
     end
 
     # Public fields
