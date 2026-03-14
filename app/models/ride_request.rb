@@ -20,8 +20,13 @@ class RideRequest < ApplicationRecord
 
   validates :desired_driver_gender, inclusion: {in: DESIRED_DRIVER_GENDERS}
 
+  CANCELLABLE_STATUSES = %i[request_sent driver_assigned].freeze
+
   def status_key
     return :draft if draft?
+    return :canceled if cancelled?
+    return :complete if completed?
+    return :driver_assigned if driver_assignments.any?
 
     :request_sent
   end
@@ -29,13 +34,25 @@ class RideRequest < ApplicationRecord
   def status_display
     STATUS_DISPLAY.fetch(status_key)
   end
+
+  def cancellable?
+    CANCELLABLE_STATUSES.include?(status_key)
+  end
+
   validate :date_not_changed_to_past, if: -> { date.present? && (new_record? || date_changed?) }
+  validate :cancellation_allowed, if: -> { cancelled_changed? && cancelled? }
   before_destroy :ensure_draft!
 
   private
 
   def date_not_changed_to_past
     errors.add(:date, "must not be in the past") if date < Date.today
+  end
+
+  def cancellation_allowed
+    return if !draft_was && !cancelled_was && !completed_was
+
+    errors.add(:base, "Only active requests can be canceled")
   end
 
   def ensure_draft!

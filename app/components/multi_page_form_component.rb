@@ -1,11 +1,12 @@
 class MultiPageFormComponent < ViewComponent::Base
   # previous_path: omit (or pass nil) to hide the Previous button (e.g. first page)
   # last_page_label: defaults to "Submit"; override on the last page (e.g. "Publish")
-  def initialize(page_paths:, current_page:, last_page_label: "Submit", delete_path: nil)
+  # destructive_action: {label:, path:, method:, confirm:} or nil
+  def initialize(page_paths:, current_page:, last_page_label: "Submit", destructive_action: nil)
     @page_paths = page_paths
     @current_page = current_page
     @last_page_label = last_page_label
-    @delete_path = delete_path
+    @destructive_action = destructive_action
   end
 
   private

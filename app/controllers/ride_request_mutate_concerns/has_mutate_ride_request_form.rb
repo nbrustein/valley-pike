@@ -31,14 +31,11 @@ module RideRequestMutateConcerns
           ride_requests_path
         end
         @form_method = page == FORM_STEP_COUNT ? :post : (ride_request&.id ? :patch : :post)
-        delete_path = if ride_request&.draft? && ride_request&.id
-          delete_draft_ride_request_path(id: ride_request.id)
-        end
         @multi_page_form = MultiPageFormComponent.new(
           page_paths: create_page_paths(ride_request),
           current_page: page,
           last_page_label: ride_request&.draft? ? "Publish" : nil,
-          delete_path:
+          destructive_action: destructive_action_for(ride_request)
         )
         @header_text = ride_request&.short_description.presence || "New Ride Request"
         @form_step_class = FORM_STEP_COMPONENTS.fetch(page)
@@ -61,6 +58,26 @@ module RideRequestMutateConcerns
         Organization.all.to_a
       else
         Organization.where(id: policy.permitted_organization_ids.compact).to_a
+      end
+    end
+
+    def destructive_action_for(ride_request)
+      return unless ride_request&.id
+
+      if ride_request.draft?
+        {
+          label: "Delete Draft",
+          path: delete_draft_ride_request_path(id: ride_request.id),
+          method: :delete,
+          confirm: "Are you sure you want to delete this draft?",
+        }
+      elsif ride_request.cancellable?
+        {
+          label: "Cancel Request",
+          path: cancel_ride_request_path(id: ride_request.id),
+          method: :post,
+          confirm: "Are you sure you want to cancel this request?",
+        }
       end
     end
 

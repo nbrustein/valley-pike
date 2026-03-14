@@ -74,37 +74,28 @@ class RideRequestsMutateController < ApplicationController
 
   # DELETE /ride_requests/:id/delete_draft
   def delete_draft
-    return render_not_found unless target_ride_request.present?
+    execute_ride_request_status_change(UnitsOfWork::DeleteDraftRideRequest)
+  end
 
-    authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
-
-    success, _errors = execute_unit_of_work do
-      UnitsOfWork::DeleteDraftRideRequest.new(
-        executor_id: current_user.id,
-        params: {ride_request_id: params[:id]}
-      )
-    end
-
-    return redirect_to ride_requests_path if success
-
-    render_form(
-      status: :unprocessable_entity, mode: :create, page: params.fetch(:page, 1).to_i,
-      ride_request: target_ride_request, submitted_params: nil
-    )
+  # POST /ride_requests/:id/cancel
+  def cancel
+    execute_ride_request_status_change(UnitsOfWork::CancelRideRequest)
   end
 
   # POST /ride_requests/:id/publish
   def publish
+    execute_ride_request_status_change(UnitsOfWork::PublishRideRequest)
+  end
+
+  private
+
+  def execute_ride_request_status_change(uow_class)
     return render_not_found unless target_ride_request.present?
 
     authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
 
-    uow = nil
     success, _errors = execute_unit_of_work do
-      uow = UnitsOfWork::PublishRideRequest.new(
-        executor_id: current_user.id,
-        params: {ride_request_id: params[:id]}
-      )
+      uow_class.new(executor_id: current_user.id, params: {ride_request_id: params[:id]})
     end
 
     return redirect_to ride_requests_path if success
@@ -114,8 +105,6 @@ class RideRequestsMutateController < ApplicationController
       ride_request: target_ride_request, submitted_params: nil
     )
   end
-
-  private
 
   def update_ride_request_params
     permitted = params.require(:ride_request).permit(
