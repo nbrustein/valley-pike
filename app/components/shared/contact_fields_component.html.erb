@@ -1,0 +1,12 @@
+<% if @readonly %>
+  <div>
+    <p class="block text-sm font-semibold text-primary"><%= @label %></p>
+    <p class="mt-2 text-sm text-primary"><%= safe_join(formatted_contact_lines, tag.br) %></p>
+  </div>
+<% else %>
+  <div class="space-y-5">
+    <%= render contact_full_name_field %>
+    <%= render contact_phone_field %>
+    <%= render contact_email_field %>
+  </div>
+<% end %>

@@ -1,5 +1,5 @@
 <section class="surface-card">
-  <h1 class="text-3xl font-semibold tracking-tight text-forest-900">Profile</h1>
+  <h1 class="text-3xl font-semibold tracking-tight text-primary">Profile</h1>
 
   <% if @profile_errors&.any? %>
     <div class="error-box mt-5">
@@ -17,7 +17,7 @@
       <%= f.email_field :email, value: current_user.email, autocomplete: "email", class: "text-input" %>
     </div>
 
-    <h2 class="mt-6 text-xl font-semibold text-forest-900"><%= @password_heading %></h2>
+    <h2 class="mt-6 text-xl font-semibold text-primary"><%= @password_heading %></h2>
 
     <div class="mt-4">
       <%= f.label :password, class: "field-label" %>

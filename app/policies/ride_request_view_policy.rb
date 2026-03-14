@@ -6,6 +6,10 @@ class RideRequestViewPolicy < ApplicationPolicy
       false
   end
 
+  def show?
+    index? && Scope.new(user, RideRequest).resolve.exists?(record.id)
+  end
+
   memoize def roles_granting_permissions
     return [] if user.nil?
 

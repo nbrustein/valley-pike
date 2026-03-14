@@ -1,0 +1,38 @@
+<div>
+  <% if @readonly %>
+    <p class="text-sm font-semibold text-primary"><%= @label %></p>
+    <p class="mt-2 text-sm text-primary"><%= selected_label %></p>
+  <% else %>
+    <fieldset class="mui-fieldset pb-3 pt-2">
+      <legend class="mui-legend"><%= @label %></legend>
+      <div class="space-y-2">
+        <% if @include_none_option %>
+          <label class="mui-radio-option" for="<%= id_prefix %>_none">
+            <input type="radio"
+                   name="<%= @name %>"
+                   id="<%= id_prefix %>_none"
+                   value=""
+                   <%= "checked" if @selected.blank? %>
+                   required
+                   <%= @input_data_attr %>>
+            None
+          </label>
+        <% end %>
+        <% @options.each do |option| %>
+          <% value, option_label = Array(option) %>
+          <% option_label ||= value.humanize %>
+          <label class="mui-radio-option" for="<%= "#{id_prefix}_#{value}" %>">
+            <input type="radio"
+                   name="<%= @name %>"
+                   id="<%= "#{id_prefix}_#{value}" %>"
+                   value="<%= value %>"
+                   <%= "checked" if @selected == value %>
+                   required
+                   <%= @input_data_attr %>>
+            <%= option_label %>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
+</div>

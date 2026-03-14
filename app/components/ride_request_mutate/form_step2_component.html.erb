@@ -1,0 +1,24 @@
+<div class="space-y-5">
+  <%= render RideRequestMutate::StepHeaderComponent.new(
+    step: 2, total_steps: @total_steps,
+    title: "Public Information Continued",
+    description: RideRequestMutate::StepHeaderComponent::PUBLIC_DESCRIPTION,
+  ) %>
+
+  <%= render destination_address_field %>
+
+  <div>
+    <p class="text-sm font-semibold text-primary">Public Description</p>
+    <p class="mt-1 text-sm text-primary/70">This description will be included in the announcement that goes out to all volunteer drivers.</p>
+    <p class="mt-1 text-sm text-primary/70">Consider including:</p>
+    <ul class="mt-1 list-disc pl-5 text-sm text-primary/70 space-y-0.5">
+      <li>Information about the rider's English ability and native language</li>
+      <li>The nature of the appointment (medical, legal, errand, etc.)</li>
+      <li>Approximate duration of the appointment</li>
+      <li>Whether the driver needs to wait or can leave and return</li>
+      <li>Number of passengers, and whether any are children — the rider must provide car seats if necessary</li>
+    </ul>
+  </div>
+
+  <%= render ride_description_public_field %>
+</div>

@@ -2,7 +2,8 @@ module UnitsOfWork
   class CreateUser < UnitOfWork
     include Memery
 
-    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name, :phone, :password, :send_login_link
+    attr_reader :user_roles, :driver_qualifications, :email, :full_name, :preferred_name,
+      :phone, :password, :send_login_link
 
     def initialize(executor_id:, params:)
       super

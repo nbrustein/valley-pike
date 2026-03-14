@@ -12,8 +12,12 @@ RSpec.describe "Ride requests index", type: :request do
   before { configure_request_host! }
 
   describe "GET /ride_requests" do
-    let!(:ride_request_a) { create(:ride_request, organization:, date: 3.days.from_now, short_description: "Earlier date request") }
-    let!(:ride_request_b) { create(:ride_request, organization:, date: 1.day.from_now, short_description: "Later date request") }
+    let!(:ride_request_a) {
+      create(:ride_request, organization:, date: 3.days.from_now, short_description: "Earlier date request")
+    }
+    let!(:ride_request_b) {
+      create(:ride_request, organization:, date: 1.day.from_now, short_description: "Later date request")
+    }
 
     context "when signed out" do
       let(:current_user) { nil }
@@ -43,7 +47,9 @@ RSpec.describe "Ride requests index", type: :request do
           expect(response.body).to include(ride_request_a.short_description)
           expect(response.body).to include(ride_request_b.short_description)
           expect(ride_request_a.date).to be > ride_request_b.date
-          expect(short_descriptions.index(ride_request_a.short_description)).to be < short_descriptions.index(ride_request_b.short_description)
+          expect(short_descriptions.index(ride_request_a.short_description)).to(
+            be < short_descriptions.index(ride_request_b.short_description)
+          )
         end
       end
     end
@@ -63,8 +69,12 @@ RSpec.describe "Ride requests index", type: :request do
     context "when the current user has access to only one organization" do
       let(:role) { UserRole::RIDE_REQUESTER }
       let(:current_user) { create_current_user_with_role(role:, role_organization: organization) }
-      let!(:ride_request_a) { create(:ride_request, organization:, date: 3.days.from_now, short_description: "Earlier date request") }
-      let!(:ride_request_b) { create(:ride_request, organization:, date: 1.day.from_now, short_description: "Later date request") }
+      let!(:ride_request_a) {
+        create(:ride_request, organization:, date: 3.days.from_now, short_description: "Earlier date request")
+      }
+      let!(:ride_request_b) {
+        create(:ride_request, organization:, date: 1.day.from_now, short_description: "Later date request")
+      }
 
       it "does not show the organization abbreviation column" do
         act
@@ -88,7 +98,7 @@ RSpec.describe "Ride requests index", type: :request do
   end
 
   def short_descriptions
-    page.all("tbody tr td:nth-child(2)").map {|node| node.text.strip }
+    page.all("tbody tr td:nth-child(3)").map {|node| node.text.strip }
   end
 
   def page

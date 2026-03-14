@@ -1,0 +1,12 @@
+<div>
+  <% if @readonly %>
+    <p class="block text-sm font-semibold text-primary"><%= @label %></p>
+    <p class="mt-2 text-sm text-primary"><%= @value %></p>
+  <% else %>
+    <fieldset class="mui-fieldset">
+      <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.label @field, @label, class: "sr-only" %>
+      <%= @form.date_field @field, value: @value, required: @required, class: "mui-fieldset-input" %>
+    </fieldset>
+  <% end %>
+</div>

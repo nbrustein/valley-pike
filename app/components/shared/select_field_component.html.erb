@@ -1,0 +1,14 @@
+<div>
+  <% if @readonly %>
+    <p class="block text-sm font-semibold text-primary"><%= @label %></p>
+    <p class="mt-2 text-sm text-primary"><%= displayed_label %></p>
+  <% elsif single_option? %>
+    <%= @form.hidden_field @field, value: @options.first.last %>
+  <% else %>
+    <fieldset class="mui-fieldset">
+      <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.label @field, @label, class: "sr-only" %>
+      <%= @form.select @field, options_for_select(@options, @selected), {}, {required: @required, class: "mui-fieldset-input"} %>
+    </fieldset>
+  <% end %>
+</div>

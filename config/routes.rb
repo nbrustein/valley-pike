@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   devise_for :identities, controllers: {sessions: "identities/sessions"}
 
-  post "identity/magic_link_identity", to: "create_magic_link_identity#create_magic_link_identity", as: :identity_magic_link_identity
+  post "identity/magic_link_identity",
+    to: "create_magic_link_identity#create_magic_link_identity",
+    as: :identity_magic_link_identity
   post "auth/password_session", to: "auth#create_password_session", as: :password_session
   resource :profile, only: %i[show update]
   resources :users, only: %i[index], controller: "users_index"
@@ -10,6 +12,13 @@ Rails.application.routes.draw do
   end
   resources :organizations, only: %i[index], controller: "organizations_index"
   resources :ride_requests, only: %i[index], controller: "ride_requests_index"
+  resources :ride_requests, only: %i[show new create], controller: "ride_requests_mutate" do
+    post :publish, on: :member
+    post :cancel, on: :member
+    delete :delete_draft, on: :member
+  end
+  get   "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#edit",   as: :edit_ride_request
+  patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :update_ride_request
   resources :organizations, only: %i[show new create edit update], controller: "organizations_mutate"
 
   root "home#index"

@@ -5,7 +5,7 @@
   show_path: editable ? nil : organization_path(id: organization.id),
   data: {organization_id: organization.id}
 )) do %>
-  <td class="px-3 py-3 text-forest-900">
+  <td class="px-3 py-3 text-primary">
     <%= link_to row_path, class: "block" do %>
       <span><%= organization.name %></span>
     <% end %>

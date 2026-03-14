@@ -5,6 +5,7 @@ plugins:
 
 # Commonly used screens these days easily fit more than 80 characters.
 Layout/LineLength:
+  Enabled: true
   Max: 120
 
 # Enforce 2-space indentation and no tabs.

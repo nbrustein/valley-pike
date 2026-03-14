@@ -1,0 +1,15 @@
+<div>
+  <% if @readonly %>
+    <p class="block text-sm font-semibold text-primary"><%= @label %></p>
+    <p class="mt-2 text-sm text-primary"><%= @value %></p>
+  <% else %>
+    <fieldset class="mui-fieldset">
+      <legend class="mui-legend"><%= @label %><% if @required %> *<% end %></legend>
+      <%= @form.label @field, @label, class: "sr-only" %>
+      <%= @form.public_send(field_method, @field, value: @value, required: @required, data: @data, placeholder: @placeholder, class: "mui-fieldset-input") %>
+    </fieldset>
+    <% if @description %>
+      <p class="mt-1 text-xs text-primary/60"><%= @description %></p>
+    <% end %>
+  <% end %>
+</div>

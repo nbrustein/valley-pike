@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_11_033020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.string "state", null: false
     t.string "street_address", null: false
     t.datetime "updated_at", null: false
-    t.string "zip", null: false
+    t.string "zip"
   end
 
   create_table "driver_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -97,7 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.string "contact_full_name"
     t.string "contact_phone"
     t.datetime "created_at", null: false
-    t.date "date"
+    t.date "date", null: false
     t.string "desired_driver_gender", default: "none", null: false
     t.uuid "destination_address_id"
     t.boolean "draft", null: false
@@ -111,20 +111,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_120002) do
     t.boolean "requires_multiple_drivers", default: false, null: false
     t.text "ride_description_private"
     t.text "ride_description_public"
-    t.string "short_description"
+    t.string "short_description", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
     t.index ["destination_address_id"], name: "index_ride_requests_on_destination_address_id"
     t.index ["organization_id"], name: "index_ride_requests_on_organization_id"
     t.index ["pick_up_address_id"], name: "index_ride_requests_on_pick_up_address_id"
     t.index ["requester_id"], name: "index_ride_requests_on_requester_id"
-    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying, 'female_accompaniment'::character varying, 'none'::character varying]::text[])", name: "ride_requests_desired_driver_gender_check"
+    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying::text, 'female_accompaniment'::character varying::text, 'none'::character varying::text])", name: "ride_requests_desired_driver_gender_check"
     t.check_constraint "draft = true OR contact_full_name IS NOT NULL", name: "ride_requests_contact_full_name_check"
     t.check_constraint "draft = true OR date IS NOT NULL", name: "ride_requests_date_check"
     t.check_constraint "draft = true OR pick_up_address_id IS NOT NULL", name: "ride_requests_pick_up_address_check"
     t.check_constraint "draft = true OR ride_description_public IS NOT NULL", name: "ride_requests_ride_description_public_check"
     t.check_constraint "draft = true OR short_description IS NOT NULL", name: "ride_requests_short_description_check"
-    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying, 'RideRequest::Published'::character varying]::text[])", name: "ride_requests_type_check"
+    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying::text, 'RideRequest::Published'::character varying::text])", name: "ride_requests_type_check"
   end
 
   create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

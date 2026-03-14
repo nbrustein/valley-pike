@@ -32,9 +32,9 @@ class AddDriverQualificationsAndRequiredQualifications < ActiveRecord::Migration
     SQL
     remove_check_constraint :user_roles, name: "user_roles_organization_id_check"
     add_check_constraint :user_roles,
-                         "(role IN ('developer', 'vanita_admin', 'vanita_viewer', 'driver') AND organization_id IS NULL) OR " \
-                         "(role IN ('org_admin', 'ride_requester') AND organization_id IS NOT NULL)",
-                         name: "user_roles_organization_id_check"
+      "(role IN ('developer', 'vanita_admin', 'vanita_viewer', 'driver') AND organization_id IS NULL) OR " \
+      "(role IN ('org_admin', 'ride_requester') AND organization_id IS NOT NULL)",
+      name: "user_roles_organization_id_check"
   end
 
   def down

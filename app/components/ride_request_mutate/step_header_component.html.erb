@@ -1,0 +1,6 @@
+<div>
+  <p class="text-base font-semibold text-primary"><%= @step %> of <%= @total_steps %>: <%= @title %></p>
+  <% if @description.present? %>
+    <p class="mt-1 text-sm text-primary/70"><%= @description %></p>
+  <% end %>
+</div>

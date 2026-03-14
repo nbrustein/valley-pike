@@ -39,4 +39,38 @@
   label:has(input[type="checkbox"]:disabled) {
     opacity: 0.5;
   }
+
+  /* Material UI Outlined Fields — fieldset/legend approach */
+  .mui-fieldset {
+    @apply rounded border border-primary/30 px-3.5 pb-2 pt-1 transition-colors;
+  }
+
+  .mui-fieldset:focus-within {
+    @apply border-accent ring-2 ring-accent/25;
+  }
+
+  .mui-legend {
+    @apply px-0.5 text-xs text-primary/50 transition-colors;
+  }
+
+  .mui-fieldset:focus-within .mui-legend {
+    @apply text-accent;
+  }
+
+  .mui-fieldset-input {
+    @apply w-full border-none bg-transparent p-0 text-sm text-primary outline-none;
+  }
+
+  /* Material UI Radio Group */
+  .mui-radio-option {
+    @apply flex items-center gap-3 rounded-lg border border-primary/20 px-3.5 py-3 text-sm text-primary transition-colors;
+  }
+
+  .mui-radio-option:has(input:checked) {
+    @apply border-accent bg-accent/5;
+  }
+
+  .mui-radio-option input[type="radio"] {
+    @apply h-4.5 w-4.5 accent-accent;
+  }
 }
