@@ -3,17 +3,25 @@
     <%= content %>
   </div>
 
-  <div class="flex items-center <%= previous_path ? "justify-between" : "justify-end" %>">
+  <div class="flex items-center <%= previous_path ? "justify-between" : "justify-end" %> gap-3">
     <% if previous_path %>
       <%= link_to "Previous", previous_path, class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
     <% end %>
 
-    <% if next_button_label %>
-      <button type="submit"
-              class="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90">
-        <%= next_button_label %>
-      </button>
-    <% end %>
+    <div class="flex items-center gap-3 ml-auto">
+      <% if @delete_path %>
+        <%= link_to "Delete Draft", @delete_path,
+          class: "rounded-full border border-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/5 active:bg-primary/10",
+          data: {turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this draft?"} %>
+      <% end %>
+
+      <% if next_button_label %>
+        <button type="submit"
+                class="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90">
+          <%= next_button_label %>
+        </button>
+      <% end %>
+    </div>
   </div>
 
   <p class="text-center text-xs text-primary/50">Page <%= @current_page %> of <%= @page_paths.length %></p>

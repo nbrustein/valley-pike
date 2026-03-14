@@ -72,6 +72,27 @@ class RideRequestsMutateController < ApplicationController
     )
   end
 
+  # DELETE /ride_requests/:id/delete_draft
+  def delete_draft
+    return render_not_found unless target_ride_request.present?
+
+    authorize(target_ride_request, :edit?, policy_class: RideRequestMutatePolicy)
+
+    success, _errors = execute_unit_of_work do
+      UnitsOfWork::DeleteDraftRideRequest.new(
+        executor_id: current_user.id,
+        params: {ride_request_id: params[:id]}
+      )
+    end
+
+    return redirect_to ride_requests_path if success
+
+    render_form(
+      status: :unprocessable_entity, mode: :create, page: params.fetch(:page, 1).to_i,
+      ride_request: target_ride_request, submitted_params: nil
+    )
+  end
+
   # POST /ride_requests/:id/publish
   def publish
     return render_not_found unless target_ride_request.present?

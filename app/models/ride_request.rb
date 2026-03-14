@@ -30,10 +30,18 @@ class RideRequest < ApplicationRecord
     STATUS_DISPLAY.fetch(status_key)
   end
   validate :date_not_changed_to_past, if: -> { date.present? && (new_record? || date_changed?) }
+  before_destroy :ensure_draft!
 
   private
 
   def date_not_changed_to_past
     errors.add(:date, "must not be in the past") if date < Date.today
+  end
+
+  def ensure_draft!
+    return if draft?
+
+    errors.add(:base, "Only draft ride requests can be deleted")
+    throw(:abort)
   end
 end

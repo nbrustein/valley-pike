@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :ride_requests, only: %i[index], controller: "ride_requests_index"
   resources :ride_requests, only: %i[show new create], controller: "ride_requests_mutate" do
     post :publish, on: :member
+    delete :delete_draft, on: :member
   end
   get   "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#edit",   as: :edit_ride_request
   patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :update_ride_request

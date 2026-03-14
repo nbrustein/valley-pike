@@ -168,6 +168,26 @@ RSpec.describe "Ride request create form", type: :system do
     end
   end
 
+  context "when deleting a draft" do
+    let(:draft) { create(:draft_ride_request, requester: identity.user, organization:) }
+
+    it "deletes the draft and redirects to index", :aggregate_failures do
+      visit edit_ride_request_path(id: draft.id, page: 1)
+      accept_confirm do
+        click_link "Delete Draft"
+      end
+      expect(page).to have_current_path(ride_requests_path)
+      expect(RideRequest.find_by(id: draft.id)).to be_nil
+    end
+
+    it "shows the delete link on every page" do
+      (1..5).each do |pg|
+        visit edit_ride_request_path(id: draft.id, page: pg)
+        expect(page).to have_link("Delete Draft")
+      end
+    end
+  end
+
   context "when viewing a ride request as a vanita viewer" do
     let(:viewer_identity) do
       user = create(
