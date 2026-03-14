@@ -3,12 +3,31 @@ module RideRequestMutate
     include Memery
     include Concerns::HasDriverOptions
 
-    def initialize(form:, total_steps:, ride_request: nil)
+    def initialize(form:, total_steps:, ride_request: nil, show_step_header: true)
       super(form:, total_steps:)
       @ride_request = ride_request
+      @show_step_header = show_step_header
     end
 
     private
+
+    STATUS_DISPLAY = {
+      draft: {label: "Draft", icon: "fa-file-pen"},
+      request_sent: {label: "Request Sent", icon: "fa-paper-plane"},
+      driver_assigned: {label: "Driver Assigned", icon: "fa-car"},
+      complete: {label: "Complete", icon: "fa-circle-check"},
+      canceled: {label: "Canceled", icon: "fa-ban"},
+    }.freeze
+
+    def status_display
+      STATUS_DISPLAY.fetch(status_key)
+    end
+
+    def status_key
+      return :draft if @ride_request.nil? || @ride_request.draft?
+
+      :request_sent
+    end
 
     # Public fields
 

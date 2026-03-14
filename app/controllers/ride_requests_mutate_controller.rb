@@ -4,6 +4,15 @@ class RideRequestsMutateController < ApplicationController
   include RideRequestMutateConcerns::HasMutateRideRequestForm
   include CastsParams
 
+  # GET /ride_requests/:id
+  def show
+    return render_not_found unless target_ride_request.present?
+
+    authorize(target_ride_request, :show?, policy_class: RideRequestViewPolicy)
+    @header_text = target_ride_request.short_description.presence || "Ride Request"
+    @ride_request = target_ride_request
+  end
+
   # GET /ride_requests/new
   def new
     authorize(nil, :new?, policy_class: RideRequestMutatePolicy)

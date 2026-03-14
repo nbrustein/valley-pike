@@ -1,9 +1,16 @@
 <div class="space-y-5">
-  <%= render RideRequestMutate::StepHeaderComponent.new(
-    step: 5, total_steps: @total_steps,
-    title: "Review and Publish",
-    description: "Review the information below before publishing",
-  ) %>
+  <% if @show_step_header %>
+    <%= render RideRequestMutate::StepHeaderComponent.new(
+      step: 5, total_steps: @total_steps,
+      title: "Review and Publish",
+      description: "Review the information below before publishing",
+    ) %>
+  <% end %>
+
+  <div>
+    <p class="text-sm text-primary"><%= status_display[:label] %> <i class="fa-solid <%= status_display[:icon] %>"></i></p>
+    <p class="text-sm text-primary"><%= @ride_request&.organization&.name %></p>
+  </div>
 
   <fieldset class="rounded-lg border border-primary/10 px-4 pb-4 pt-3">
     <legend class="px-1 text-sm font-semibold text-primary">Public Information</legend>

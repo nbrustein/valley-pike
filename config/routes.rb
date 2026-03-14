@@ -12,10 +12,11 @@ Rails.application.routes.draw do
   end
   resources :organizations, only: %i[index], controller: "organizations_index"
   resources :ride_requests, only: %i[index], controller: "ride_requests_index"
-  resources :ride_requests, only: %i[new create], controller: "ride_requests_mutate"
+  resources :ride_requests, only: %i[show new create], controller: "ride_requests_mutate" do
+    post :publish, on: :member
+  end
   get   "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#edit",   as: :edit_ride_request
-  patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :ride_request
-  post  "ride_requests/:id/publish",      to: "ride_requests_mutate#publish", as: :publish_ride_request
+  patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :update_ride_request
   resources :organizations, only: %i[show new create edit update], controller: "organizations_mutate"
 
   root "home#index"

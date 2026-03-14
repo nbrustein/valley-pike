@@ -167,4 +167,40 @@ RSpec.describe "Ride request create form", type: :system do
       expect(page).to have_text("can't be blank")
     end
   end
+
+  context "when viewing a ride request as a vanita viewer" do
+    let(:viewer_identity) do
+      user = create(
+        :user,
+        :with_identity,
+        email: "viewer@example.com",
+        role: UserRole::VANITA_VIEWER,
+        identity_kind: "magic_link",
+        identity_email: "viewer@example.com"
+      )
+      user.identities.find_by!(kind: "magic_link")
+    end
+    let(:ride_request) do
+      create(:ride_request, organization:,
+        short_description: "Hospital visit",
+        contact_full_name: "Jane Doe",
+        ride_description_public: "Ride for a woman",
+        ride_description_private: "Ring doorbell")
+    end
+
+    before { login_as(viewer_identity, scope: :identity) }
+
+    it "displays the ride request details", :aggregate_failures do
+      visit ride_request_path(id: ride_request.id)
+      expect(page).to have_text("Hospital visit")
+      expect(page).to have_text("Jane Doe")
+      expect(page).to have_text("Ride for a woman")
+      expect(page).to have_text("Ring doorbell")
+    end
+
+    it "does not show a publish button" do
+      visit ride_request_path(id: ride_request.id)
+      expect(page).not_to have_button("Publish")
+    end
+  end
 end
