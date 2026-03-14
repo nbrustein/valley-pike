@@ -63,7 +63,8 @@ fi
 
 (
   cd "$dir"
-  printf "WEB_PORT=%s\n" "$port" > .env
+  page_header="$(echo "$branch" | tr '[:lower:]' '[:upper:]' | cut -c1-12)"
+  printf "WEB_PORT=%s\nPAGE_HEADER=%s\n" "$port" "$page_header" > .env
   host-bin/setup
 )
 

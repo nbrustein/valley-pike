@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Msse Capstone" %></title>
+    <title><%= content_for(:title) || ENV.fetch("PAGE_HEADER", "VANITA") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Msse Capstone">
@@ -25,17 +25,25 @@
   </head>
 
   <body>
-    <div class="min-h-screen bg-gradient-to-b from-surface via-muted/35 to-accent/20">
-      <header class="border-b border-primary bg-primary">
-        <div class="flex w-full items-center justify-between py-4 pl-8 pr-4 sm:pl-10 sm:pr-6">
-          <p class="text-lg font-semibold tracking-tight text-surface">Valley Pike</p>
-          <nav aria-label="Main" class="flex items-center gap-2">
+    <div class="flex min-h-screen flex-col bg-gradient-to-b from-surface via-muted/35 to-accent/20">
+      <header class="sticky top-0 z-40 border-b border-primary bg-primary">
+        <div class="flex w-full items-center justify-between py-2 px-4 sm:py-4 sm:pl-10 sm:pr-6">
+          <p class="text-lg font-semibold tracking-tight text-surface"><%= ENV.fetch("PAGE_HEADER", "VANITA") %></p>
+          <nav aria-label="Main" class="hidden items-center gap-2 sm:flex">
             <%= render "layouts/app_menu" %>
           </nav>
+          <button type="button" class="sm:hidden rounded-md p-2 text-surface hover:bg-secondary/70 transition" data-mobile-menu-toggle>
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
         </div>
+        <nav aria-label="Mobile menu" class="absolute left-0 right-0 z-50 hidden border-t border-surface/20 bg-primary px-4 pb-3 pt-2 shadow-lg sm:hidden" data-mobile-menu>
+          <div class="flex flex-col gap-1">
+            <%= render "layouts/app_menu" %>
+          </div>
+        </nav>
       </header>
 
-      <main class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+      <main class="flex-1 bg-white/80 px-4 py-4 sm:mx-auto sm:w-full sm:max-w-3xl sm:bg-transparent sm:px-6 sm:py-8">
         <% flash.each do |type, message| %>
           <% flash_style = type.to_s == "notice" ? "border-accent/35 bg-accent/12 text-primary" : "border-red-300 bg-red-50 text-red-700" %>
           <div class="mb-4 rounded-lg border px-4 py-3 text-sm <%= flash_style %>"><%= message %></div>
