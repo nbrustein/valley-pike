@@ -5,7 +5,7 @@
 
   <% form = ActionView::Helpers::FormBuilder.new("ride_request", @ride_request, self, {}) %>
   <%= render RideRequestMutate::FormStep5Component.new(
-    form: form,
+    form:,
     total_steps: RideRequestMutateConcerns::HasMutateRideRequestForm::FORM_STEP_COUNT,
     ride_request: @ride_request,
     show_step_header: false

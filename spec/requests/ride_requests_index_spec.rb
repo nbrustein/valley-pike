@@ -98,7 +98,7 @@ RSpec.describe "Ride requests index", type: :request do
   end
 
   def short_descriptions
-    page.all("tbody tr td:nth-child(2)").map {|node| node.text.strip }
+    page.all("tbody tr td:nth-child(3)").map {|node| node.text.strip }
   end
 
   def page

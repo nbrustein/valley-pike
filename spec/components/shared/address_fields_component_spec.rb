@@ -29,7 +29,9 @@ RSpec.describe Shared::AddressFieldsComponent, type: :component do
 
   context "when readonly" do
     def render_readonly(value: nil)
-      render_inline(described_class.new(form:, field: :pick_up_address, label: "Pick Up Address", value:, readonly: true))
+      render_inline(described_class.new(
+        form:, field: :pick_up_address, label: "Pick Up Address", value:, readonly: true
+      ))
     end
 
     it "renders the label" do
@@ -43,7 +45,8 @@ RSpec.describe Shared::AddressFieldsComponent, type: :component do
     end
 
     it "renders each address part on its own line" do
-      address = build_stubbed(:address, name: "City Hospital", street_address: "100 Main St", city: "Richmond", state: "VA")
+      address = build_stubbed(:address,
+        name: "City Hospital", street_address: "100 Main St", city: "Richmond", state: "VA")
       render_readonly(value: address)
       expect(page).to have_text("City Hospital")
       expect(page).to have_text("100 Main St")
