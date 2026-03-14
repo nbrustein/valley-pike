@@ -166,14 +166,14 @@ begin
     {
       organization: organizations.fetch("udo"),
       requester: udo_requester,
-      date: Date.new(2026, 3, 15),
+      date: 1.year.from_now.to_date,
       short_description: "Doctor appointment - UDO client",
       contact_full_name: "udo ride requester",
     },
     {
       organization: organizations.fetch("vdo"),
       requester: vdo_requester,
-      date: Date.new(2026, 3, 10),
+      date: (1.year + 1.week).from_now.to_date,
       short_description: "Physical therapy - VDO client",
       contact_full_name: "vdo ride requester",
     },
