@@ -118,13 +118,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_033020) do
     t.index ["organization_id"], name: "index_ride_requests_on_organization_id"
     t.index ["pick_up_address_id"], name: "index_ride_requests_on_pick_up_address_id"
     t.index ["requester_id"], name: "index_ride_requests_on_requester_id"
-    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying::text, 'female_accompaniment'::character varying::text, 'none'::character varying::text])", name: "ride_requests_desired_driver_gender_check"
+    t.check_constraint "desired_driver_gender::text = ANY (ARRAY['female'::character varying, 'female_accompaniment'::character varying, 'none'::character varying]::text[])", name: "ride_requests_desired_driver_gender_check"
     t.check_constraint "draft = true OR contact_full_name IS NOT NULL", name: "ride_requests_contact_full_name_check"
     t.check_constraint "draft = true OR date IS NOT NULL", name: "ride_requests_date_check"
     t.check_constraint "draft = true OR pick_up_address_id IS NOT NULL", name: "ride_requests_pick_up_address_check"
     t.check_constraint "draft = true OR ride_description_public IS NOT NULL", name: "ride_requests_ride_description_public_check"
     t.check_constraint "draft = true OR short_description IS NOT NULL", name: "ride_requests_short_description_check"
-    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying::text, 'RideRequest::Published'::character varying::text])", name: "ride_requests_type_check"
+    t.check_constraint "type::text = ANY (ARRAY['RideRequest::Draft'::character varying, 'RideRequest::Published'::character varying]::text[])", name: "ride_requests_type_check"
   end
 
   create_table "unit_of_work_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -148,8 +148,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_033020) do
     t.uuid "user_id", null: false
     t.index ["organization_id"], name: "index_user_roles_on_organization_id"
     t.index ["user_id"], name: "index_user_roles_on_user_id"
-    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'vanita_viewer'::character varying::text, 'driver'::character varying::text])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying::text, 'ride_requester'::character varying::text])) AND organization_id IS NOT NULL", name: "user_roles_organization_id_check"
-    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying::text, 'vanita_admin'::character varying::text, 'vanita_viewer'::character varying::text, 'org_admin'::character varying::text, 'ride_requester'::character varying::text, 'driver'::character varying::text])", name: "user_roles_role_check"
+    t.check_constraint "(role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'driver'::character varying]::text[])) AND organization_id IS NULL OR (role::text = ANY (ARRAY['org_admin'::character varying, 'ride_requester'::character varying]::text[])) AND organization_id IS NOT NULL", name: "user_roles_organization_id_check"
+    t.check_constraint "role::text = ANY (ARRAY['developer'::character varying, 'vanita_admin'::character varying, 'vanita_viewer'::character varying, 'org_admin'::character varying, 'ride_requester'::character varying, 'driver'::character varying]::text[])", name: "user_roles_role_check"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
