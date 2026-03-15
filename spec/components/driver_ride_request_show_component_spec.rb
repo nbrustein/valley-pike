@@ -56,7 +56,17 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
     expect(page).to have_text("We are looking for a female driver for this ride.")
   end
 
-  it "renders the pick up address" do
+  it "shows pick up name and city/state but not street address when not assigned" do
+    render_component
+    expect(page).to have_text("Home")
+    expect(page).to have_text("Richmond, VA")
+    expect(page).not_to have_text("123 Main St")
+  end
+
+  it "shows pick up full address when assigned" do
+    assignment = build_stubbed(:driver_assignment, driver: current_user, ride_request:)
+    allow(ride_request).to receive(:driver_assignments).and_return([ assignment ])
+
     render_component
     expect(page).to have_text("Home")
     expect(page).to have_text("123 Main St, Richmond, VA, 23220")

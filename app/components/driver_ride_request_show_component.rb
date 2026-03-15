@@ -50,4 +50,10 @@ class DriverRideRequestShowComponent < ViewComponent::Base
     parts << address.zip if address.zip.present?
     parts.join(", ")
   end
+
+  def format_city_state(address)
+    return nil if address.blank?
+
+    [ address.city, address.state ].compact_blank.join(", ")
+  end
 end

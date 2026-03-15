@@ -35,7 +35,11 @@
       <div>
         <p class="text-sm font-medium text-secondary">Pick Up</p>
         <p class="text-primary"><%= @ride_request.pick_up_address.name %></p>
-        <p class="text-sm text-secondary"><%= format_address(@ride_request.pick_up_address) %></p>
+        <% if assigned_to_current_user? %>
+          <p class="text-sm text-secondary"><%= format_address(@ride_request.pick_up_address) %></p>
+        <% else %>
+          <p class="text-sm text-secondary"><%= format_city_state(@ride_request.pick_up_address) %></p>
+        <% end %>
       </div>
     <% end %>
 

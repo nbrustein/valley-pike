@@ -267,6 +267,18 @@ begin
     },
     {
       short_description: "Available ride for drivers",
+      destination_address:,
+      appointment_time: "10:00 AM",
+      desired_driver_gender: "female_accompaniment",
+      contact_full_name: "David Chen",
+      contact_phone: "540-555-0192",
+      contact_email: "david.chen@example.com",
+      ride_description_public: "Maecenas faucibus mollis interdum. Cras justo odio, dapibus ut facilisis et, " \
+        "egestas eget quam. Donec sed odio dui. Nullam id dolor id nibh ultricies vehicula ut id elit.",
+      ride_description_private: "Etiam porta sem malesuada magna mollis euismod. " \
+        "Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+      requester_notes: "Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.",
+      other_notes: "Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
     },
     {
       short_description: "Other driver's ride (single, full)",
