@@ -22,34 +22,36 @@
         </div>
       <% end %>
 
-      <% if formatted_gender_preference %>
+    </div>
+
+    <% if formatted_gender_preference %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Requirements</p>
+        <p class="text-primary"><%= formatted_gender_preference %></p>
+      </div>
+    <% end %>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <% if @ride_request.pick_up_address.present? %>
         <div>
-          <p class="text-sm font-medium text-secondary">Requirements</p>
-          <p class="text-primary"><%= formatted_gender_preference %></p>
+          <p class="text-sm font-medium text-secondary">Pick Up</p>
+          <p class="text-primary"><%= @ride_request.pick_up_address.name %></p>
+          <% if assigned_to_current_user? %>
+            <p class="text-sm text-secondary"><%= format_address(@ride_request.pick_up_address) %></p>
+          <% else %>
+            <p class="text-sm text-secondary"><%= format_city_state(@ride_request.pick_up_address) %></p>
+          <% end %>
         </div>
       <% end %>
 
+      <% if @ride_request.destination_address.present? %>
+        <div>
+          <p class="text-sm font-medium text-secondary">Destination</p>
+          <p class="text-primary"><%= @ride_request.destination_address.name %></p>
+          <p class="text-sm text-secondary"><%= format_address(@ride_request.destination_address) %></p>
+        </div>
+      <% end %>
     </div>
-
-    <% if @ride_request.pick_up_address.present? %>
-      <div>
-        <p class="text-sm font-medium text-secondary">Pick Up</p>
-        <p class="text-primary"><%= @ride_request.pick_up_address.name %></p>
-        <% if assigned_to_current_user? %>
-          <p class="text-sm text-secondary"><%= format_address(@ride_request.pick_up_address) %></p>
-        <% else %>
-          <p class="text-sm text-secondary"><%= format_city_state(@ride_request.pick_up_address) %></p>
-        <% end %>
-      </div>
-    <% end %>
-
-    <% if @ride_request.destination_address.present? %>
-      <div>
-        <p class="text-sm font-medium text-secondary">Destination</p>
-        <p class="text-primary"><%= @ride_request.destination_address.name %></p>
-        <p class="text-sm text-secondary"><%= format_address(@ride_request.destination_address) %></p>
-      </div>
-    <% end %>
 
     <% if @ride_request.ride_description_public.present? %>
       <div>
