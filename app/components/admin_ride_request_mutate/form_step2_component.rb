@@ -15,6 +15,7 @@ module AdminRideRequestMutate
         field: :pick_up_address,
         label: "Pick Up Address",
         value: @ride_request&.pick_up_address,
+        name_placeholder: "ex. Rider's Home",
         street_address_description: "The exact street address will only be sent to the driver who accepts the ride",
       )
     end
@@ -25,6 +26,7 @@ module AdminRideRequestMutate
         field: :destination_address,
         label: "Destination Address",
         value: @ride_request&.destination_address,
+        name_placeholder: "ex. UVA Hospital",
       )
     end
 

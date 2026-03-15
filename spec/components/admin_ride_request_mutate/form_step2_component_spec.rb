@@ -22,6 +22,7 @@ RSpec.describe AdminRideRequestMutate::FormStep2Component, type: :component do
         field: :pick_up_address,
         label: "Pick Up Address",
         value: nil,
+        name_placeholder: "ex. Rider's Home",
         street_address_description: "The exact street address will only be sent to the driver who accepts the ride",
       )
     end
@@ -46,6 +47,7 @@ RSpec.describe AdminRideRequestMutate::FormStep2Component, type: :component do
         field: :destination_address,
         label: "Destination Address",
         value: nil,
+        name_placeholder: "ex. UVA Hospital",
       )
     end
 
