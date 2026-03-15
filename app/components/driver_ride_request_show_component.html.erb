@@ -79,10 +79,10 @@
           <p class="text-primary"><%= @ride_request.contact_full_name %></p>
         <% end %>
         <% if @ride_request.contact_phone.present? %>
-          <p class="text-primary"><%= @ride_request.contact_phone %></p>
+          <p><%= link_to @ride_request.contact_phone, "tel:#{@ride_request.contact_phone}", class: "text-primary underline" %></p>
         <% end %>
         <% if @ride_request.contact_email.present? %>
-          <p class="text-primary"><%= @ride_request.contact_email %></p>
+          <p><%= link_to @ride_request.contact_email, "mailto:#{@ride_request.contact_email}", class: "text-primary underline" %></p>
         <% end %>
       </div>
     </div>
