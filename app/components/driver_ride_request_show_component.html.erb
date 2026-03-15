@@ -18,17 +18,18 @@
         </div>
       <% end %>
 
+      <% if formatted_gender_preference %>
+        <div>
+          <p class="text-sm font-medium text-secondary">Requirements</p>
+          <p class="text-primary"><%= formatted_gender_preference %></p>
+        </div>
+      <% end %>
+
       <div>
         <p class="text-sm font-medium text-secondary">Status</p>
         <p class="text-primary"><%= status_label %></p>
       </div>
 
-      <% if formatted_gender_preference %>
-        <div>
-          <p class="text-sm font-medium text-secondary">Driver Preference</p>
-          <p class="text-primary"><%= formatted_gender_preference %></p>
-        </div>
-      <% end %>
     </div>
 
     <% if @ride_request.pick_up_address.present? %>

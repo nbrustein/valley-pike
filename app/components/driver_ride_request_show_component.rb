@@ -12,9 +12,9 @@ class DriverRideRequestShowComponent < ViewComponent::Base
   def formatted_gender_preference
     case @ride_request.desired_driver_gender
     when "female"
-      "Female driver requested"
+      "We are looking for a female driver for this ride."
     when "female_accompaniment"
-      "Female accompaniment requested"
+      "We are looking for a female driver or a male driver with a female accompaniment for this ride."
     else
       nil
     end

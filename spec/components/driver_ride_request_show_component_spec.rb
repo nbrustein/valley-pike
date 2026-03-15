@@ -54,9 +54,10 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
     expect(page).to have_text("Request Sent")
   end
 
-  it "renders the gender preference" do
+  it "renders the gender preference under Requirements" do
     render_component
-    expect(page).to have_text("Female driver requested")
+    expect(page).to have_text("Requirements")
+    expect(page).to have_text("We are looking for a female driver for this ride.")
   end
 
   it "renders the pick up address" do
@@ -127,7 +128,7 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
 
     it "hides the gender preference when none" do
       render_component
-      expect(page).not_to have_text("Driver Preference")
+      expect(page).not_to have_text("We are looking for")
     end
   end
 end
