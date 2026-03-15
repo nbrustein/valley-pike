@@ -70,7 +70,12 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
         safe_join([
           tag.div(class: "min-w-0 flex-1") do
             safe_join([
-              tag.h3(ride_request.short_description, class: "text-lg font-semibold text-primary"),
+              tag.h3(class: "text-lg font-semibold text-primary") do
+                safe_join([
+                  tag.i(class: "fa-solid #{driver_status_icon(ride_request)} mr-2 text-secondary"),
+                  ride_request.short_description,
+                ])
+              end,
               tag.p(ride_request.organization.name, class: "mt-1 text-sm text-secondary"),
               if ride_request.destination_address.present?
                 tag.p(class: "mt-1 text-sm text-secondary") do
@@ -88,6 +93,19 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
   end
 
   private
+
+  def driver_status_icon(ride_request)
+    return "fa-ban" if ride_request.cancelled?
+    return "fa-circle-check" if ride_request.completed?
+    return "fa-user-check" if assigned?(ride_request)
+
+    if ride_request.driver_assignments.any?
+      return "fa-user-plus" unless ride_request.has_enough_drivers?
+      return "fa-car"
+    end
+
+    "fa-user"
+  end
 
   def assigned?(ride_request)
     ride_request.driver_assignments.any? {|da| da.driver_id == @current_user.id }
