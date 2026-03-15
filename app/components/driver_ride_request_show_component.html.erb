@@ -58,6 +58,13 @@
       </div>
     <% end %>
 
+    <% if assigned_to_current_user? && @ride_request.ride_description_private.present? %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Private Notes</p>
+        <p class="text-primary whitespace-pre-line"><%= @ride_request.ride_description_private %></p>
+      </div>
+    <% end %>
+
     <% if @ride_request.driver_notes.present? %>
       <div>
         <p class="text-sm font-medium text-secondary">Driver Notes</p>

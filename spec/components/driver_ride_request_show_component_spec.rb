@@ -19,6 +19,7 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
       date: Date.new(2026, 6, 15),
       appointment_time: "2:00 PM",
       ride_description_public: "Please arrive 10 minutes early.",
+      ride_description_private: "Ring the doorbell twice.",
       driver_notes: "Park in the back lot.",
       contact_full_name: "Jane Doe",
       contact_phone: "555-1234",
@@ -81,6 +82,21 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
   it "renders the ride description" do
     render_component
     expect(page).to have_text("Please arrive 10 minutes early.")
+  end
+
+  it "does not show private notes when not assigned" do
+    render_component
+    expect(page).not_to have_text("Private Notes")
+    expect(page).not_to have_text("Ring the doorbell twice.")
+  end
+
+  it "shows private notes when assigned" do
+    assignment = build_stubbed(:driver_assignment, driver: current_user, ride_request:)
+    allow(ride_request).to receive(:driver_assignments).and_return([ assignment ])
+
+    render_component
+    expect(page).to have_text("Private Notes")
+    expect(page).to have_text("Ring the doorbell twice.")
   end
 
   it "renders the driver notes" do
