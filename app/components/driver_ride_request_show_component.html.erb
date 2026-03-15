@@ -89,9 +89,16 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-end">
+    <div class="flex items-center justify-end gap-3">
       <%= link_to "Back", root_path,
             class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
+      <% if can_accept? %>
+        <%= button_to "Accept Ride",
+              helpers.accept_driver_ride_request_path(id: @ride_request.id),
+              method: :post,
+              data: {turbo_confirm: "Are you sure you want to accept this ride?"},
+              class: "rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90" %>
+      <% end %>
     </div>
   </div>
 </section>

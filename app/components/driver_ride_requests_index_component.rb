@@ -14,7 +14,7 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
 
   memoize def looking_for_drivers
     @ride_requests.select {|rr|
-      !assigned?(rr) && !rr.has_enough_drivers? && !rr.completed? && !rr.cancelled? && rr.date >= Date.current
+      !assigned?(rr) && rr.needs_more_drivers?(current_date: Date.current)
     }
   end
 

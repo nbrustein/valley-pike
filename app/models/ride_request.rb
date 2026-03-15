@@ -40,6 +40,10 @@ class RideRequest < ApplicationRecord
     ADMIN_STATUS_DISPLAY.fetch(status_key)
   end
 
+  def needs_more_drivers?(current_date:)
+    date >= current_date && !has_enough_drivers? && !completed? && !cancelled?
+  end
+
   def cancellable?
     CANCELLABLE_STATUSES.include?(status_key)
   end

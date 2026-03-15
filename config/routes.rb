@@ -25,7 +25,9 @@ Rails.application.routes.draw do
   end
 
   scope "driver", as: "driver" do
-    resources :ride_requests, only: %i[show], controller: "driver_ride_requests"
+    resources :ride_requests, only: %i[show], controller: "driver_ride_requests" do
+      post :accept, on: :member
+    end
   end
 
   root "home#index"

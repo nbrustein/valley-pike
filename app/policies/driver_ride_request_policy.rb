@@ -9,6 +9,10 @@ class DriverRideRequestPolicy < ApplicationPolicy
     index? && Scope.new(user, RideRequest).resolve.exists?(record.id)
   end
 
+  def accept?
+    show?
+  end
+
   class Scope < Scope
     def resolve
       return RideRequest.where("FALSE") unless policy.index?

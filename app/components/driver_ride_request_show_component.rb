@@ -39,6 +39,10 @@ class DriverRideRequestShowComponent < ViewComponent::Base
     {label: "Looking for a driver", icon: "fa-user"}
   end
 
+  def can_accept?
+    !assigned_to_current_user? && @ride_request.needs_more_drivers?(current_date: Date.current)
+  end
+
   def assigned_to_current_user?
     @ride_request.driver_assignments.any? {|da| da.driver_id == @current_user.id }
   end
