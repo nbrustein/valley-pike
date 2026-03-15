@@ -75,7 +75,7 @@ class RideRequestAssignmentValidator
     @organizations.each do |org|
       next unless org.required_qualifications_changed?
 
-      active_ride_requests_for_org(org).each do |ride_request|
+      driver_ride_requests_for_org(org).each do |ride_request|
         yield ride_request, org.required_qualifications
       end
     end
@@ -117,7 +117,7 @@ class RideRequestAssignmentValidator
       .where(ride_requests: {completed: false, cancelled: false})
   end
 
-  def active_ride_requests_for_org(org)
+  def driver_ride_requests_for_org(org)
     RideRequest
       .joins(:driver_assignments)
       .where(organization: org, completed: false, cancelled: false)
