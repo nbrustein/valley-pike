@@ -3,6 +3,10 @@
     <div>
       <h1 class="text-2xl font-semibold tracking-tight text-primary"><%= @ride_request.short_description %></h1>
       <p class="mt-1 text-sm text-secondary"><%= @ride_request.organization.name %></p>
+      <p class="mt-1 text-sm text-secondary">
+        <i class="fa-solid <%= driver_status[:icon] %>"></i>
+        <%= driver_status[:label] %>
+      </p>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2">
@@ -24,11 +28,6 @@
           <p class="text-primary"><%= formatted_gender_preference %></p>
         </div>
       <% end %>
-
-      <div>
-        <p class="text-sm font-medium text-secondary">Status</p>
-        <p class="text-primary"><%= status_label %></p>
-      </div>
 
     </div>
 

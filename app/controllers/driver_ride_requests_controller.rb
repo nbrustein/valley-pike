@@ -5,7 +5,7 @@ class DriverRideRequestsController < ApplicationController
     return render_not_found unless target_ride_request.present?
 
     authorize(target_ride_request, :show?, policy_class: DriverRideRequestPolicy)
-    @component = DriverRideRequestShowComponent.new(ride_request: target_ride_request)
+    @component = DriverRideRequestShowComponent.new(ride_request: target_ride_request, current_user:)
   end
 
   private

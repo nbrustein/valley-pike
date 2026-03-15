@@ -8,9 +8,10 @@ class RideRequest < ApplicationRecord
   has_many :driver_assignments
   has_many :drivers, through: :driver_assignments, source: :driver
 
-  STATUS_DISPLAY = {
+  # Drivers see a slightly different set of statuses, which are defined in DriverRideRequestShowComponent
+  ADMIN_STATUS_DISPLAY = {
     draft: {label: "Draft", icon: "fa-file-pen"},
-    request_sent: {label: "Request Sent", icon: "fa-paper-plane"},
+    request_sent: {label: "Request Sent", icon: "fa-user"},
     driver_assigned: {label: "Driver Assigned", icon: "fa-car"},
     needs_more_drivers: {label: "Needs More Drivers", icon: "fa-user-plus"},
     complete: {label: "Complete", icon: "fa-circle-check"},
@@ -36,7 +37,7 @@ class RideRequest < ApplicationRecord
   end
 
   def status_display
-    STATUS_DISPLAY.fetch(status_key)
+    ADMIN_STATUS_DISPLAY.fetch(status_key)
   end
 
   def cancellable?

@@ -12,7 +12,7 @@ module AdminRideRequestMutate
     private
 
     def status_display
-      @ride_request&.status_display || RideRequest::STATUS_DISPLAY[:draft]
+      @ride_request&.status_display || RideRequest::ADMIN_STATUS_DISPLAY[:draft]
     end
 
     # Public fields

@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe DriverRideRequestShowComponent, type: :component do
+  let(:current_user) { build_stubbed(:user) }
   let(:organization) { build_stubbed(:organization, name: "Test Org") }
   let(:pick_up_address) do
     build_stubbed(:address, name: "Home", street_address: "123 Main St", city: "Richmond", state: "VA", zip: "23220")
@@ -26,7 +27,7 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
   end
 
   def render_component
-    render_inline(described_class.new(ride_request:))
+    render_inline(described_class.new(ride_request:, current_user:))
   end
 
   it "renders the short description as the title" do
@@ -47,11 +48,6 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
   it "renders the appointment time" do
     render_component
     expect(page).to have_text("2:00 PM")
-  end
-
-  it "renders the status" do
-    render_component
-    expect(page).to have_text("Request Sent")
   end
 
   it "renders the gender preference under Requirements" do
@@ -92,6 +88,55 @@ RSpec.describe DriverRideRequestShowComponent, type: :component do
   it "renders a back link" do
     render_component
     expect(page).to have_link("Back", href: "/")
+  end
+
+  describe "driver status" do
+    it "shows 'Looking for a driver' when no drivers assigned" do
+      render_component
+      expect(page).to have_text("Looking for a driver")
+    end
+
+    it "shows 'You are assigned to this ride' when current user is assigned" do
+      assignment = build_stubbed(:driver_assignment, driver: current_user, ride_request:)
+      allow(ride_request).to receive(:driver_assignments).and_return([ assignment ])
+
+      render_component
+      expect(page).to have_text("You are assigned to this ride")
+    end
+
+    it "shows 'Driver assigned' when has_enough_drivers" do
+      other_driver = build_stubbed(:user)
+      assignment = build_stubbed(:driver_assignment, driver: other_driver, ride_request:)
+      allow(ride_request).to receive(:driver_assignments).and_return([ assignment ])
+      allow(ride_request).to receive(:has_enough_drivers?).and_return(true)
+
+      render_component
+      expect(page).to have_text("Driver assigned")
+    end
+
+    it "shows 'Looking for more drivers' when has drivers but needs more" do
+      other_driver = build_stubbed(:user)
+      assignment = build_stubbed(:driver_assignment, driver: other_driver, ride_request:)
+      allow(ride_request).to receive(:driver_assignments).and_return([ assignment ])
+      allow(ride_request).to receive(:has_enough_drivers?).and_return(false)
+
+      render_component
+      expect(page).to have_text("Looking for more drivers")
+    end
+
+    it "shows 'Complete' for completed rides" do
+      allow(ride_request).to receive(:completed?).and_return(true)
+
+      render_component
+      expect(page).to have_text("Complete")
+    end
+
+    it "shows 'Canceled' for canceled rides" do
+      allow(ride_request).to receive(:cancelled?).and_return(true)
+
+      render_component
+      expect(page).to have_text("Canceled")
+    end
   end
 
   context "when optional fields are absent" do
