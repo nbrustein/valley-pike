@@ -12,6 +12,7 @@ class RideRequest < ApplicationRecord
     draft: {label: "Draft", icon: "fa-file-pen"},
     request_sent: {label: "Request Sent", icon: "fa-paper-plane"},
     driver_assigned: {label: "Driver Assigned", icon: "fa-car"},
+    needs_more_drivers: {label: "Needs More Drivers", icon: "fa-user-plus"},
     complete: {label: "Complete", icon: "fa-circle-check"},
     canceled: {label: "Canceled", icon: "fa-ban"},
   }.freeze
@@ -20,13 +21,16 @@ class RideRequest < ApplicationRecord
 
   validates :desired_driver_gender, inclusion: {in: DESIRED_DRIVER_GENDERS}
 
-  CANCELLABLE_STATUSES = %i[request_sent driver_assigned].freeze
+  CANCELLABLE_STATUSES = %i[request_sent driver_assigned needs_more_drivers].freeze
 
   def status_key
     return :draft if draft?
     return :canceled if cancelled?
     return :complete if completed?
-    return :driver_assigned if driver_assignments.any?
+    if driver_assignments.any?
+      return :needs_more_drivers unless has_enough_drivers?
+      return :driver_assigned
+    end
 
     :request_sent
   end
