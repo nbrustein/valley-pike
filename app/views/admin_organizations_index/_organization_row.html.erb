@@ -1,0 +1,13 @@
+<% editable = organization_edit_allowed?(organization) %>
+<% row_path = editable ? edit_admin_organization_path(id: organization.id) : admin_organization_path(id: organization.id) %>
+<%= render(ResourceRowComponent.new(
+  edit_path: editable ? edit_admin_organization_path(id: organization.id) : nil,
+  show_path: editable ? nil : admin_organization_path(id: organization.id),
+  data: {organization_id: organization.id}
+)) do %>
+  <td class="px-3 py-3 text-primary">
+    <%= link_to row_path, class: "block" do %>
+      <span><%= organization.name %></span>
+    <% end %>
+  </td>
+<% end %>

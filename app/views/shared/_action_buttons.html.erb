@@ -1,4 +1,4 @@
-<% cancel_path = local_assigns.fetch(:cancel_path, users_path) %>
+<% cancel_path = local_assigns.fetch(:cancel_path, admin_users_path) %>
 <% readonly = local_assigns.fetch(:readonly, false) %>
 <% back_text = local_assigns.fetch(:back_text, "Back") %>
 <div class="flex items-center justify-end gap-3">
@@ -8,7 +8,7 @@
     <%= link_to "Cancel", cancel_path, class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
     <% if @show_send_login_link_button %>
       <%= button_to "Send Login Link",
-        send_login_link_user_path(id: @target_user.id),
+        send_login_link_admin_user_path(id: @target_user.id),
         method: :post,
         disabled: @send_login_link_button_disabled,
         class: "rounded-full border border-primary/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:border-primary hover:text-primary/80" %>

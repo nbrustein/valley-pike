@@ -1,0 +1,22 @@
+<% editable = user_edit_allowed?(user) %>
+<% row_path = editable ? edit_admin_user_path(id: user.id) : admin_user_path(id: user.id) %>
+<%= render(ResourceRowComponent.new(
+  edit_path: editable ? edit_admin_user_path(id: user.id) : nil,
+  show_path: editable ? nil : admin_user_path(id: user.id),
+  data: {user_id: user.id}
+)) do %>
+  <td class="px-3 py-3 text-primary">
+    <%= link_to row_path, class: "block" do %>
+      <span><%= user_display_name(user) %></span>
+    <% end %>
+  </td>
+  <td class="px-3 py-3">
+    <%= link_to row_path, class: "block" do %>
+      <div class="flex flex-wrap gap-2">
+        <% user.user_roles.each do |user_role| %>
+          <span class="rounded-full bg-muted/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary" data-role-pill><%= user_role.pill_label %></span>
+        <% end %>
+      </div>
+    <% end %>
+  </td>
+<% end %>

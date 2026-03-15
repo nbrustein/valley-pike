@@ -1,0 +1,9 @@
+<div class="space-y-5">
+  <%= render AdminRideRequestMutate::StepHeaderComponent.new(
+    step: 4, total_steps: @total_steps,
+    title: "Contact Information",
+    description: AdminRideRequestMutate::StepHeaderComponent::PUBLIC_DESCRIPTION,
+  ) %>
+
+  <%= render contact_fields %>
+</div>

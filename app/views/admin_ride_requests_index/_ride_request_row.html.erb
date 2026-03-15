@@ -1,0 +1,26 @@
+<% editable = ride_request_edit_allowed?(ride_request) %>
+<% row_path = editable ? admin_edit_ride_request_path(id: ride_request.id) : admin_ride_request_path(id: ride_request.id) %>
+<%= render(ResourceRowComponent.new(
+  edit_path: editable ? admin_edit_ride_request_path(id: ride_request.id) : nil,
+  show_path: editable ? nil : admin_ride_request_path(id: ride_request.id),
+  data: {ride_request_id: ride_request.id}
+)) do %>
+  <td class="px-3 py-3 text-primary">
+    <%= link_to row_path, class: "block" do %>
+      <span><%= ride_request.date&.strftime("%-m/%-d/%Y") %></span>
+    <% end %>
+  </td>
+  <td class="px-3 py-3 text-primary">
+    <%= link_to row_path, class: "block" do %>
+      <i class="fa-solid <%= ride_request.status_display[:icon] %>" title="<%= ride_request.status_display[:label] %>"></i>
+    <% end %>
+  </td>
+  <td class="px-3 py-3 text-primary">
+    <%= link_to row_path, class: "block" do %>
+      <span><%= ride_request.short_description %></span>
+    <% end %>
+  </td>
+  <% if show_ride_request_org_column? %>
+    <td class="px-3 py-3 text-primary"><%= ride_request.organization.abbreviation %></td>
+  <% end %>
+<% end %>

@@ -1,11 +1,11 @@
 <% if show_ride_requests_index_link? %>
-  <%= link_to "Ride Requests", ride_requests_path, class: "menu-link" %>
+  <%= link_to "Ride Requests", admin_ride_requests_path, class: "menu-link" %>
 <% end %>
 <% if show_users_index_link? %>
-  <%= link_to "Users", users_path, class: "menu-link" %>
+  <%= link_to "Users", admin_users_path, class: "menu-link" %>
 <% end %>
 <% if show_organizations_index_link? %>
-  <%= link_to "Orgs", organizations_path, class: "menu-link" %>
+  <%= link_to "Orgs", admin_organizations_path, class: "menu-link" %>
 <% end %>
 <% if user_signed_in? %>
   <%= link_to "Edit profile", profile_path, class: "menu-link" %>

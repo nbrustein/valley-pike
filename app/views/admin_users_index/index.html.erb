@@ -1,0 +1,7 @@
+<%= render(ResourceListPageComponent.new(title: "Users", create_path: user_create_allowed? ? new_admin_user_path : nil)) do %>
+  <%= render(ResourceListComponent.new(columns: [ "Full name", "Roles" ])) do %>
+    <% @users.each do |user| %>
+      <%= render "admin_users_index/user_row", user: %>
+    <% end %>
+  <% end %>
+<% end %>
