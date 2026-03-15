@@ -137,6 +137,13 @@ user_definitions = [
     user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
     driver_qualifications: [ DriverQualification::QUALIFICATION_CWS_VETTED ],
   },
+  {
+    email: "driver@#{EMAIL_DOMAIN}",
+    full_name: "driver",
+    phone: "555-0113",
+    user_roles: [ {role: UserRole::DRIVER, organization_id: nil} ],
+    driver_qualifications: [],
+  },
 ]
 
 begin
@@ -201,6 +208,87 @@ begin
       draft: false
     )
   end
+  driver = User.find_by!(email: "driver@#{EMAIL_DOMAIN}")
+  other_driver = User.find_by!(email: "unvetted.driver.1@#{EMAIL_DOMAIN}")
+  udo = organizations.fetch("udo")
+
+  seed_address = Address.find_or_create_by!(
+    name: "Seed Pickup Location",
+    street_address: "456 Oak Ave",
+    city: "Harrisonburg",
+    state: "VA",
+    zip: "22801",
+    country: "US"
+  )
+
+  ride_request_seeds = [
+    {
+      short_description: "Completed ride - driver",
+      completed: true,
+      assign_driver: driver,
+      has_enough_drivers: true,
+    },
+    {
+      short_description: "My assigned ride (single driver)",
+      assign_driver: driver,
+      has_enough_drivers: true,
+      requires_multiple_drivers: false,
+    },
+    {
+      short_description: "My assigned ride (needs more drivers)",
+      assign_driver: driver,
+      has_enough_drivers: false,
+      requires_multiple_drivers: true,
+    },
+    {
+      short_description: "Available ride for drivers",
+    },
+    {
+      short_description: "Other driver's ride (single, full)",
+      assign_driver: other_driver,
+      has_enough_drivers: true,
+      requires_multiple_drivers: false,
+    },
+    {
+      short_description: "Other driver's ride (multi, needs more)",
+      assign_driver: other_driver,
+      has_enough_drivers: false,
+      requires_multiple_drivers: true,
+    },
+  ]
+
+  ride_request_seeds.each do |attrs|
+    existing = RideRequest.find_by(organization: udo, short_description: attrs[:short_description])
+    if existing
+      if attrs[:completed]
+        existing.update_columns(date: 1.month.ago.to_date, completed: true)
+      end
+      next
+    end
+
+    rr = RideRequest::Published.create!(
+      organization: udo,
+      requester: udo_requester,
+      date: 1.year.from_now.to_date,
+      short_description: attrs[:short_description],
+      contact_full_name: "udo ride requester",
+      pick_up_address: seed_address,
+      ride_description_public: "Seed ride request",
+      desired_driver_gender: "none",
+      draft: false,
+      has_enough_drivers: attrs.fetch(:has_enough_drivers, false),
+      requires_multiple_drivers: attrs.fetch(:requires_multiple_drivers, false),
+    )
+
+    if attrs[:completed]
+      rr.update_columns(date: 1.month.ago.to_date, completed: true)
+    end
+
+    if attrs[:assign_driver]
+      DriverAssignment.find_or_create_by!(ride_request: rr, driver: attrs[:assign_driver])
+    end
+  end
+
 rescue StandardError => error
   warn "SEED FAILURE: #{error.message}"
   warn(error.backtrace.first(10).join("\n")) if error.backtrace.present?

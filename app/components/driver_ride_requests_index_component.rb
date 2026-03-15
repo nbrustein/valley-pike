@@ -1,5 +1,93 @@
 class DriverRideRequestsIndexComponent < ViewComponent::Base
-  def initialize(ride_requests:)
+  include Memery
+
+  def initialize(ride_requests:, current_user:)
     @ride_requests = ride_requests
+    @current_user = current_user
+  end
+
+  memoize def your_upcoming_rides
+    @ride_requests.select {|rr|
+      assigned?(rr) && !rr.completed? && !rr.cancelled? && rr.date >= Date.current
+    }
+  end
+
+  memoize def looking_for_drivers
+    @ride_requests.select {|rr|
+      !assigned?(rr) && !rr.has_enough_drivers? && !rr.completed? && !rr.cancelled? && rr.date >= Date.current
+    }
+  end
+
+  memoize def no_longer_available
+    @ride_requests.select {|rr|
+      !assigned?(rr) && rr.date >= Date.current &&
+        (rr.has_enough_drivers? || rr.cancelled?) && !rr.completed?
+    }
+  end
+
+  memoize def your_completed_rides
+    @ride_requests.select {|rr|
+      assigned?(rr) && (rr.completed? || rr.cancelled?)
+    }
+  end
+
+  def render_looking_for_drivers_section
+    if looking_for_drivers.any?
+      return render_section("Looking for Drivers", looking_for_drivers)
+    end
+
+    message = if no_longer_available.any? {|rr| !rr.cancelled? }
+      "All upcoming rides have drivers assigned."
+    else
+      "There are no upcoming rides."
+    end
+
+    tag.div(class: "space-y-3") do
+      safe_join([
+        tag.h2("Looking for Drivers", class: "text-xl font-semibold tracking-tight text-primary"),
+        tag.p(message, class: "text-secondary"),
+      ])
+    end
+  end
+
+  def render_section(title, rides)
+    return if rides.empty?
+
+    tag.div(class: "space-y-3") do
+      safe_join([
+        tag.h2(title, class: "text-xl font-semibold tracking-tight text-primary"),
+        *rides.map {|rr| render_ride_card(rr) },
+      ])
+    end
+  end
+
+  def render_ride_card(ride_request)
+    link_to(helpers.driver_ride_request_path(id: ride_request.id),
+      class: "surface-card block transition hover:shadow-md") do
+      tag.div(class: "flex items-start justify-between gap-4") do
+        safe_join([
+          tag.div(class: "min-w-0 flex-1") do
+            safe_join([
+              tag.h3(ride_request.short_description, class: "text-lg font-semibold text-primary truncate"),
+              tag.p(ride_request.organization.name, class: "mt-1 text-sm text-secondary"),
+              if ride_request.destination_address.present?
+                tag.p(class: "mt-1 text-sm text-secondary") do
+                  "#{ride_request.destination_address.name}, #{ride_request.destination_address.city}"
+                end
+              end,
+            ].compact)
+          end,
+          tag.div(class: "shrink-0 text-right") do
+            tag.p(ride_request.date.strftime("%b %-d, %Y"), class: "text-sm font-medium text-primary")
+          end,
+        ])
+      end
+    end
+  end
+
+  private
+
+  def assigned?(ride_request)
+    ride_request.driver_assignments.any? {|da| da.driver_id == @current_user.id }
   end
 end

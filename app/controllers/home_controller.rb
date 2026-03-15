@@ -25,7 +25,7 @@ class HomeController < ApplicationController
 
   def render_driver_home
     ride_requests = DriverRideRequestRepo.new(current_user:).list
-    @component = DriverRideRequestsIndexComponent.new(ride_requests:)
+    @component = DriverRideRequestsIndexComponent.new(ride_requests:, current_user:)
   end
 
   def render_welcome

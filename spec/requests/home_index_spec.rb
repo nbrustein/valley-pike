@@ -52,7 +52,7 @@ RSpec.describe "Home index", type: :request do
       it "renders the driver ride requests index component" do
         act
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Active Rides")
+        expect(response.body).to include("Looking for Drivers")
       end
     end
 
@@ -72,7 +72,7 @@ RSpec.describe "Home index", type: :request do
       it "renders the driver ride requests index component (driver takes priority)" do
         act
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Active Rides")
+        expect(response.body).to include("No ride requests available.")
       end
     end
 
