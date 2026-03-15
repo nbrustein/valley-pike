@@ -1,7 +1,4 @@
-<section class="space-y-6">
-  <%= link_to "Back", root_path,
-        class: "text-sm font-semibold text-primary/70 transition hover:text-primary" %>
-
+<section>
   <div class="rounded-2xl border border-primary/10 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-6 space-y-5">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight text-primary"><%= @ride_request.short_description %></h1>
@@ -77,6 +74,11 @@
           <p class="text-primary"><%= @ride_request.contact_email %></p>
         <% end %>
       </div>
+    </div>
+
+    <div class="flex items-center justify-end">
+      <%= link_to "Back", root_path,
+            class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
     </div>
   </div>
 </section>
