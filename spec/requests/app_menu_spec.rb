@@ -40,7 +40,7 @@ RSpec.describe "App menu", type: :request do
       it "shows the users link with the label" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).to have_link("Users", href: users_path)
+        expect(page).to have_link("Users", href: admin_users_path)
       end
     end
 
@@ -50,7 +50,7 @@ RSpec.describe "App menu", type: :request do
       it "does not show the users link" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).not_to have_link("Users", href: users_path)
+        expect(page).not_to have_link("Users", href: admin_users_path)
       end
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe "App menu", type: :request do
       it "shows the orgs link with the label" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).to have_link("Orgs", href: organizations_path)
+        expect(page).to have_link("Orgs", href: admin_organizations_path)
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe "App menu", type: :request do
       it "does not show the orgs link" do
         act_get_profile(current_user:)
         page = Capybara.string(response.body)
-        expect(page).not_to have_link("Orgs", href: organizations_path)
+        expect(page).not_to have_link("Orgs", href: admin_organizations_path)
       end
     end
   end
@@ -108,6 +108,6 @@ RSpec.describe "App menu", type: :request do
 
   def act_get_profile(current_user:)
     sign_in current_user.identities.find_by!(kind: "magic_link")
-    get root_path, headers:
+    get profile_path, headers:
   end
 end

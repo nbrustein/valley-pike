@@ -1,0 +1,104 @@
+<section>
+  <div class="rounded-2xl border border-primary/10 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-6 space-y-5">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-primary"><%= @ride_request.short_description %></h1>
+      <p class="mt-1 text-sm text-secondary"><%= @ride_request.organization.name %></p>
+      <p class="mt-1 text-sm text-secondary">
+        <%= driver_status[:label] %>
+        <i class="fa-solid <%= driver_status[:icon] %> ml-1"></i>
+      </p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <p class="text-sm font-medium text-secondary">Date</p>
+        <p class="text-primary"><%= formatted_date %></p>
+      </div>
+
+      <% if @ride_request.appointment_time.present? %>
+        <div>
+          <p class="text-sm font-medium text-secondary">Appointment Time</p>
+          <p class="text-primary"><%= @ride_request.appointment_time %></p>
+        </div>
+      <% end %>
+
+    </div>
+
+    <% if formatted_gender_preference %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Requirements</p>
+        <p class="text-primary"><%= formatted_gender_preference %></p>
+      </div>
+    <% end %>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <% if @ride_request.pick_up_address.present? %>
+        <div>
+          <p class="text-sm font-medium text-secondary">Pick Up</p>
+          <p class="text-primary"><%= @ride_request.pick_up_address.name %></p>
+          <% if assigned_to_current_user? %>
+            <p class="text-sm text-secondary"><%= format_address(@ride_request.pick_up_address) %></p>
+          <% else %>
+            <p class="text-sm text-secondary"><%= format_city_state(@ride_request.pick_up_address) %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @ride_request.destination_address.present? %>
+        <div>
+          <p class="text-sm font-medium text-secondary">Destination</p>
+          <p class="text-primary"><%= @ride_request.destination_address.name %></p>
+          <p class="text-sm text-secondary"><%= format_address(@ride_request.destination_address) %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @ride_request.ride_description_public.present? %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Ride Description</p>
+        <p class="text-primary whitespace-pre-line"><%= @ride_request.ride_description_public %></p>
+      </div>
+    <% end %>
+
+    <% if assigned_to_current_user? && @ride_request.ride_description_private.present? %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Private Notes</p>
+        <p class="text-primary whitespace-pre-line"><%= @ride_request.ride_description_private %></p>
+      </div>
+    <% end %>
+
+    <% if @ride_request.driver_notes.present? %>
+      <div>
+        <p class="text-sm font-medium text-secondary">Driver Notes</p>
+        <p class="text-primary whitespace-pre-line"><%= @ride_request.driver_notes %></p>
+      </div>
+    <% end %>
+
+    <div class="border-t border-primary/10 pt-4">
+      <p class="text-sm font-medium text-secondary mb-2">Contact</p>
+      <div class="grid gap-2 sm:grid-cols-3">
+        <% if @ride_request.contact_full_name.present? %>
+          <p class="text-primary"><%= @ride_request.contact_full_name %></p>
+        <% end %>
+        <% if @ride_request.contact_phone.present? %>
+          <p class="text-primary"><%= @ride_request.contact_phone %></p>
+        <% end %>
+        <% if @ride_request.contact_email.present? %>
+          <p><%= link_to @ride_request.contact_email, "mailto:#{@ride_request.contact_email}", class: "text-primary underline" %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3">
+      <%= link_to "Back", root_path,
+            class: "text-sm font-semibold text-primary/70 transition hover:text-primary active:text-primary/80" %>
+      <% if can_accept? %>
+        <%= button_to "Accept Ride",
+              helpers.accept_driver_ride_request_path(id: @ride_request.id),
+              method: :post,
+              data: {turbo_confirm: "Are you sure you want to accept this ride?"},
+              class: "rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-surface transition hover:bg-primary/85 active:bg-primary/90" %>
+      <% end %>
+    </div>
+  </div>
+</section>

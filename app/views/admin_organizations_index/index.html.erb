@@ -1,0 +1,7 @@
+<%= render(ResourceListPageComponent.new(title: "Organizations", create_path: organization_create_allowed? ? new_admin_organization_path : nil)) do %>
+  <%= render(ResourceListComponent.new(columns: [ "Name" ])) do %>
+    <% @organizations.each do |organization| %>
+      <%= render "admin_organizations_index/organization_row", organization: %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -6,20 +6,29 @@ Rails.application.routes.draw do
     as: :identity_magic_link_identity
   post "auth/password_session", to: "auth#create_password_session", as: :password_session
   resource :profile, only: %i[show update]
-  resources :users, only: %i[index], controller: "users_index"
-  resources :users, only: %i[show new create edit update], controller: "users_mutate" do
-    post :send_login_link, on: :member
+
+  scope "admin", as: "admin" do
+    resources :users, only: %i[index], controller: "admin_users_index"
+    resources :users, only: %i[show new create edit update], controller: "admin_users_mutate" do
+      post :send_login_link, on: :member
+    end
+    resources :organizations, only: %i[index], controller: "admin_organizations_index"
+    resources :ride_requests, only: %i[index], controller: "admin_ride_requests_index"
+    resources :ride_requests, only: %i[show new create], controller: "admin_ride_requests_mutate" do
+      post :publish, on: :member
+      post :cancel, on: :member
+      delete :delete_draft, on: :member
+    end
+    get   "ride_requests/:id/edit(/:page)", to: "admin_ride_requests_mutate#edit",   as: :edit_ride_request
+    patch "ride_requests/:id/edit(/:page)", to: "admin_ride_requests_mutate#update", as: :update_ride_request
+    resources :organizations, only: %i[show new create edit update], controller: "admin_organizations_mutate"
   end
-  resources :organizations, only: %i[index], controller: "organizations_index"
-  resources :ride_requests, only: %i[index], controller: "ride_requests_index"
-  resources :ride_requests, only: %i[show new create], controller: "ride_requests_mutate" do
-    post :publish, on: :member
-    post :cancel, on: :member
-    delete :delete_draft, on: :member
+
+  scope "driver", as: "driver" do
+    resources :ride_requests, only: %i[show], controller: "driver_ride_requests" do
+      post :accept, on: :member
+    end
   end
-  get   "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#edit",   as: :edit_ride_request
-  patch "ride_requests/:id/edit(/:page)", to: "ride_requests_mutate#update", as: :update_ride_request
-  resources :organizations, only: %i[show new create edit update], controller: "organizations_mutate"
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

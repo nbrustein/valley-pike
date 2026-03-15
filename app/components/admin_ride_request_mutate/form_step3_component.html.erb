@@ -1,0 +1,17 @@
+<div class="space-y-5">
+  <%= render AdminRideRequestMutate::StepHeaderComponent.new(
+    step: 3, total_steps: @total_steps,
+    title: "Private Information",
+    description: AdminRideRequestMutate::StepHeaderComponent::PRIVATE_DESCRIPTION,
+  ) %>
+
+  <div>
+    <p class="text-sm font-semibold text-primary">Ride Notes</p>
+    <p class="mt-1 text-sm text-primary/70">These notes will be sent to the assigned driver. Consider including:</p>
+    <ul class="mt-1 list-disc pl-5 text-sm text-primary/70 space-y-0.5">
+      <li>The rider's name and contact information</li>
+      <li>Any other information the driver may need that was not included in the public description</li>
+    </ul>
+    <%= render ride_description_private_field %>
+  </div>
+</div>

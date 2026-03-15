@@ -1,0 +1,38 @@
+<div class="space-y-5">
+  <% if @show_step_header %>
+    <%= render AdminRideRequestMutate::StepHeaderComponent.new(
+      step: 5, total_steps: @total_steps,
+      title: @ride_request&.draft? ? "Review and Publish" : "Review",
+      description: @ride_request&.draft? ? "Review the information below before publishing" : nil,
+    ) %>
+  <% end %>
+
+  <div>
+    <p class="text-sm text-primary"><%= status_display[:label] %> <i class="fa-solid <%= status_display[:icon] %>"></i></p>
+    <p class="text-sm text-primary"><%= @ride_request&.organization&.name %></p>
+  </div>
+
+  <fieldset class="rounded-lg border border-primary/10 px-4 pb-4 pt-3">
+    <legend class="px-1 text-sm font-semibold text-primary">Public Information</legend>
+    <p class="mb-4 text-sm text-primary/70"><%= AdminRideRequestMutate::StepHeaderComponent::PUBLIC_DESCRIPTION %></p>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <%= render short_description_field %>
+      <%= render ride_date_field %>
+      <%= render driver_count_field %>
+      <%= render driver_gender_field %>
+      <%= render appointment_time_field %>
+      <%= render contact_fields %>
+      <%= render destination_address_field %>
+      <%= render pick_up_address_field %>
+      <%= render ride_description_public_field %>
+    </div>
+  </fieldset>
+
+  <fieldset class="rounded-lg border border-primary/10 px-4 pb-4 pt-3">
+    <legend class="px-1 text-sm font-semibold text-primary">Private Information</legend>
+    <p class="mb-4 text-sm text-primary/70"><%= AdminRideRequestMutate::StepHeaderComponent::PRIVATE_DESCRIPTION %></p>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <%= render ride_description_private_field %>
+    </div>
+  </fieldset>
+</div>

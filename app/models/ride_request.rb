@@ -8,10 +8,12 @@ class RideRequest < ApplicationRecord
   has_many :driver_assignments
   has_many :drivers, through: :driver_assignments, source: :driver
 
-  STATUS_DISPLAY = {
+  # Drivers see a slightly different set of statuses, which are defined in DriverRideRequestShowComponent
+  ADMIN_STATUS_DISPLAY = {
     draft: {label: "Draft", icon: "fa-file-pen"},
-    request_sent: {label: "Request Sent", icon: "fa-paper-plane"},
+    request_sent: {label: "Request Sent", icon: "fa-user"},
     driver_assigned: {label: "Driver Assigned", icon: "fa-car"},
+    needs_more_drivers: {label: "Needs More Drivers", icon: "fa-user-plus"},
     complete: {label: "Complete", icon: "fa-circle-check"},
     canceled: {label: "Canceled", icon: "fa-ban"},
   }.freeze
@@ -20,19 +22,26 @@ class RideRequest < ApplicationRecord
 
   validates :desired_driver_gender, inclusion: {in: DESIRED_DRIVER_GENDERS}
 
-  CANCELLABLE_STATUSES = %i[request_sent driver_assigned].freeze
+  CANCELLABLE_STATUSES = %i[request_sent driver_assigned needs_more_drivers].freeze
 
   def status_key
     return :draft if draft?
     return :canceled if cancelled?
     return :complete if completed?
-    return :driver_assigned if driver_assignments.any?
+    if driver_assignments.any?
+      return :needs_more_drivers unless has_enough_drivers?
+      return :driver_assigned
+    end
 
     :request_sent
   end
 
   def status_display
-    STATUS_DISPLAY.fetch(status_key)
+    ADMIN_STATUS_DISPLAY.fetch(status_key)
+  end
+
+  def needs_more_drivers?(current_date:)
+    date >= current_date && !has_enough_drivers? && !completed? && !cancelled?
   end
 
   def cancellable?

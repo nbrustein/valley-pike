@@ -110,6 +110,25 @@ RSpec.describe UnitsOfWork::UpdateUser do
       end
     end
 
+    context "when assignment validation fails" do
+      let(:validator) { instance_double(RideRequestAssignmentValidator) }
+
+      before do
+        allow(RideRequestAssignmentValidator).to receive(:new).and_return(validator)
+        allow(validator).to receive(:validate).and_return(false)
+        allow(validator).to receive(:errors).and_return(
+          ActiveModel::Errors.new(validator).tap {|e| e.add(:base, "Validator error") }
+        )
+      end
+
+      it "surfaces the validator errors and does not persist changes" do
+        result = act
+
+        expect(result.success?).to be(false)
+        expect(result.errors.full_messages).to include("Validator error")
+      end
+    end
+
     context "when a nil value is passed" do
       let(:custom_params) do
         {

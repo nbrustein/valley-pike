@@ -48,6 +48,9 @@ module UnitsOfWork
       update_user_record(user, errors)
       return if errors.any?
 
+      validate_ride_requests(user, errors)
+      return if errors.any?
+
       sync_roles(user, errors)
       return if errors.any?
 
@@ -82,6 +85,28 @@ module UnitsOfWork
       return if user.save
 
       merge_errors(errors, user)
+    end
+
+    def validate_ride_requests(user, errors)
+      removed_roles = if has_user_roles_key
+        user.user_roles.reject {|ur| user_roles.include?(role: ur.role, organization_id: ur.organization_id) }
+      else
+        []
+      end
+
+      removed_qualifications = if has_driver_qualifications_key
+        user.driver_qualifications.reject {|dq| driver_qualifications.include?(dq.qualification) }
+      else
+        []
+      end
+
+      validator = RideRequestAssignmentValidator.new(
+        removed_user_roles: removed_roles,
+        removed_driver_qualifications: removed_qualifications
+      )
+      return if validator.validate
+
+      validator.errors.each {|e| errors.add(e.attribute, e.message) }
     end
 
     def sync_roles(user, errors)
