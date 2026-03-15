@@ -26,7 +26,7 @@ class DriverRideRequestShowComponent < ViewComponent::Base
     return {label: "Complete", icon: "fa-circle-check"} if @ride_request.completed?
 
     if assigned_to_current_user?
-      return {label: "You are assigned to this ride", icon: "fa-circle-check"}
+      return {label: "You are assigned to this ride", icon: "fa-user-check"}
     end
 
     if @ride_request.driver_assignments.any?
