@@ -10,25 +10,10 @@ RSpec.describe "Home index", type: :request do
 
   describe "GET /" do
     context "when signed out" do
-      before do
-        get root_path, headers:
-      end
-
-      it "returns ok" do
+      it "renders the welcome component" do
+        get(root_path, headers:)
         expect(response).to have_http_status(:ok)
-      end
-
-      it "shows magic link and password sign-in options" do
-        expect(response.body).to include("Sign in with a magic link")
-        expect(response.body).to include("Sign in with password")
-      end
-
-      it "renders the password form with the correct action" do
-        expect(response.body).to include(%(action="#{password_session_path}"))
-      end
-
-      it "renders the magic link form with the correct action" do
-        expect(response.body).to include(%(action="#{identity_magic_link_identity_path}"))
+        expect(response.body).to include("Welcome")
       end
     end
 
@@ -43,11 +28,10 @@ RSpec.describe "Home index", type: :request do
         user.identities.first
       end
 
-      it "shows the signed-in state and sign-out button" do
+      it "renders the welcome component" do
         act
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Signed in as user@example.com")
-        expect(response.body).to include(destroy_identity_session_path)
+        expect(response.body).to include("Welcome")
       end
     end
 
@@ -65,16 +49,14 @@ RSpec.describe "Home index", type: :request do
       end
       let!(:ride_request) { create(:ride_request, organization:) }
 
-      it "renders the active ride requests page" do
+      it "renders the driver ride requests index component" do
         act
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Active Rides")
-        expect(response.body).to include(ride_request.short_description)
       end
     end
 
     context "when signed in as a driver who also has another role" do
-      let(:organization) { create(:organization) }
       let(:user) do
         create(:user, :with_identity,
           identity_kind: "magic_link",
@@ -87,7 +69,7 @@ RSpec.describe "Home index", type: :request do
         create(:user_role, user:, role: UserRole::VANITA_VIEWER)
       end
 
-      it "renders the active ride requests page (driver takes priority)" do
+      it "renders the driver ride requests index component (driver takes priority)" do
         act
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Active Rides")

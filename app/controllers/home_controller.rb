@@ -6,6 +6,8 @@ class HomeController < ApplicationController
       render_driver_home
     elsif can_view_admin_ride_requests?
       redirect_to admin_ride_requests_path
+    else
+      render_welcome
     end
   end
 
@@ -23,7 +25,11 @@ class HomeController < ApplicationController
 
   def render_driver_home
     scope = DriverRideRequestPolicy::Scope.new(current_user, RideRequest).resolve
-    @ride_requests = sorted_ride_requests(scope)
+    @component = DriverRideRequestsIndexComponent.new(ride_requests: sorted_ride_requests(scope))
+  end
+
+  def render_welcome
+    @component = WelcomeComponent.new(identity: current_identity)
   end
 
   def sorted_ride_requests(scope)
@@ -37,6 +43,11 @@ class HomeController < ApplicationController
       )
   end
 
+  # Sort order:
+  # 1. Future (today or later) before past
+  # 2. Assigned to this driver before unassigned
+  # 3. Needs drivers (has_enough_drivers=false) before fully staffed
+  # 4. Date ascending for future rides, descending for past rides
   def sanitize_sort_sql(today, driver_id)
     ActiveRecord::Base.sanitize_sql_array([
       <<~SQL.squish,
