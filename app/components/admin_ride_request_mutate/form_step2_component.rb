@@ -9,6 +9,16 @@ module AdminRideRequestMutate
 
     private
 
+    memoize def pick_up_address_field
+      Shared::AddressFieldsComponent.new(
+        form: @form,
+        field: :pick_up_address,
+        label: "Pick Up Address",
+        value: @ride_request&.pick_up_address,
+        street_address_description: "The exact street address will only be sent to the driver who accepts the ride",
+      )
+    end
+
     memoize def destination_address_field
       Shared::AddressFieldsComponent.new(
         form: @form,

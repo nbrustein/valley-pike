@@ -103,7 +103,7 @@ RSpec.describe AdminRideRequestMutate::FormStep5Component, type: :component do
     it "renders ride_description_private_field as readonly" do
       render_component
       expect(Shared::TextareaFieldComponent).to have_received(:new).with(
-        hash_including(field: :ride_description_private, label: "Private Ride Notes", readonly: true)
+        hash_including(field: :ride_description_private, label: "Ride Notes", readonly: true)
       )
     end
   end

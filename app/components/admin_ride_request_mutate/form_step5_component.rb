@@ -114,7 +114,7 @@ module AdminRideRequestMutate
       Shared::TextareaFieldComponent.new(
         form: @form,
         field: :ride_description_private,
-        label: "Private Ride Notes",
+        label: "Ride Notes",
         value: @ride_request&.ride_description_private,
         readonly: true,
       )

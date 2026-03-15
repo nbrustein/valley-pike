@@ -2,12 +2,13 @@ module Shared
   class AddressFieldsComponent < ViewComponent::Base
     include Memery
 
-    def initialize(form:, field:, label:, value: nil, readonly: false)
+    def initialize(form:, field:, label:, value: nil, readonly: false, street_address_description: nil)
       @form = form
       @field = field
       @label = label
       @value = value
       @readonly = readonly
+      @street_address_description = street_address_description
     end
 
     def before_render
@@ -39,10 +40,10 @@ module Shared
     end
 
     memoize def street_address_field
-      Shared::TextFieldComponent.new(
-        form: @addr_form, field: :street_address, label: "Street Address",
-        value: @value&.street_address, required: true,
-      )
+      attrs = {form: @addr_form, field: :street_address, label: "Street Address",
+               value: @value&.street_address, required: true}
+      attrs[:description] = @street_address_description if @street_address_description
+      Shared::TextFieldComponent.new(**attrs)
     end
 
     memoize def city_field

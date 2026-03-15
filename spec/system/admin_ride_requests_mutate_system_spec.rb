@@ -77,17 +77,27 @@ RSpec.describe "Ride request create form", type: :system do
         fill_in "City", with: "Richmond"
         fill_in "State", with: "VA"
       end
+      within_fieldset("Pick Up Address") do
+        fill_in "Name", with: "Home"
+        fill_in "Street Address", with: "100 Main St"
+        fill_in "City", with: "Richmond"
+        fill_in "State", with: "VA"
+      end
       find("textarea[name='ride_request[ride_description_public]']").fill_in with: description
       click_button "Save and Continue"
     end
 
-    it "saves the description and moves to page 3", :aggregate_failures do
+    it "saves the addresses and description and moves to page 3", :aggregate_failures do
       act
       expect(page).to have_current_path(%r{/admin/ride_requests/[^/]+/edit/3})
       draft.reload
       expect(draft.ride_description_public).to eq(description)
       expect(draft.destination_address).to be_present
       expect(draft.destination_address.street_address).to eq("200 Broad St")
+      expect(draft.pick_up_address).to be_present
+      expect(draft.pick_up_address.street_address).to eq("100 Main St")
+      expect(draft.pick_up_address.city).to eq("Richmond")
+      expect(draft.pick_up_address.country).to eq("US")
     end
   end
 
@@ -96,22 +106,14 @@ RSpec.describe "Ride request create form", type: :system do
 
     def act
       visit admin_edit_ride_request_path(id: draft.id, page: 3)
-      fill_in "Name", with: "City Hospital"
-      fill_in "Street Address", with: "100 Main St"
-      fill_in "City", with: "Richmond"
-      fill_in "State", with: "VA"
       find("textarea[name='ride_request[ride_description_private]']").fill_in with: "Ring the doorbell twice."
       click_button "Save and Continue"
     end
 
-    it "saves the address and private notes and moves to page 4", :aggregate_failures do
+    it "saves the ride notes and moves to page 4", :aggregate_failures do
       act
       expect(page).to have_current_path(%r{/admin/ride_requests/[^/]+/edit/4})
       draft.reload
-      expect(draft.pick_up_address).to be_present
-      expect(draft.pick_up_address.street_address).to eq("100 Main St")
-      expect(draft.pick_up_address.city).to eq("Richmond")
-      expect(draft.pick_up_address.country).to eq("US")
       expect(draft.ride_description_private).to eq("Ring the doorbell twice.")
     end
   end

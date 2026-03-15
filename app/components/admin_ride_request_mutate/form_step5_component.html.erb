@@ -23,6 +23,7 @@
       <%= render appointment_time_field %>
       <%= render contact_fields %>
       <%= render destination_address_field %>
+      <%= render pick_up_address_field %>
       <%= render ride_description_public_field %>
     </div>
   </fieldset>
@@ -31,7 +32,6 @@
     <legend class="px-1 text-sm font-semibold text-primary">Private Information</legend>
     <p class="mb-4 text-sm text-primary/70"><%= AdminRideRequestMutate::StepHeaderComponent::PRIVATE_DESCRIPTION %></p>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <%= render pick_up_address_field %>
       <%= render ride_description_private_field %>
     </div>
   </fieldset>
