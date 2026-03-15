@@ -221,6 +221,15 @@ begin
     country: "US"
   )
 
+  destination_address = Address.find_or_create_by!(
+    name: "Valley Medical Center",
+    street_address: "1200 Health Blvd",
+    city: "Staunton",
+    state: "VA",
+    zip: "24401",
+    country: "US"
+  )
+
   ride_request_seeds = [
     {
       short_description: "Completed ride - driver",
@@ -233,6 +242,22 @@ begin
       assign_driver: driver,
       has_enough_drivers: true,
       requires_multiple_drivers: false,
+      destination_address:,
+      appointment_time: "2:30 PM",
+      desired_driver_gender: "female",
+      contact_full_name: "Maria Santos",
+      contact_phone: "540-555-0147",
+      contact_email: "maria.santos@example.com",
+      ride_description_public: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " \
+        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " \
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+      driver_notes: nil,
+      ride_description_private: "Praesent commodo cursus magna, vel scelerisque nisl consectetur et. " \
+        "Nullam quis risus eget urna mollis ornare vel eu leo.",
+      requester_notes: "Cras mattis consectetur purus sit amet fermentum. " \
+        "Maecenas sed diam eget risus varius blandit sit amet non magna.",
+      other_notes: "Aenean lacinia bibendum nulla sed consectetur. " \
+        "Integer posuere erat a ante venenatis dapibus posuere velit aliquet.",
     },
     {
       short_description: "My assigned ride (needs more drivers)",
@@ -271,10 +296,18 @@ begin
       requester: udo_requester,
       date: 1.year.from_now.to_date,
       short_description: attrs[:short_description],
-      contact_full_name: "udo ride requester",
+      contact_full_name: attrs.fetch(:contact_full_name, "udo ride requester"),
+      contact_phone: attrs[:contact_phone],
+      contact_email: attrs[:contact_email],
       pick_up_address: seed_address,
-      ride_description_public: "Seed ride request",
-      desired_driver_gender: "none",
+      destination_address: attrs[:destination_address],
+      appointment_time: attrs[:appointment_time],
+      ride_description_public: attrs.fetch(:ride_description_public, "Seed ride request"),
+      ride_description_private: attrs[:ride_description_private],
+      driver_notes: attrs[:driver_notes],
+      requester_notes: attrs[:requester_notes],
+      other_notes: attrs[:other_notes],
+      desired_driver_gender: attrs.fetch(:desired_driver_gender, "none"),
       draft: false,
       has_enough_drivers: attrs.fetch(:has_enough_drivers, false),
       requires_multiple_drivers: attrs.fetch(:requires_multiple_drivers, false),
