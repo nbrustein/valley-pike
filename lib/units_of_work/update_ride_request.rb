@@ -35,6 +35,12 @@ module UnitsOfWork
         @ride_request.destination_address = address
       end
 
+      validator = RideRequestAssignmentValidator.new(ride_requests: [ @ride_request ])
+      unless validator.validate
+        validator.errors.each {|e| errors.add(e.attribute, e.message) }
+        return
+      end
+
       return if @ride_request.save
 
       merge_errors(errors, @ride_request)

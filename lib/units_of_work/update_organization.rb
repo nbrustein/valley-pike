@@ -41,6 +41,13 @@ module UnitsOfWork
       if has_required_qualifications_key
         organization.required_qualifications = Array(required_qualifications).compact_blank.uniq
       end
+
+      validator = RideRequestAssignmentValidator.new(organizations: [ organization ])
+      unless validator.validate
+        validator.errors.each {|e| errors.add(e.attribute, e.message) }
+        return
+      end
+
       return if organization.save
 
       merge_errors(errors, organization)
