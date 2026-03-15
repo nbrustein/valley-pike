@@ -44,7 +44,7 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
 
     tag.div(class: "space-y-3") do
       safe_join([
-        tag.h2("Looking for Drivers", class: "text-xl font-semibold tracking-tight text-primary"),
+        tag.h2("Looking for Drivers", class: "text-sm font-semibold uppercase tracking-wide text-secondary"),
         tag.p(message, class: "text-secondary"),
       ])
     end
@@ -55,15 +55,17 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
 
     tag.div(class: "space-y-3") do
       safe_join([
-        tag.h2(title, class: "text-xl font-semibold tracking-tight text-primary"),
+        tag.h2(title, class: "text-sm font-semibold uppercase tracking-wide text-secondary"),
         *rides.map {|rr| render_ride_card(rr) },
       ])
     end
   end
 
+  RIDE_CARD_CLASS = "block rounded-2xl border border-primary/10 bg-white/80 p-4 shadow-sm " \
+    "backdrop-blur transition hover:shadow-md sm:p-6"
+
   def render_ride_card(ride_request)
-    link_to(helpers.driver_ride_request_path(id: ride_request.id),
-      class: "surface-card block transition hover:shadow-md") do
+    link_to(helpers.driver_ride_request_path(id: ride_request.id), class: RIDE_CARD_CLASS) do
       tag.div(class: "flex items-start justify-between gap-4") do
         safe_join([
           tag.div(class: "min-w-0 flex-1") do
