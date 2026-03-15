@@ -33,7 +33,7 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
 
   def render_looking_for_drivers_section
     if looking_for_drivers.any?
-      return render_section("Looking for Drivers", looking_for_drivers)
+      return render_section("Looking for Drivers", looking_for_drivers, icon: "fa-user-plus")
     end
 
     message = if no_longer_available.any? {|rr| !rr.cancelled? }
@@ -44,20 +44,29 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
 
     tag.div(class: "space-y-3") do
       safe_join([
-        tag.h2("Looking for Drivers", class: "text-sm font-semibold uppercase tracking-wide text-secondary"),
+        section_header("Looking for Drivers", "fa-user-plus"),
         tag.p(message, class: "text-secondary"),
       ])
     end
   end
 
-  def render_section(title, rides)
+  def render_section(title, rides, icon: nil)
     return if rides.empty?
 
     tag.div(class: "space-y-3") do
       safe_join([
-        tag.h2(title, class: "text-sm font-semibold uppercase tracking-wide text-secondary"),
+        section_header(title, icon),
         *rides.map {|rr| render_ride_card(rr) },
       ])
+    end
+  end
+
+  def section_header(title, icon)
+    tag.h2(class: "text-sm font-semibold uppercase tracking-wide text-secondary") do
+      safe_join([
+        icon ? tag.i(class: "fa-solid #{icon} mr-1.5") : nil,
+        title,
+      ].compact)
     end
   end
 
@@ -70,12 +79,7 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
         safe_join([
           tag.div(class: "min-w-0 flex-1") do
             safe_join([
-              tag.h3(class: "text-lg font-semibold text-primary") do
-                safe_join([
-                  tag.i(class: "fa-solid #{driver_status_icon(ride_request)} mr-2 text-secondary"),
-                  ride_request.short_description,
-                ])
-              end,
+              tag.h3(ride_request.short_description, class: "text-lg font-semibold text-primary"),
               tag.p(ride_request.organization.name, class: "mt-1 text-sm text-secondary"),
               if ride_request.destination_address.present?
                 tag.p(class: "mt-1 text-sm text-secondary") do
@@ -93,19 +97,6 @@ class DriverRideRequestsIndexComponent < ViewComponent::Base
   end
 
   private
-
-  def driver_status_icon(ride_request)
-    return "fa-ban" if ride_request.cancelled?
-    return "fa-circle-check" if ride_request.completed?
-    return "fa-user-check" if assigned?(ride_request)
-
-    if ride_request.driver_assignments.any?
-      return "fa-user-plus" unless ride_request.has_enough_drivers?
-      return "fa-car"
-    end
-
-    "fa-user"
-  end
 
   def assigned?(ride_request)
     ride_request.driver_assignments.any? {|da| da.driver_id == @current_user.id }

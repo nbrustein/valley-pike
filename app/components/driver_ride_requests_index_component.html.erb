@@ -2,9 +2,9 @@
   <% if @ride_requests.empty? %>
     <p class="text-secondary">No ride requests available.</p>
   <% else %>
-    <%= render_section("Your Upcoming Rides", your_upcoming_rides) %>
+    <%= render_section("Your Upcoming Rides", your_upcoming_rides, icon: "fa-user-check") %>
     <%= render_looking_for_drivers_section %>
-    <%= render_section("No Longer Available", no_longer_available) %>
-    <%= render_section("Your Completed Rides", your_completed_rides) %>
+    <%= render_section("No Longer Available", no_longer_available, icon: "fa-car") %>
+    <%= render_section("Your Completed Rides", your_completed_rides, icon: "fa-circle-check") %>
   <% end %>
 </section>
