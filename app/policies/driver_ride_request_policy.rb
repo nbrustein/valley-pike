@@ -19,8 +19,9 @@ class DriverRideRequestPolicy < ApplicationPolicy
     private
 
     def assigned_rides
+      # We use the where with the sub-select so that this can be combined with
+      # qualifying_future_rides with `or`
       RideRequest
-        .where(draft: false, cancelled: false)
         .where(id: DriverAssignment.where(driver_id: user.id).select(:ride_request_id))
     end
 

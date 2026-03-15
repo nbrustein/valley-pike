@@ -40,29 +40,15 @@ RSpec.describe DriverRideRequestPolicy do
       end
     end
 
-    context "with draft ride requests" do
-      let!(:draft) { create(:draft_ride_request, organization: org_no_quals) }
-
-      it "excludes drafts" do
-        expect(scope).not_to include(draft)
-      end
-    end
-
-    context "with canceled ride requests" do
-      let!(:canceled) { create(:ride_request, organization: org_no_quals, cancelled: true) }
-
-      it "excludes canceled requests" do
-        expect(scope).not_to include(canceled)
-      end
-    end
-
     context "when the driver is assigned to a ride" do
       let!(:past_ride) { create_ride_request_with_past_date(organization: org_no_quals, date: 1.day.ago) }
       let!(:completed_ride) { create(:ride_request, organization: org_no_quals, completed: true) }
+      let!(:canceled_ride) { create(:ride_request, organization: org_no_quals, cancelled: true) }
 
       before do
         create(:driver_assignment, ride_request: past_ride, driver: current_user)
         create(:driver_assignment, ride_request: completed_ride, driver: current_user)
+        create(:driver_assignment, ride_request: canceled_ride, driver: current_user)
       end
 
       it "includes assigned past rides" do
@@ -72,6 +58,10 @@ RSpec.describe DriverRideRequestPolicy do
       it "includes assigned completed rides" do
         expect(scope).to include(completed_ride)
       end
+
+      it "includes assigned canceled rides" do
+        expect(scope).to include(canceled_ride)
+      end
     end
 
     context "when the driver is not assigned" do
@@ -79,6 +69,7 @@ RSpec.describe DriverRideRequestPolicy do
       let!(:today_ride) { create(:ride_request, organization: org_no_quals, date: Date.current) }
       let!(:past_ride) { create_ride_request_with_past_date(organization: org_no_quals, date: 1.day.ago) }
       let!(:completed_ride) { create(:ride_request, organization: org_no_quals, completed: true) }
+      let!(:canceled_ride) { create(:ride_request, organization: org_no_quals, cancelled: true) }
 
       it "includes future rides the driver qualifies for" do
         expect(scope).to include(future_ride)
@@ -94,6 +85,10 @@ RSpec.describe DriverRideRequestPolicy do
 
       it "excludes completed rides" do
         expect(scope).not_to include(completed_ride)
+      end
+
+      it "excludes canceled rides" do
+        expect(scope).not_to include(canceled_ride)
       end
     end
 

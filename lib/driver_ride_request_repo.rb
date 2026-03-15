@@ -29,11 +29,11 @@ class DriverRideRequestRepo
   def sort_sql(today, driver_id)
     ActiveRecord::Base.sanitize_sql_array([
       <<~SQL.squish,
-        CASE WHEN date >= ? THEN 0 ELSE 1 END ASC,
-        CASE WHEN id IN (SELECT ride_request_id FROM driver_assignments WHERE driver_id = ?) THEN 0 ELSE 1 END ASC,
-        CASE WHEN has_enough_drivers = FALSE THEN 0 ELSE 1 END ASC,
-        CASE WHEN date >= ? THEN date END ASC,
-        CASE WHEN date < ? THEN date END DESC
+        CASE WHEN ride_requests.date >= ? THEN 0 ELSE 1 END ASC,
+        CASE WHEN ride_requests.id IN (SELECT ride_request_id FROM driver_assignments WHERE driver_id = ?) THEN 0 ELSE 1 END ASC,
+        CASE WHEN ride_requests.has_enough_drivers = FALSE THEN 0 ELSE 1 END ASC,
+        CASE WHEN ride_requests.date >= ? THEN ride_requests.date END ASC,
+        CASE WHEN ride_requests.date < ? THEN ride_requests.date END DESC
       SQL
       today, driver_id, today, today
     ])
